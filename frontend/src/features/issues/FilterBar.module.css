@@ -1,0 +1,115 @@
+/* Filter card: search and resolution on the first row, field filters on the second. */
+.bar {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-shape);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-raised);
+}
+
+.primaryRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.searchBox {
+  position: relative;
+  flex: 1 1 18rem;
+  min-inline-size: 0;
+}
+
+.searchIcon {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: var(--space-3);
+  z-index: 1;
+  color: var(--color-text-subtle);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.search input {
+  padding-inline-start: var(--space-8);
+}
+
+/* Page actions sit at the end of the search row, separated from the filters by a rule. */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-inline-start: var(--space-3);
+  border-inline-start: 1px solid var(--color-border);
+}
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block-start: var(--space-3);
+  border-block-start: 1px solid var(--color-border);
+}
+
+/* Each select sizes to a compact width instead of stretching across the row. */
+.filterRow > div {
+  flex: 0 1 11rem;
+  min-inline-size: 8.5rem;
+}
+
+.filterLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-inline-end: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.filterCount {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.125rem;
+  block-size: 1.125rem;
+  padding-inline: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-on-accent-fg);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-semibold);
+}
+
+.clear {
+  margin-inline-start: auto;
+}
+
+/* Phones: two filters per row, label on its own line. */
+@media (max-width: 40rem) {
+  .filterLabel {
+    flex-basis: 100%;
+  }
+
+  .filterRow > div {
+    flex: 1 1 calc(50% - var(--space-2));
+    min-inline-size: 0;
+  }
+
+  .clear {
+    margin-inline-start: 0;
+  }
+
+  .actions {
+    flex-basis: 100%;
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
+
+  .actions > * {
+    flex: 1;
+  }
+}

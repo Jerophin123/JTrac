@@ -1,0 +1,48 @@
+# JTAC dependency catalog (backend).
+# Versions and the official sources used to verify them are recorded in
+# docs/adr/0003-technology-baseline.md and docs/dependencies.md.
+# Libraries without a version are managed by the Spring Boot / Spring Modulith BOMs.
+
+[versions]
+java = "25"
+spring-boot = "4.1.2"          # Java 17–27, Gradle 8.14+/9.x
+spring-modulith = "2.1.2"      # built against Spring Boot 4.1.2
+bouncycastle = "1.86"          # not managed by Boot; required by Spring Security's Argon2PasswordEncoder
+commons-csv = "1.14.1"         # CSV import/export (RFC 4180 parsing)
+greenmail = "2.1.14"           # in-process SMTP server for mail integration tests (Jakarta Mail 2.1)
+cyclonedx = "3.4.1"            # SBOM generation for release packages (Gradle 8.4+/9.x)
+
+[libraries]
+spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
+spring-modulith-bom = { module = "org.springframework.modulith:spring-modulith-bom", version.ref = "spring-modulith" }
+
+spring-modulith-api = { module = "org.springframework.modulith:spring-modulith-api" }
+
+spring-boot-starter-webmvc ={ module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-starter-flyway = { module = "org.springframework.boot:spring-boot-starter-flyway" }
+flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
+postgresql = { module = "org.postgresql:postgresql" }
+spring-boot-starter-session-jdbc = { module = "org.springframework.boot:spring-boot-starter-session-jdbc" }
+spring-boot-starter-mail = { module = "org.springframework.boot:spring-boot-starter-mail" }
+spring-modulith-starter-jdbc = { module = "org.springframework.modulith:spring-modulith-starter-jdbc" }
+micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
+bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
+commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commons-csv" }
+greenmail-junit5 = { module = "com.icegreen:greenmail-junit5", version.ref = "greenmail" }
+angus-mail = { module = "org.eclipse.angus:angus-mail" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+assertj-core = { module = "org.assertj:assertj-core" }
+
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+spring-boot-starter-security-test = { module = "org.springframework.boot:spring-boot-starter-security-test" }
+spring-modulith-starter-test = { module = "org.springframework.modulith:spring-modulith-starter-test" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+cyclonedx = { id = "org.cyclonedx.bom", version.ref = "cyclonedx" }

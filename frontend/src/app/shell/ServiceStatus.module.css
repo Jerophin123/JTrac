@@ -1,0 +1,39 @@
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.dot {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-border-strong);
+}
+
+/* Shape changes as well as color, so status is not conveyed by color alone. */
+.ok {
+  background: var(--color-success);
+}
+
+.warn {
+  background: transparent;
+  border: 2px solid var(--color-warning);
+}
+
+.down {
+  background: var(--color-danger);
+  border-radius: 1px;
+}
+
+.pending {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.35;
+  }
+}

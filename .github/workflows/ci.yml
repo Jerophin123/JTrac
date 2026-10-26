@@ -1,0 +1,86 @@
+# JTRAC continuous integration: backend (unit, modularity, migrations, integration, API
+# contract), shared libraries, and frontend checks. No secrets are needed: the test database
+# is an ephemeral PostgreSQL 18 service container that only this job can reach.
+name: ci
+
+on:
+  push:
+    branches: [main, "release/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          # Ephemeral, job-local container: trust authentication avoids putting any password
+          # in the repository. Never use trust outside CI.
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_INITDB_ARGS: "--locale-provider=builtin --builtin-locale=C.UTF-8"
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - name: Provision jtac_test (roles as in ADR 0004)
+        run: |
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE jtac_owner LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE;
+          CREATE ROLE jtac_app LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE;
+          CREATE DATABASE jtac_test OWNER jtac_owner TEMPLATE template0;
+          REVOKE ALL ON DATABASE jtac_test FROM PUBLIC;
+          GRANT CONNECT ON DATABASE jtac_test TO jtac_owner, jtac_app;
+          \connect jtac_test
+          REVOKE ALL ON SCHEMA public FROM PUBLIC;
+          CREATE SCHEMA jtac AUTHORIZATION jtac_owner;
+          GRANT USAGE ON SCHEMA jtac TO jtac_app;
+          ALTER DEFAULT PRIVILEGES FOR ROLE jtac_owner IN SCHEMA jtac GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO jtac_app;
+          ALTER DEFAULT PRIVILEGES FOR ROLE jtac_owner IN SCHEMA jtac GRANT USAGE, SELECT ON SEQUENCES TO jtac_app;
+          ALTER DEFAULT PRIVILEGES FOR ROLE jtac_owner IN SCHEMA jtac GRANT EXECUTE ON FUNCTIONS TO jtac_app;
+          ALTER ROLE jtac_owner IN DATABASE jtac_test SET search_path = jtac;
+          ALTER ROLE jtac_app IN DATABASE jtac_test SET search_path = jtac;
+          SQL
+      - name: Build and test (unit, modules, migrate jtac_test, integration, contract)
+        run: ./gradlew build :serverconfig:test :launcher:test --no-configuration-cache
+      - name: Test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            backend/build/reports/tests
+            serverconfig/build/reports/tests
+            launcher/build/reports/tests
+
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build

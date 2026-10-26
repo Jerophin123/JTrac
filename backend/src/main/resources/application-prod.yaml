@@ -1,0 +1,25 @@
+# Production profile (SPRING_PROFILES_ACTIVE=prod). Contains no secrets: every secret comes
+# from the environment. See docs/operations.md.
+server:
+  servlet:
+    session:
+      cookie:
+        secure: true
+  forward-headers-strategy: ${JTRAC_FORWARD_HEADERS:${JTAC_FORWARD_HEADERS:native}}
+
+logging:
+  structured:
+    format:
+      console: ecs
+
+jtac:
+  public-url: ${JTRAC_PUBLIC_URL:${JTAC_PUBLIC_URL}}
+  registration:
+    mode: ${JTRAC_REGISTRATION_MODE:${JTAC_REGISTRATION_MODE:INVITE_ONLY}}
+  mail:
+    transport: smtp
+  integrations:
+    secret-key: ${JTRAC_SECRET_KEY:${JTAC_SECRET_KEY}}
+    require-secret-key: true
+    allow-private-networks: false
+    allow-http: false

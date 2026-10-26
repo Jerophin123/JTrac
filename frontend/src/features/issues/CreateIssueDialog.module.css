@@ -1,0 +1,19 @@
+.form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.another {
+  margin-inline-end: auto;
+  align-self: center;
+}
+
+.labelGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.labels {
+  padding-block-start: var(--space-1);
+}

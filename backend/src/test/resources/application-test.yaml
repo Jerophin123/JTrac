@@ -1,0 +1,31 @@
+# Integration tests run against the dedicated jtac_test database as jtac_app.
+# The schema is migrated beforehand by the Gradle task migrateTestDb (as jtac_owner).
+spring:
+  datasource:
+    url: ${JTRAC_TEST_DB_URL:${JTAC_TEST_DB_URL:jdbc:postgresql://localhost:5432/jtac_test}}
+    username: ${JTRAC_TEST_DB_USER:${JTAC_TEST_DB_USER:jtac_app}}
+    hikari:
+      maximum-pool-size: 4
+
+jtac:
+  public-url: http://localhost:5173
+  # Tests drive the mail and webhook dispatchers explicitly.
+  jobs:
+    enabled: false
+  mail:
+    transport: smtp
+    from: no-reply@jtrac.test
+    smtp:
+      # GreenMail SMTP server started by the mail tests (plain, no authentication).
+      host: localhost
+      port: 3025
+      auth: false
+      tls: NONE
+  attachments:
+    directory: ./build/test-data/attachments
+  integrations:
+    # Test-only fixture key (bytes 0..31), not a secret; production requires JTAC_SECRET_KEY.
+    secret-key: AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=
+    allow-private-networks: true
+    allow-http: true
+    timeout: 3s

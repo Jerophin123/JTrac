@@ -1,0 +1,17 @@
+JTrac
+Copyright 2026 Jerophin D R
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+JTrac is a modern, independent re-implementation inspired by the original JTrac issue
+tracker (JTrac 2.3.3). The behaviour of the original was studied with the REA MCP
+reverse-engineering server; no source code, schema or templates of the original are
+included in this product.
+
+Release packages built from this repository bundle third-party software:
+  - Eclipse Temurin (OpenJDK) 25 runtime: GPL v2 with the Classpath Exception
+    (notices in runtime/legal/ inside each package)
+  - PostgreSQL 18 binaries: PostgreSQL License (licenses/PostgreSQL-LICENSE.txt),
+    packaged by io.zonky.test.postgres:embedded-postgres-binaries (Apache License 2.0)
+  - Java and JavaScript libraries listed in licenses/THIRD-PARTY-JAVA.md and
+    licenses/THIRD-PARTY-WEB.md inside each package (generated at release time)

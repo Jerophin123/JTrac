@@ -1,0 +1,27 @@
+.screen {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-4);
+  min-block-size: 100dvh;
+  padding: var(--space-6);
+  text-align: center;
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.text {
+  max-inline-size: 28rem;
+  color: var(--color-text-muted);
+}
+
+.reference {
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}
+
+.link {
+  font-weight: var(--weight-medium);
+}

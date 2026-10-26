@@ -1,0 +1,219 @@
+/*
+ * JTRAC design tokens: the single source of visual decisions.
+ * Components consume semantic tokens only (never raw colors). Light is the default;
+ * [data-theme='dark'] is set before first paint by public/theme-init.js.
+ * Palette: warm stone neutrals with one natural accent (clay). No gradients.
+ */
+:root {
+  /* Typography */
+  --font-sans: 'IBM Plex Sans Variable', 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --text-xs: 0.75rem;   /* 12px */
+  --text-sm: 0.8125rem; /* 13px */
+  --text-md: 0.875rem;  /* 14px, base UI size */
+  --text-lg: 1rem;      /* 16px */
+  --text-xl: 1.25rem;   /* 20px */
+  --text-2xl: 1.625rem; /* 26px */
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --tracking-tight: -0.011em;
+  --tracking-caps: 0.06em;
+
+  /* Spacing (4px grid) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+
+  /* Shape */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 999px;
+  /*
+   * Shape language taken from the JTRAC logo: forward-leaning strokes with one rounded
+   * and one sharp diagonal end. Containers round two opposite corners (like the logo's
+   * strokes) and controls lean forward by --slant.
+   */
+  --radius-shape: var(--radius-lg) var(--radius-xs);
+  --radius-shape-sm: var(--radius-md) 3px;
+  /* One angle for every slanted element, so all edges run parallel. */
+  --slant: -12deg;
+  --slant-mark: var(--slant);
+
+  /* Layout */
+  --sidebar-width: 15.5rem;
+  --shell-gap: 0.5rem;
+  --content-max: 72rem;
+  --content-wide: 96rem;
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Color: light */
+  --color-canvas: #f5f3ef;
+  --color-surface: #ffffff;
+  --color-surface-muted: #faf8f5;
+  --color-surface-sunken: #eeebe6;
+  --color-surface-hover: #f2efea;
+  --color-border: #e3ded6;
+  --color-border-strong: #cdc6bb;
+  --color-text: #1d1a16;
+  --color-text-muted: #5a5249;
+  --color-text-subtle: #6c645a; /* ≥ 4.5:1 on every light surface (checked by e2e axe run) */
+  --color-accent: #b4532a;
+  --color-accent-hover: #9a4422;
+  --color-accent-soft: #f7e8df;
+  --color-accent-text: #8c3d1d;
+  --color-on-accent: #fff8f2;
+  --color-success: #2f6f4a;
+  --color-success-soft: #e5f1e9;
+  --color-warning: #8f5a0a;
+  --color-warning-soft: #f8eedb;
+  --color-danger: #b02a1c;
+  --color-danger-soft: #fbe9e6;
+  --color-info: #2b5d78;
+  --color-info-soft: #e4eef3;
+  --color-focus: #b4532a;
+  --color-overlay: rgb(29 26 22 / 0.36);
+  /* Status categories (badges, board column markers, charts). */
+  --color-cat-todo: #5a5249;
+  --color-cat-todo-soft: #efebe5;
+  --color-cat-progress: #2b5d78;
+  --color-cat-progress-soft: #e4eef3;
+  --color-cat-done: #2f6f4a;
+  --color-cat-done-soft: #e5f1e9;
+  --color-cat-canceled: #6c645a;
+  --color-cat-canceled-soft: #f0ede8;
+  /* Data visualization (validated: dataviz validate_palette, light surface #ffffff). */
+  --viz-1: #2a78d6;
+  --viz-2: #eb6834;
+  --viz-grid: #ebe7e1;
+  --shadow-float: 0 1px 2px rgb(29 26 22 / 0.04), 0 8px 24px rgb(29 26 22 / 0.06);
+  --shadow-raised: 0 1px 2px rgb(29 26 22 / 0.06);
+  --shadow-overlay: 0 2px 6px rgb(29 26 22 / 0.08), 0 24px 48px rgb(29 26 22 / 0.16);
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --color-canvas: #141210;
+  --color-surface: #1c1916;
+  --color-surface-muted: #201d19;
+  --color-surface-sunken: #110f0d;
+  --color-surface-hover: #26221e;
+  --color-border: #2e2924;
+  --color-border-strong: #433c35;
+  --color-text: #eee8e1;
+  --color-text-muted: #aaa196;
+  --color-text-subtle: #9c9287; /* ≥ 4.5:1 on every dark surface */
+  --color-accent: #e07c50;
+  --color-accent-hover: #ea9068;
+  --color-accent-soft: #3a2419;
+  --color-accent-text: #f0a37f;
+  --color-on-accent: #1a0e08;
+  --color-success: #6fbf8e;
+  --color-success-soft: #18291f;
+  --color-warning: #e2b05a;
+  --color-warning-soft: #2e2413;
+  --color-danger: #f08a7c;
+  --color-danger-soft: #36191a;
+  --color-info: #8cbcd6;
+  --color-info-soft: #172934;
+  --color-focus: #ea9068;
+  --color-overlay: rgb(0 0 0 / 0.55);
+  --color-cat-todo: #c9c0b5;
+  --color-cat-todo-soft: #2a2622;
+  --color-cat-progress: #8cbcd6;
+  --color-cat-progress-soft: #172934;
+  --color-cat-done: #6fbf8e;
+  --color-cat-done-soft: #18291f;
+  --color-cat-canceled: #a59b90;
+  --color-cat-canceled-soft: #24211d;
+  /* Validated against the dark surface #1c1916. */
+  --viz-1: #3987e5;
+  --viz-2: #d95926;
+  --viz-grid: #2e2924;
+  --shadow-float: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px rgb(0 0 0 / 0.35);
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-overlay: 0 2px 6px rgb(0 0 0 / 0.5), 0 24px 48px rgb(0 0 0 / 0.5);
+
+  color-scheme: dark;
+}
+
+/*
+ * Adaptive accent tokens. Organization branding can replace --color-accent and friends
+ * with any color (see lib/colorExtractor.ts), so components never pair the raw brand color
+ * with a fixed text color. They use these derived tokens instead:
+ *   --color-accent-fg         accent-colored text and state indicators on surfaces
+ *   --color-on-accent-fg      text and icons on an accent fill (white or black,
+ *                             whichever has more contrast by WCAG luminance;
+ *                             never below 4.58:1)
+ *   --color-accent-hover-fill hover fill for accent surfaces; moves away from the text
+ *                             color so contrast only increases on hover
+ *   --color-focus-ring        keyboard focus outline (always >= 3:1 on surfaces)
+ * .theme-scope re-derives them where an element overrides --color-accent inline.
+ * Browsers without relative color syntax fall back to the static tokens.
+ */
+:root,
+.theme-scope {
+  --color-accent-fg: var(--color-accent-text);
+  --color-on-accent-fg: var(--color-on-accent);
+  --color-accent-hover-fill: var(--color-accent-hover);
+  --color-focus-ring: var(--color-focus);
+}
+
+@supports (color: color(from red srgb-linear r g b)) {
+  :root,
+  .theme-scope {
+    /* 0.179 is the luminance where white and black text have equal contrast (4.58:1). */
+    --color-on-accent-fg: color(
+      from var(--color-accent) srgb-linear
+      clamp(0, (0.179 - (0.2126 * r + 0.7152 * g + 0.0722 * b)) * 10000, 1)
+      clamp(0, (0.179 - (0.2126 * r + 0.7152 * g + 0.0722 * b)) * 10000, 1)
+      clamp(0, (0.179 - (0.2126 * r + 0.7152 * g + 0.0722 * b)) * 10000, 1)
+    );
+    --color-accent-away: color(
+      from var(--color-accent) srgb-linear
+      clamp(0, ((0.2126 * r + 0.7152 * g + 0.0722 * b) - 0.179) * 10000, 1)
+      clamp(0, ((0.2126 * r + 0.7152 * g + 0.0722 * b) - 0.179) * 10000, 1)
+      clamp(0, ((0.2126 * r + 0.7152 * g + 0.0722 * b) - 0.179) * 10000, 1)
+    );
+    --color-accent-hover-fill: color-mix(in oklab, var(--color-accent) 86%, var(--color-accent-away));
+    --color-accent-fg: oklch(from var(--color-accent-text) min(l, 0.48) min(c, 0.2) h);
+    --color-focus-ring: var(--color-accent-fg);
+  }
+
+  :root[data-theme='dark'],
+  :root[data-theme='dark'] .theme-scope {
+    --color-accent-fg: oklch(from var(--color-accent-text) max(l, 0.78) min(c, 0.16) h);
+  }
+
+  /*
+   * With an organization theme active the surfaces are tinted toward the brand, so the
+   * neutral text follows the same tint. Lightness is clamped, which keeps every text token
+   * at >= 4.5:1 on every surface whatever the brand color is.
+   */
+  :root:has(#jtrac-org-theme) {
+    --color-text: oklch(from color-mix(in oklab, var(--color-accent) 12%, #0f172a) min(l, 0.24) min(c, 0.03) h);
+    --color-text-muted: oklch(from color-mix(in oklab, var(--color-accent) 12%, #475569) min(l, 0.44) min(c, 0.04) h);
+    --color-text-subtle: oklch(from color-mix(in oklab, var(--color-accent) 10%, #64748b) min(l, 0.46) min(c, 0.04) h);
+  }
+
+  :root[data-theme='dark']:has(#jtrac-org-theme) {
+    --color-text: oklch(from color-mix(in oklab, var(--color-accent) 8%, #f1f5f9) max(l, 0.93) min(c, 0.02) h);
+    --color-text-muted: oklch(from color-mix(in oklab, var(--color-accent) 10%, #a7b3c4) max(l, 0.8) min(c, 0.035) h);
+    --color-text-subtle: oklch(from color-mix(in oklab, var(--color-accent) 10%, #8e9bb0) max(l, 0.76) min(c, 0.035) h);
+  }
+}

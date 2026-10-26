@@ -1,0 +1,9 @@
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.sh text eol=lf
+distribution/src/unix/bin/jtrac text eol=lf
+gradlew text eol=lf
+*.jar binary
+*.png binary
+*.svg text

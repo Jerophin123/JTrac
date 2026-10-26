@@ -1,0 +1,98 @@
+/* Saved views: label, chips (or a hint), and the view actions on the end side. */
+.viewsBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  min-block-size: 2.25rem;
+}
+
+.viewsLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.viewsHint {
+  color: var(--color-text-subtle);
+  font-size: var(--text-sm);
+}
+
+.viewActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-inline-start: auto;
+}
+
+.viewChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  block-size: 1.75rem;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.viewChip:hover {
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+
+.viewChip[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-fg);
+}
+
+/* Results: the count and table actions sit directly on top of the table they act on. */
+.results {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+
+.resultsBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-inline: var(--space-1);
+}
+
+.count {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.count strong {
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.updating {
+  color: var(--color-text-subtle);
+}
+
+.resultActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}

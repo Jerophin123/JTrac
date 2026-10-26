@@ -1,0 +1,245 @@
+.field {
+  display: grid;
+  align-content: start;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.label,
+.checkLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.input,
+.select,
+.textarea {
+  inline-size: 100%;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-shape-sm);
+  font-size: var(--text-md);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.input,
+.select {
+  block-size: 2.25rem;
+  padding-inline: var(--space-3);
+}
+
+.selectWrap {
+  position: relative;
+  display: grid;
+  align-items: center;
+}
+
+/* The select trigger is a button styled like the text inputs. */
+.select {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  padding-inline-end: var(--space-8);
+  appearance: none;
+  text-align: start;
+  cursor: pointer;
+}
+
+.select:disabled {
+  cursor: not-allowed;
+}
+
+.selectValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectPlaceholder {
+  color: var(--color-text-subtle);
+}
+
+.chevron {
+  position: absolute;
+  inset-inline-end: var(--space-3);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.chevron[data-open] {
+  transform: rotate(180deg);
+}
+
+/* The option list: a floating card in the browser's top layer, placed under the trigger. */
+.listbox {
+  position: fixed;
+  inset: auto;
+  z-index: 60;
+  box-sizing: border-box;
+  max-inline-size: min(24rem, calc(100vw - 16px));
+  max-block-size: min(18rem, 60vh);
+  margin: 0;
+  padding: var(--space-1);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  list-style: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-shape-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-overlay);
+  font-size: var(--text-sm);
+}
+
+.listbox:focus {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .listbox:popover-open {
+    animation: listIn var(--duration-fast) var(--ease-out);
+  }
+}
+
+@keyframes listIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* Options: the highlighted one gets a slanted fill, like every other active state. */
+.option {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 2rem;
+  padding: var(--space-1) var(--space-3);
+  cursor: pointer;
+  user-select: none;
+}
+
+.option::before {
+  content: '';
+  position: absolute;
+  inset-block: 1px;
+  inset-inline: 3px;
+  z-index: -1;
+  border-radius: var(--radius-sm);
+  transform: skewX(var(--slant));
+}
+
+.option[data-active]::before {
+  background: var(--color-surface-hover);
+}
+
+.option[aria-selected='true'] {
+  color: var(--color-accent-fg);
+  font-weight: var(--weight-semibold);
+}
+
+.option[aria-selected='true']::before {
+  background: var(--color-accent-soft);
+}
+
+.option[aria-selected='true'][data-active]::before {
+  background: color-mix(in srgb, var(--color-accent-soft) 70%, var(--color-surface-hover));
+}
+
+.option[aria-disabled='true'] {
+  color: var(--color-text-subtle);
+  cursor: not-allowed;
+}
+
+.optionLabel {
+  flex: 1;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.optionCheck {
+  flex: none;
+}
+
+.textarea {
+  min-block-size: 6rem;
+  padding: var(--space-2) var(--space-3);
+  line-height: var(--leading-normal);
+  resize: vertical;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-text-subtle);
+}
+
+.input:hover:not(:disabled),
+.select:hover:not(:disabled),
+.textarea:hover:not(:disabled) {
+  border-color: var(--color-text-subtle);
+}
+
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-focus-ring);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.input[aria-invalid='true'],
+.select[aria-invalid='true'],
+.textarea[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.input[aria-invalid='true']:focus-visible,
+.select[aria-invalid='true']:focus-visible,
+.textarea[aria-invalid='true']:focus-visible {
+  box-shadow: 0 0 0 3px var(--color-danger-soft);
+}
+
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.hint,
+.error {
+  font-size: var(--text-xs);
+}
+
+.hint {
+  color: var(--color-text-muted);
+}
+
+.error {
+  color: var(--color-danger);
+  font-weight: var(--weight-medium);
+}
+
+.check {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.checkLabel {
+  cursor: pointer;
+}
+
+.checkbox {
+  inline-size: 1rem;
+  block-size: 1rem;
+  margin-block-start: 0.15rem;
+  accent-color: var(--color-accent);
+}

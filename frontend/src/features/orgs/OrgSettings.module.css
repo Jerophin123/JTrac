@@ -1,0 +1,491 @@
+.contextName {
+  color: var(--color-text);
+  font-weight: var(--weight-semibold);
+}
+
+.form {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.grow {
+  flex: 1 1 14rem;
+  min-inline-size: 0;
+}
+
+.alignEnd {
+  align-self: flex-end;
+}
+
+.pad {
+  padding: var(--space-4) var(--space-5);
+}
+
+.fieldLabel {
+  display: block;
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+/* Forms that sit on one line (invite, create team) and wrap on narrow screens. */
+.inlineForm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+/* Search and filter boxes with a leading icon. */
+.search {
+  position: relative;
+  inline-size: min(100%, 20rem);
+}
+
+.searchIcon {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: var(--space-3);
+  z-index: 1;
+  color: var(--color-text-subtle);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.search input {
+  padding-inline-start: var(--space-8);
+}
+
+.footerNote {
+  margin-inline-end: auto;
+}
+
+/* Branding: a logo field and a color field, then a live preview. */
+.brandField {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.brandField + .brandField {
+  padding-block-start: var(--space-5);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.brandFieldHead {
+  display: grid;
+  gap: 2px;
+}
+
+.note {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
+}
+
+.logoField {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-shape-sm);
+  background: var(--color-surface-muted);
+}
+
+/* The logo sits on a checkerboard so transparent images read clearly. */
+.logoTile {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 4.5rem;
+  block-size: 4.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background:
+    repeating-conic-gradient(var(--color-surface-sunken) 0% 25%, var(--color-surface) 0% 50%) 50% / 12px 12px;
+}
+
+.logoInfo {
+  display: grid;
+  flex: 1 1 14rem;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.logoTitle {
+  font-weight: var(--weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.brandingActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-block-start: var(--space-2);
+}
+
+.colorRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+}
+
+/* One control: the swatch (opens the system picker) joined to the hex field. */
+.colorField {
+  display: inline-flex;
+  align-items: stretch;
+  block-size: 2.25rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-shape-sm);
+  background: var(--color-surface);
+  overflow: hidden;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.colorField:hover {
+  border-color: var(--color-text-subtle);
+}
+
+.colorField:focus-within {
+  border-color: var(--color-focus-ring);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+.colorField[data-invalid] {
+  border-color: var(--color-danger);
+}
+
+.colorSwatch {
+  position: relative;
+  flex: none;
+  inline-size: 2.75rem;
+  border-inline-end: 1px solid var(--color-border-strong);
+  background:
+    repeating-conic-gradient(var(--color-surface-sunken) 0% 25%, var(--color-surface) 0% 50%) 50% / 8px 8px;
+  cursor: pointer;
+}
+
+/* The native picker covers the swatch invisibly, so a click or Enter opens it. */
+.colorNative {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.colorNative:disabled {
+  cursor: not-allowed;
+}
+
+.hexInput {
+  inline-size: 6.5rem;
+  padding-inline: var(--space-3);
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-transform: lowercase;
+}
+
+.hexInput:focus {
+  outline: none;
+}
+
+.hexInput:disabled {
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+.colorError {
+  color: var(--color-danger);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Presets lean like the logo's strokes; the chosen one gets a ring. */
+.swatchButton {
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xs);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-text) 14%, transparent);
+  transform: skewX(var(--slant));
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.swatchButton:hover:not(:disabled) {
+  transform: skewX(var(--slant)) translateY(-2px);
+}
+
+.swatchButton[data-active] {
+  box-shadow:
+    0 0 0 2px var(--color-surface),
+    0 0 0 4px var(--color-text);
+}
+
+.swatchButton:disabled {
+  cursor: not-allowed;
+}
+
+.preview {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-shape-sm);
+}
+
+.previewLabel {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.previewSample {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Drawn exactly like a primary button: the fill is a slanted layer behind the label. */
+.previewButton {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  block-size: 1.875rem;
+  padding-inline: calc(var(--space-3) + 4px);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.previewButton::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline: 4px;
+  z-index: -1;
+  border-radius: var(--radius-sm);
+  background: var(--preview-color);
+  transform: skewX(var(--slant));
+}
+
+.previewChip {
+  display: inline-flex;
+  align-items: center;
+  block-size: 1.375rem;
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--preview-color);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.previewNote {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+@media (max-width: 40rem) {
+  .preview {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+}
+
+.domains {
+  inline-size: min(100%, 22rem);
+}
+
+/* Teams */
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.teamAdd {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Notification preferences: event, inbox switch, email switch. */
+.prefHead,
+.prefRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4.5rem 4.5rem;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+}
+
+.prefHead {
+  border-block-end: 1px solid var(--color-border);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.prefHead > span:not(:first-child),
+.prefRow > :not(:first-child) {
+  justify-self: center;
+}
+
+.prefList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.prefRow + .prefRow {
+  border-block-start: 1px solid var(--color-border);
+}
+
+.prefLabel {
+  font-weight: var(--weight-medium);
+}
+
+/* Audit log */
+.scroll {
+  overflow-x: auto;
+}
+
+.audit {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.audit th,
+.audit td {
+  padding: var(--space-2) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+  text-align: start;
+  vertical-align: top;
+}
+
+.audit thead th {
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.audit tbody tr:last-child td {
+  border-block-end: 0;
+}
+
+.audit tbody tr:hover {
+  background: var(--color-surface-muted);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.action {
+  padding: 1px var(--space-1);
+  border-radius: var(--radius-xs);
+  background: var(--color-surface-sunken);
+}
+
+.details {
+  max-inline-size: 24rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  overflow-wrap: anywhere;
+}
+
+/* Webhooks */
+.endpoint {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.hookMark {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-sunken);
+  color: var(--color-text-muted);
+}
+
+.hookMark[data-active] {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.events {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-block-start: 2px;
+}
+
+.eventTag {
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-xs);
+  background: var(--color-surface-sunken);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.eventGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr));
+  gap: var(--space-2);
+}
+
+/* Organization lists outside settings (account page, organization picker). */
+.orgChoice {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+
+@media (max-width: 40rem) {
+  .prefHead,
+  .prefRow {
+    grid-template-columns: minmax(0, 1fr) 3.5rem 3.5rem;
+    padding-inline: var(--space-4);
+  }
+}

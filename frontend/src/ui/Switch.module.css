@@ -1,0 +1,84 @@
+.switch {
+  position: relative;
+  display: inline-flex;
+}
+
+/* The real checkbox stays in place (and focusable) under the drawn track. */
+.input {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: 2.5rem;
+  block-size: 1.375rem;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+.input:disabled + .label {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Track and thumb lean like the strokes of the logo. */
+.track {
+  position: relative;
+  flex: none;
+  inline-size: 2.5rem;
+  block-size: 1.375rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-sunken);
+  transform: skewX(var(--slant));
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.thumb {
+  position: absolute;
+  inset-block: 2px;
+  inset-inline-start: 2px;
+  inline-size: 1rem;
+  border-radius: 3px;
+  background: var(--color-text-subtle);
+  box-shadow: var(--shadow-raised);
+  transition:
+    inset-inline-start var(--duration-base) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.input:hover:not(:disabled) + .label .track {
+  border-color: var(--color-text-subtle);
+}
+
+.input:checked + .label .track {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+
+.input:checked + .label .thumb {
+  inset-inline-start: calc(100% - 1rem - 2px);
+  background: var(--color-on-accent-fg);
+}
+
+.input:focus-visible + .label .track {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.text {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}

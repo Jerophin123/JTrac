@@ -1,0 +1,231 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+/* Dashboard list: one card per dashboard, plus a "new" card at the end. */
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cardGrid > li {
+  display: grid;
+}
+
+.dashCard,
+.newCard {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-block-size: 10.5rem;
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-shape);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-decoration: none;
+  overflow: hidden;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.dashCard {
+  box-shadow: var(--shadow-raised);
+}
+
+.dashCard:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-float);
+  transform: translateY(-2px);
+}
+
+.dashTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-block-end: var(--space-2);
+}
+
+/* Icon on a slanted tile, like the logo's strokes. */
+.dashIcon,
+.newIcon {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  color: var(--color-accent-fg);
+}
+
+.dashIcon::before,
+.newIcon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  transform: skewX(var(--slant));
+}
+
+/* Decorative speed strokes in the corner; they grow on hover. */
+.dashStrokes {
+  inline-size: 2.75rem;
+  block-size: 4px;
+  margin-block-start: var(--space-2);
+  border-radius: 1px;
+  background: var(--color-accent);
+  box-shadow: 0 8px 0 0 color-mix(in srgb, var(--color-accent) 40%, transparent);
+  transform: skewX(var(--slant));
+  opacity: 0.85;
+  transform-origin: right center;
+  transition: inline-size var(--duration-base) var(--ease-out);
+}
+
+.dashCard:hover .dashStrokes {
+  inline-size: 4rem;
+}
+
+.dashName {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  overflow-wrap: anywhere;
+}
+
+.dashMeta {
+  display: grid;
+  gap: 2px;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.dashMeta > span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.dashTags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-block-start: auto;
+  padding-block-start: var(--space-3);
+}
+
+.dashArrow {
+  margin-inline-start: auto;
+  color: var(--color-text-subtle);
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.dashCard:hover .dashArrow {
+  color: var(--color-accent-fg);
+  transform: translateX(3px);
+}
+
+:global([dir='rtl']) .dashArrow {
+  transform: scaleX(-1);
+}
+
+:global([dir='rtl']) .dashCard:hover .dashArrow {
+  transform: scaleX(-1) translateX(3px);
+}
+
+.newCard {
+  justify-items: start;
+  border-style: dashed;
+  border-color: var(--color-border-strong);
+  background: transparent;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.newCard:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  background: var(--color-surface);
+}
+
+.newCard:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.newIcon {
+  margin-block-end: var(--space-2);
+}
+
+.newHint {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashCard:hover {
+    transform: none;
+  }
+}
+
+.grow {
+  flex: 1;
+}
+
+.count {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.count > span:first-child {
+  font-size: 2.5rem;
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.pad {
+  padding: var(--space-4);
+}
+
+.editorList {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editorItem {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-shape-sm);
+  background: var(--color-surface-muted);
+}
+
+@media (max-width: 48rem) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

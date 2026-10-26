@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability (private)
+    url: https://github.com/Jerophin123/JTrac/security/advisories/new
+    about: Please report security problems privately, never in public issues.
+  - name: Documentation
+    url: https://github.com/Jerophin123/JTrac#readme
+    about: Installation, configuration, SMTP, backups, troubleshooting and the full API reference.

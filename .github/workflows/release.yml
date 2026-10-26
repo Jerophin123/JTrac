@@ -1,0 +1,70 @@
+# JTRAC release packages: one native job per OS/architecture. Each job builds the package on
+# the target platform itself (the Java runtime is linked from that machine's JDK), verifies it
+# (allowlist, denylist, secret scan before and after archiving), runs the installer smoke test
+# on the unpacked archive where PostgreSQL is bundled, and uploads the archive, its SHA-256 and
+# the test report. Nothing here publishes anything; attach the artifacts to a release by hand.
+name: release
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { target: windows-x64, runner: windows-latest, smoke: true }
+          - { target: windows-arm64, runner: windows-11-arm, smoke: false }   # no bundled PostgreSQL: external database only
+          - { target: linux-x64, runner: ubuntu-24.04, smoke: true }
+          - { target: linux-arm64, runner: ubuntu-24.04-arm, smoke: true }
+          - { target: macos-x64, runner: macos-15-intel, smoke: true }
+          - { target: macos-arm64, runner: macos-15, smoke: true }
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        working-directory: .
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: corepack enable
+      - name: Build the web UI
+        working-directory: frontend
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+      - name: Build and verify the package
+        run: ./gradlew -PwithFrontend -Ptarget=${{ matrix.target }} :distribution:release :serverconfig:testFixturesJar --no-configuration-cache
+      - name: Dependency vulnerability scan (OSV)
+        if: matrix.target == 'linux-x64'
+        run: python -I tools/osv-scan.py
+      - name: Installer smoke test on the unpacked archive
+        if: matrix.smoke
+        run: |
+          version=$(sed -n 's/^version=//p' gradle.properties)
+          root=$(pwd -W 2>/dev/null || pwd)   # Windows paths for Java under Git Bash
+          archive=$(ls distribution/releases/$version/jtrac-$version-${{ matrix.target }}.* | grep -v '\.sha256$' | grep -v '\.md$')
+          python -I tools/installer-smoke.py --archive "$archive" --smtp-fixtures "$root/serverconfig/build/libs/serverconfig-$version-test-fixtures.jar"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jtrac-${{ matrix.target }}
+          path: |
+            distribution/releases/**
+            distribution/build/verification/**
+          if-no-files-found: error

@@ -1,0 +1,164 @@
+# JTAC runtime configuration. Contains no secrets.
+#
+# Database: the application connects as the least-privileged role jtac_app. No password
+# is configured here: the PostgreSQL JDBC driver reads the user's pgpass file
+# (%APPDATA%\postgresql\pgpass.conf on Windows), or set SPRING_DATASOURCE_PASSWORD in
+# the environment. Schema migrations are NOT run by the application; see ADR 0004.
+
+spring:
+  application:
+    # Shown in log lines and metrics tags.
+    name: jtrac
+  config:
+    # Installation settings written by the setup wizard / `jtrac configure` / the admin pages.
+    # Absent in development (optional). Values in these files override this file; Spring's
+    # environment variables (e.g. SERVER_PORT, JTAC_MAIL_SMTP_HOST) override the files.
+    import:
+      - optional:file:${jtrac.config-dir:./config}/jtrac.properties
+      - optional:file:${jtrac.config-dir:./config}/secrets.properties
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${JTRAC_DB_URL:${JTAC_DB_URL:jdbc:postgresql://localhost:5432/jtac_dev}}
+    username: ${JTRAC_DB_USER:${JTAC_DB_USER:jtac_app}}
+    hikari:
+      pool-name: jtac
+      maximum-pool-size: 10
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.default_schema: jtac
+  flyway:
+    # Validates (does not migrate) on startup: see FlywayValidationConfiguration.
+    enabled: true
+  mvc:
+    problemdetails:
+      enabled: true
+  jackson:
+    deserialization:
+      # Optional boolean/number flags in request bodies (e.g. "delete", "archived") may be
+      # omitted and default to false/0 instead of failing the whole request.
+      fail-on-null-for-primitives: false
+  session:
+    # Sessions live in PostgreSQL (tables created by migration V2, never by the app).
+    jdbc:
+      initialize-schema: never
+      cleanup-cron: "0 */10 * * * *"
+  servlet:
+    multipart:
+      # Upper bound for any upload; attachments enforce jtac.attachments.max-file-size.
+      max-file-size: 25MB
+      max-request-size: 26MB
+  modulith:
+    events:
+      jdbc:
+        schema-initialization:
+          enabled: false
+      # Re-deliver event listener invocations that did not complete (e.g. after a crash).
+      republish-outstanding-events-on-restart: true
+      completion-mode: update
+
+server:
+  port: ${JTRAC_PORT:${JTAC_PORT:8080}}
+  # "native" honours X-Forwarded-* only behind a trusted reverse proxy (see docs/operations.md).
+  forward-headers-strategy: ${JTRAC_FORWARD_HEADERS:${JTAC_FORWARD_HEADERS:none}}
+  error:
+    whitelabel:
+      enabled: false
+    include-stacktrace: never
+    include-message: never
+  servlet:
+    session:
+      timeout: 8h
+      tracking-modes: cookie
+      cookie:
+        name: ${JTRAC_SESSION_COOKIE_NAME:${JTAC_SESSION_COOKIE_NAME:JTRAC_SESSION}}
+        http-only: true
+        same-site: lax
+        # Must be true whenever JTAC is served over HTTPS (all non-local environments).
+        secure: ${JTRAC_SECURE_COOKIES:${JTAC_SECURE_COOKIES:false}}
+
+management:
+  health:
+    # Mail is delivered asynchronously from the outbox; an SMTP outage must not mark the
+    # application unhealthy. Failed deliveries are visible in email_outbox and the logs.
+    mail:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,db
+
+logging:
+  structured:
+    format:
+      # Structured JSON (Elastic Common Schema) by default; includes the requestId MDC key.
+      console: ${JTRAC_LOG_FORMAT:${JTAC_LOG_FORMAT:ecs}}
+
+jtac:
+  # Externally visible base URL, used for links in emails.
+  public-url: ${JTRAC_PUBLIC_URL:${JTAC_PUBLIC_URL:http://localhost:5173}}
+  registration:
+    # INVITE_ONLY (default): accounts are created only by an administrator's invitation (or
+    # the createUser task); the sign-up API refuses requests. OPEN allows self-sign-up.
+    mode: ${JTRAC_REGISTRATION_MODE:${JTAC_REGISTRATION_MODE:INVITE_ONLY}}
+  setup:
+    # First-run setup: while no account exists, a one-time setup code is written here (never
+    # logged) and must be entered on the welcome screen. The file is deleted after setup.
+    code-file: ${JTRAC_SETUP_CODE_FILE:${JTAC_SETUP_CODE_FILE:./data/setup-code.txt}}
+  legal:
+    # Shown in the Terms of Service, Privacy Notice and grievance page. Fill these in before
+    # going live; blank values appear as clearly marked placeholders. Changing the version
+    # asks every user to accept the terms again.
+    version: ${JTRAC_LEGAL_VERSION:2026-10-26}
+    effective-date: ${JTRAC_LEGAL_EFFECTIVE_DATE:2026-10-26}
+    operator-name: ${JTRAC_LEGAL_OPERATOR_NAME:}
+    operator-address: ${JTRAC_LEGAL_OPERATOR_ADDRESS:}
+    contact-email: ${JTRAC_LEGAL_CONTACT_EMAIL:}
+    grievance-officer-name: ${JTRAC_LEGAL_GRIEVANCE_OFFICER_NAME:}
+    grievance-officer-email: ${JTRAC_LEGAL_GRIEVANCE_OFFICER_EMAIL:}
+    jurisdiction: ${JTRAC_LEGAL_JURISDICTION:}
+  jobs:
+    enabled: ${JTRAC_JOBS_ENABLED:${JTAC_JOBS_ENABLED:true}}
+  mail:
+    # smtp: send via jtac.mail.smtp.*; disabled: email pending (queued, not sent);
+    # file: development only, writes .eml files to ./data/mail.
+    transport: ${JTRAC_MAIL_TRANSPORT:${JTAC_MAIL_TRANSPORT:file}}
+    from: ${JTRAC_MAIL_FROM:${JTAC_MAIL_FROM:no-reply@jtrac.local}}
+    from-name: ${JTRAC_MAIL_FROM_NAME:JTRAC}
+    reply-to: ${JTRAC_MAIL_REPLY_TO:}
+    smtp:
+      host: ${JTRAC_SMTP_HOST:${JTAC_SMTP_HOST:}}
+      port: ${JTRAC_SMTP_PORT:${JTAC_SMTP_PORT:587}}
+      auth: ${JTRAC_SMTP_AUTH:${JTAC_SMTP_AUTH:true}}
+      username: ${JTRAC_SMTP_USER:${JTRAC_SMTP_USERNAME:${JTAC_SMTP_USER:${JTAC_SMTP_USERNAME:}}}}
+      password: ${JTRAC_SMTP_PASSWORD:${JTAC_SMTP_PASSWORD:}}
+      # STARTTLS, IMPLICIT or NONE; blank = derived from the port (465 implicit, 25 none, else STARTTLS).
+      tls: ${JTRAC_SMTP_TLS:}
+      timeout-seconds: ${JTRAC_SMTP_TIMEOUT:15}
+  attachments:
+    directory: ${JTRAC_ATTACHMENTS_DIR:${JTAC_ATTACHMENTS_DIR:./data/attachments}}
+  integrations:
+    # Base64 32-byte key encrypting webhook secrets. Without it a development key is
+    # generated into ./data/secret.key (the prod profile requires it).
+    secret-key: ${JTRAC_SECRET_KEY:${JTAC_SECRET_KEY:}}
+  database:
+    app-role: jtac_app
+  security:
+    login-throttle:
+      max-failures-per-account-and-client: 5
+      max-failures-per-client: 30
+      max-failures-per-account: 50
+      window: 15m
+      max-tracked-keys: 100000

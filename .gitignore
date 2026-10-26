@@ -1,0 +1,42 @@
+# Build outputs
+build/
+.gradle/
+frontend/dist/
+frontend/node_modules/
+frontend/test-results/
+frontend/playwright-report/
+node_modules/
+
+# Release packages are build outputs (attach them to GitHub releases, never commit them)
+distribution/releases/
+
+# Local runtime data: databases, mail, attachments, setup codes, generated keys
+/data/
+/config/
+backend/data/
+backend/config/
+
+# Secrets and machine-local configuration: never commit these
+.env
+.env.*
+!.env.example
+*.pgpass
+pgpass.conf
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+secrets.properties
+admin-secrets.properties
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~

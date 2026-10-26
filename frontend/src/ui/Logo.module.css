@@ -1,0 +1,14 @@
+.svg {
+  display: block;
+  flex: none;
+}
+
+.base {
+  fill: var(--color-text, currentColor);
+  transition: fill 0.15s ease;
+}
+
+.accent {
+  fill: var(--color-accent, #fc6f08);
+  transition: fill 0.15s ease;
+}

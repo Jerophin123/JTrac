@@ -1,0 +1,46 @@
+name: Bug report
+description: Something in JTrac doesn't work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please **don't include personal data, passwords or production logs** without redacting them.
+        Security problems: use a private advisory instead (see SECURITY.md).
+  - type: input
+    id: version
+    attributes:
+      label: JTrac version and package
+      placeholder: jtrac-3.0.0-linux-x64 (output of `jtrac version`)
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options: [Windows x64, Windows ARM64, Linux x64, Linux ARM64, macOS Intel, macOS Apple Silicon, Development build]
+    validations:
+      required: true
+  - type: dropdown
+    id: database
+    attributes:
+      label: Database mode
+      options: [Managed (bundled PostgreSQL), External PostgreSQL 18, Not relevant]
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. ...\n2. ...\n3. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output of `jtrac status` / `jtrac logs` (redacted)
+      render: text
