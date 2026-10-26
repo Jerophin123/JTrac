@@ -1,5 +1,11 @@
 <div align="center">
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/jtrac-logo-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/assets/jtrac-logo-light.svg">
+  <img src="docs/assets/jtrac-logo-light.svg" alt="JTRAC logo" width="420">
+</picture>
+
 # JTrac
 
 ### The issue tracker you can actually own: modern, secure, self-hosted, and ready for production.
