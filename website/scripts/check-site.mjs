@@ -94,7 +94,18 @@ if (siteUrl) {
   if (!robots.includes(`Sitemap: ${siteUrl}sitemap.xml`)) fail('robots.txt does not reference the sitemap');
 } else if (canonical || meta('property', 'og:url')) fail('canonical/og:url emitted without a site URL');
 
-// Source must not talk to any backend or third-party service.
+// The Google tag is the only third-party script, and it must be on the page.
+const gaId = /export const gaMeasurementId: string \| null = '([^']+)'/.exec(readFileSync(join(root, 'lib', 'site.ts'), 'utf8'))?.[1];
+const thirdPartyScripts = [...html.matchAll(/<script[^>]+src="(https?:\/\/[^"]+)"/g)].map((m) => m[1]);
+for (const src of thirdPartyScripts) if (!src.startsWith('https://www.googletagmanager.com/gtag/js?id=')) fail(`unexpected third-party script: ${src}`);
+if (gaId) {
+  const tags = html.split(`googletagmanager.com/gtag/js?id=${gaId}`).length - 1;
+  if (tags < 1) fail(`Google tag ${gaId} is not on the page`);
+  // The inline gtag('config') call is injected at runtime by next/script (afterInteractive);
+  // it is verified in a browser, not in the static HTML.
+}
+
+// Source must not talk to any backend (analytics aside, see above).
 const sourceDirs = ['app', 'components', 'lib'];
 const banned = /supabase|firebase|stripe|\bfetch\(|XMLHttpRequest|axios|process\.env/i;
 const walk = (dir) =>

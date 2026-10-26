@@ -1,8 +1,10 @@
 # JTRAC landing page
 
 Static marketing page for JTRAC, built with Next.js 16 (`output: 'export'`). It has no
-backend, API calls, forms, analytics or environment variables. Outbound links go only to
-the GitHub repository (and SourceForge for the original JTrac).
+backend, API calls, forms or environment variables. Outbound links go only to the GitHub
+repository (and SourceForge for the original JTrac). The only third-party script is the
+Google Analytics 4 tag (`gaMeasurementId` in `lib/site.ts`, loaded after the page is
+interactive); the JTRAC product itself has no telemetry.
 
 ```powershell
 pnpm install

@@ -5,9 +5,11 @@ import './globals.css';
 
 import type { Viewport } from 'next';
 import type { ReactNode } from 'react';
+import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { MotionProvider } from '@/components/Reveal';
 import { faq } from '@/lib/faq';
 import { buildMetadata, jsonLd, structuredData } from '@/lib/seo';
+import { gaMeasurementId } from '@/lib/site';
 
 export const metadata = buildMetadata();
 
@@ -30,6 +32,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{ __html: jsonLd(structuredData(faq)) }}
         />
         <MotionProvider>{children}</MotionProvider>
+        {gaMeasurementId ? <GoogleAnalytics id={gaMeasurementId} /> : null}
       </body>
     </html>
   );

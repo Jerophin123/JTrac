@@ -12,6 +12,9 @@ const doc = (path: string) => `${repo}/blob/main/${path}`;
  */
 export const siteUrl: string | null = 'https://www.jtrac.site/';
 
+/** Google Analytics 4 measurement ID for this site (gtag.js); null removes the tag. */
+export const gaMeasurementId: string | null = 'G-3NT3JYGSES';
+
 /** Latest published release (checked on the Releases page). Update with each release. */
 export const latestRelease = { version: '3.0.0', url: `${repo}/releases/tag/v3.0.0` } as const;
 
