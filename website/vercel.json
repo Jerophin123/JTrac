@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/googleb41baf20f70d21c3.html",
+      "destination": "/googleb41baf20f70d21c3/"
+    }
+  ]
+}

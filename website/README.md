@@ -52,6 +52,9 @@ packages is missing or a download URL is malformed.
 - **Outline:** one `h1`, no skipped heading levels. Replica titles are styled `p` elements and
   demo areas carry `data-nosnippet`, so demo data stays out of the outline and search snippets.
 - `pnpm check:site` enforces all of the above.
+- **Search Console:** `public/googleb41baf20f70d21c3.html` must stay byte-identical. Vercel
+  serves exported `.html` files at clean URLs (`/googleb41baf20f70d21c3/`), so `vercel.json`
+  rewrites the exact `.html` path Google requests to it.
 
 ## Notes
 
