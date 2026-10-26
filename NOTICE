@@ -3,10 +3,11 @@ Copyright 2026 Jerophin D R
 
 This product is licensed under the Apache License, Version 2.0 (see LICENSE).
 
-JTrac is a modern, independent re-implementation inspired by the original JTrac issue
-tracker (JTrac 2.3.3). The behaviour of the original was studied with the REA MCP
-reverse-engineering server; no source code, schema or templates of the original are
-included in this product.
+This JTrac is an unofficial, independent reimagining of how the original JTrac issue
+tracker (JTrac 2.3.3) could look in the modern era. It is not affiliated with, endorsed
+by or maintained by the original JTrac project or its authors. The behaviour of the
+original was studied with the REA MCP reverse-engineering server; no source code, schema
+or templates of the original are included in this product.
 
 Release packages built from this repository bundle third-party software:
   - Eclipse Temurin (OpenJDK) 25 runtime: GPL v2 with the Classpath Exception

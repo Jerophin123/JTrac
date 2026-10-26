@@ -6,7 +6,8 @@ All notable changes to JTrac are documented here. The format follows
 
 ## [3.0.0] - 2026-10-26
 
-First release of JTRAC as a self-contained server package.
+First release of this unofficial, modern-era reimagining of JTrac, as a self-contained
+server package. Not affiliated with or endorsed by the original JTrac project.
 
 ## Highlights
 

@@ -83,7 +83,9 @@ confirm you have the right to submit it. See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## 8. Trademarks and names
 
 "JTrac" refers to this project and to the original JTrac issue tracker whose concepts inspired
-it. The Apache License does not grant permission to use the project's names or logos to imply
+it. This project is an unofficial, independent reimagining of that tracker for the modern era;
+it is not affiliated with, endorsed by or maintained by the original JTrac project or its
+authors. The Apache License does not grant permission to use the project's names or logos to imply
 endorsement of a modified version or a service. Distribute modified versions under a name that
 makes clear they are modified. Third-party names (Java, PostgreSQL, Spring, React, GitHub,
 Zoho, Microsoft and others) belong to their owners and are used only to describe compatibility.

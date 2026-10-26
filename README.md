@@ -8,11 +8,14 @@
 
 # JTrac
 
-### The issue tracker you can actually own: modern, secure, self-hosted, and ready for production.
+### What if JTrac had been born today?
 
-**JTrac** is a ground-up modernization of the classic JTrac issue tracker: reverse-engineered with the
-**REA MCP** server, rebuilt on **Java 25, Spring Boot 4, React 19 and PostgreSQL 18**, and shipped as a
-self-contained server package with a guided setup wizard.
+**An unofficial, imagined reboot of the classic JTrac issue tracker: what it could look like in the modern era.**
+
+This project imagines how JTrac might look and work if it were designed today. The last public JTrac
+binary (2.3.3) was studied with the **REA MCP** reverse-engineering server, and the idea was rebuilt from
+scratch on **Java 25, Spring Boot 4, React 19 and PostgreSQL 18**, shipped as a self-contained server
+package with a guided setup wizard.
 
 [![CI](https://github.com/Jerophin123/JTrac/actions/workflows/ci.yml/badge.svg)](https://github.com/Jerophin123/JTrac/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-b4532a.svg)](LICENSE)
@@ -23,18 +26,47 @@ self-contained server package with a guided setup wizard.
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-1d1a16.svg)
 ![Reverse-engineered with REA MCP](https://img.shields.io/badge/reverse--engineered%20with-REA%20MCP-b4532a.svg)
 ![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-1d1a16.svg)
+![Unofficial reimagining](https://img.shields.io/badge/status-unofficial%20reimagining-fc6f08.svg)
 
 [Quick start](#quick-start) · [Features](#features) · [Install](#installation) · [API reference](#api-reference) ·
 [Security](#security) · [Terms & Conditions](#terms-and-conditions) · [License](#license)
 
 </div>
 
+> [!IMPORTANT]
+> **This is not an official JTrac release.** It is an independent, unofficial reimagining: a "what if"
+> of how JTrac could look in the modern era. It is not affiliated with, endorsed by or maintained by the
+> original JTrac project or its authors, and it contains none of the original's source code, database
+> schema or templates. The JTrac name is used only to credit the tracker that inspired it. Looking for
+> the original? See the [JTrac project on SourceForge](https://sourceforge.net/projects/j-trac/).
+
 ---
 
+> **Imagine the tracker you loved in 2008, reborn for 2026.**
+> Same soul: workflows, custom fields and `KEY-42` issues. New everything else: a fast React UI,
+> one-command installs, a real REST API and security you can explain to an auditor.
+
+**Why people stop scrolling here:**
+
+- **Five minutes, zero dependencies.** One download and one `setup` command. Java and PostgreSQL are
+  already inside: no JDK, no Node.js, no DBA.
+- **Your data never leaves your server.** No telemetry, no trackers, no per-seat SaaS bill.
+- **Workflow power without the bloat.** A visual workflow editor, role-based transitions and per-status
+  field rules, all enforced on the server.
+- **Built for people who integrate.** 140 REST operations, an OpenAPI 3 contract, API tokens and
+  HMAC-signed webhooks.
+- **Tested where you run it.** Every 3.0.0 package passed 36 installer checks natively on Windows,
+  Linux (x64 and ARM64) and macOS (Intel and Apple Silicon).
+- **Secure by default.** Argon2id passwords, CSRF protection, a strict CSP, least-privilege database
+  roles and owner-only secret files.
+- **Privacy built in.** Terms, Privacy and Grievance pages aligned with India's DPDP Act, with recorded
+  consent and a personal data download.
+- **Free, open and yours.** Apache License 2.0, standard PostgreSQL and a documented schema: no lock-in.
+
 > **Your team's work deserves better than a spreadsheet, and better than renting it back from a SaaS vendor.**
-> JTrac gives you boards, workflows, custom fields, dashboards and a real REST API on your own server,
-> installed with one command and no JDK, no Node.js and no DBA required. It takes about five minutes.
-> Keep reading: the first issue is closer than you think.
+> This reimagined JTrac gives you boards, workflows, custom fields, dashboards and a real REST API on your
+> own server, installed with one command. It takes about five minutes.
+> Curious how a classic would feel if it were built today? Keep reading: the first issue is closer than you think.
 
 ## Contents
 
@@ -105,7 +137,7 @@ self-host. Its last distribution (2.3.3) is a **binary-only** Java web applicati
 bytecode built on Wicket 1.3, Spring 2.5, Acegi Security 1.0, Hibernate 3.2, Lucene 2 and HSQLDB, with no
 buildable source in the distribution.
 
-JTrac (this project) was created by **studying that binary with the REA MCP server**, a
+This unofficial reimagining was created by **studying that binary with the REA MCP server**, a
 reverse-engineering toolkit exposed through the Model Context Protocol, and then **re-implementing the
 domain from scratch** on a modern stack.
 
@@ -140,7 +172,7 @@ not code. The result is an independent, Apache-licensed code base.
 | Setup | manual config files | interactive or unattended 13-stage setup wizard |
 | Email | basic SMTP | runtime-configurable SMTP with step-by-step test diagnostics, queued delivery |
 
-> ➜ *Enough history. Here's everything the modern JTrac can do for your team today.*
+> ➜ *Enough history. Here's everything this reimagined JTrac can do for your team today.*
 
 ## Features
 
@@ -10996,9 +11028,9 @@ Yes. It's open source under the Apache License 2.0: free to use, modify and dist
 </details>
 
 <details>
-<summary><b>Is this the original JTrac?</b></summary>
+<summary><b>Is this the official JTrac?</b></summary>
 
-No. It's an independent, modern re-implementation inspired by JTrac 2.3.3, whose behaviour was studied with the REA MCP reverse-engineering server. No original code, schema or templates are reused.
+No. It's an unofficial, independent reimagining of how JTrac could look in the modern era, inspired by JTrac 2.3.3, whose behaviour was studied with the REA MCP reverse-engineering server. It is not affiliated with or endorsed by the original JTrac project or its authors, and no original code, schema or templates are reused. The original lives at [SourceForge](https://sourceforge.net/projects/j-trac/).
 
 </details>
 
@@ -11455,7 +11487,9 @@ confirm you have the right to submit it. See [CONTRIBUTING.md](CONTRIBUTING.md).
 ### 8. Trademarks and names
 
 "JTrac" refers to this project and to the original JTrac issue tracker whose concepts inspired
-it. The Apache License does not grant permission to use the project's names or logos to imply
+it. This project is an unofficial, independent reimagining of that tracker for the modern era;
+it is not affiliated with, endorsed by or maintained by the original JTrac project or its
+authors. The Apache License does not grant permission to use the project's names or logos to imply
 endorsement of a modified version or a service. Distribute modified versions under a name that
 makes clear they are modified. Third-party names (Java, PostgreSQL, Spring, React, GitHub,
 Zoho, Microsoft and others) belong to their owners and are used only to describe compatibility.
