@@ -75,11 +75,11 @@ python -I tools/installer-smoke.py --archive <archive> --smtp-fixtures servercon
 
 - `.github/workflows/ci.yml`: backend build and tests against an ephemeral PostgreSQL 18
   service container, `serverconfig` and `launcher` tests, frontend typecheck/lint/test/build.
-- `.github/workflows/release.yml`: native matrix (Windows x64/ARM64, Linux x64/ARM64,
-  macOS x64/ARM64), each building, verifying and smoke-testing its own package (Windows ARM64:
-  build only, no bundled PostgreSQL), OSV scan on Linux x64, artifacts uploaded. Nothing is
-  published automatically. These workflows have not run yet (no CI remote); see
-  `platform-support.md` for the actual status of each target.
+- `.github/workflows/release.yml`: native matrix (Windows x64, Linux x64/ARM64,
+  macOS x64/ARM64), each building, verifying and smoke-testing its own package, OSV scan on
+  Linux x64, artifacts uploaded. Nothing is published automatically: a maintainer attaches
+  the tested artifacts to the GitHub release. Windows ARM64 is not in the matrix because
+  `actions/setup-java` had no Temurin 25 build for it; see `platform-support.md`.
 
 ## Versioning
 

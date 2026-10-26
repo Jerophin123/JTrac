@@ -20,7 +20,8 @@ jobs:
       matrix:
         include:
           - { target: windows-x64, runner: windows-latest, smoke: true }
-          - { target: windows-arm64, runner: windows-11-arm, smoke: false }   # no bundled PostgreSQL: external database only
+          # windows-arm64 is not built: actions/setup-java has no Temurin 25 for Windows ARM64
+          # (and there are no bundled PostgreSQL binaries for it). Add it back when there are.
           - { target: linux-x64, runner: ubuntu-24.04, smoke: true }
           - { target: linux-arm64, runner: ubuntu-24.04-arm, smoke: true }
           - { target: macos-x64, runner: macos-15-intel, smoke: true }

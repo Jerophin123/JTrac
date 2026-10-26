@@ -19,17 +19,21 @@ Status words mean exactly this:
   shell scripts with shebang, LF endings and a passing `sh -n`; runtime modules identical to
   the smoke-tested Windows package; release scans. **Nothing in it has been executed on the
   target OS.**
-- **CI configured**: a native job exists in `.github/workflows/release.yml`, but it has not
-  run yet (the repository has no CI remote at the time of this release).
+- **Not packaged**: no archive is published for the target.
+
+The 3.0.0 archives published on GitHub are the ones the
+[release workflow](https://github.com/Jerophin123/JTrac/actions/runs/40331273688) built natively on each platform; each one passed
+`tools/installer-smoke.py` on that same runner before it was uploaded, and its report is
+published next to it (`*.installer-smoke.md`).
 
 | Target | Package | Database strategy | Status (JTRAC 3.0.0) |
 |---|---|---|---|
-| Windows x64 | `jtrac-<v>-windows-x64.zip` | Managed (bundled PostgreSQL 18.6) or external | **Built and smoke-tested** (36/36 checks) on Windows 11 build 26300, x64 |
-| Windows ARM64 | `jtrac-<v>-windows-arm64.zip` | **External PostgreSQL 18 only** (no redistributable Windows ARM64 binaries were found) | CI configured; not built or tested |
-| Linux x64 | `jtrac-<v>-linux-x64.tar.gz` | Managed or external | **Smoke-tested** (36/36 checks) on Arch Linux, kernel 7.2, glibc 2.44, x86_64 (cross-built on Windows); systemd user service verified |
-| Linux ARM64 (AArch64) | `jtrac-<v>-linux-arm64.tar.gz` | Managed or external | **Cross-built on Windows, statically verified**; not run on Linux |
-| macOS x64 (Intel) | `jtrac-<v>-macos-x64.tar.gz` | Managed or external | **Cross-built on Windows, statically verified**; not run on macOS |
-| macOS ARM64 (Apple Silicon) | `jtrac-<v>-macos-arm64.tar.gz` | Managed or external | **Cross-built on Windows, statically verified**; not run on macOS |
+| Windows x64 | `jtrac-<v>-windows-x64.zip` | Managed (bundled PostgreSQL 18.6) or external | **Smoke-tested** (36/36 checks) on Windows Server 2025 (GitHub runner) and on Windows 11 build 26300 |
+| Windows ARM64 | none | **External PostgreSQL 18 only** (no redistributable Windows ARM64 binaries were found) | **Not packaged**: the CI job was removed because no Temurin 25 build for Windows ARM64 was available to `actions/setup-java`; build from source |
+| Linux x64 | `jtrac-<v>-linux-x64.tar.gz` | Managed or external | **Smoke-tested** (36/36 checks) on Ubuntu 24.04 x86_64, glibc 2.39 (GitHub runner) and on Arch Linux, glibc 2.44; systemd user service verified on Arch |
+| Linux ARM64 (AArch64) | `jtrac-<v>-linux-arm64.tar.gz` | Managed or external | **Smoke-tested** (36/36 checks) on Ubuntu 24.04 AArch64, glibc 2.39 (GitHub runner) |
+| macOS x64 (Intel) | `jtrac-<v>-macos-x64.tar.gz` | Managed or external | **Smoke-tested** (36/36 checks) on macOS 15.7.9 x86_64 (GitHub runner) |
+| macOS ARM64 (Apple Silicon) | `jtrac-<v>-macos-arm64.tar.gz` | Managed or external | **Smoke-tested** (36/36 checks) on macOS 15.7.9 arm64 (GitHub runner) |
 
 Do not treat a target as supported for production until its status says smoke-tested.
 
@@ -59,7 +63,7 @@ Do not treat a target as supported for production until its status says smoke-te
 
 JTRAC never substitutes another database.
 
-## What was verified for Linux and macOS (without running)
+## What was verified for Linux and macOS (static inspection)
 
 | Package | Size | Binary architecture (Java, JVM, PostgreSQL) | Other checks |
 |---|---|---|---|
@@ -68,9 +72,10 @@ JTRAC never substitutes another database.
 | macos-x64 | ~225 MiB | Mach-O x86_64 (PostgreSQL universal x86_64+arm64), all slices signed | same (no symlinks) |
 | macos-arm64 | ~224 MiB | Mach-O arm64 (PostgreSQL universal), all slices signed | same |
 
-Linux x64 has since been run for real (next section). Still unverified on the real OS for
-linux-arm64 and both macOS packages: setup, the managed PostgreSQL, background start, graceful
-stop, backups, and the launchd agent. Run `tools/installer-smoke.py` there (see `testing.md`).
+Every package has since been run for real: the installer smoke test (setup, managed
+PostgreSQL, background start, SMTP test, lifecycle, graceful stop, backup/restore, update,
+uninstall) passed on its own OS in the release workflow. Not yet exercised: the launchd agent
+on macOS and the systemd service on ARM64 (the systemd unit was verified on Linux x64 only).
 
 ## What was verified on Linux x64 (Arch Linux VM)
 

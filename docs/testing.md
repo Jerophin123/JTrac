@@ -44,10 +44,9 @@
 
 | Installer smoke test, final `jtrac-3.0.0-linux-x64.tar.gz`, Arch Linux VM (kernel 7.2, glibc 2.44) | 36/36 checks passed; systemd user service start/stop/remove verified |
 
-linux-arm64 and the macOS packages have **not been executed** on those systems yet; see
-`platform-support.md`.
+| Release workflow ([run 40331273688](https://github.com/Jerophin123/JTrac/actions/runs/40331273688)): each package built and smoke-tested natively; these are the published archives | 36/36 checks on each of Windows Server 2025 x64, Ubuntu 24.04 x64, Ubuntu 24.04 AArch64, macOS 15.7.9 x86_64 and macOS 15.7.9 arm64 |
 
-## Remaining validation for untested targets
+## Validating a new target or a new machine
 
 On a machine of the target platform (or by running `release.yml` in CI):
 
@@ -55,8 +54,9 @@ On a machine of the target platform (or by running `release.yml` in CI):
    or copy the cross-built archive and `serverconfig-<v>-test-fixtures.jar` to the machine.
    Run as a normal user (the managed PostgreSQL refuses root), with Python 3.12+ installed.
 2. `python -I tools/installer-smoke.py --archive distribution/releases/<v>/jtrac-<v>-<target>.<ext> --smtp-fixtures serverconfig/build/libs/serverconfig-<v>-test-fixtures.jar`
-3. Windows ARM64 (no bundled PostgreSQL): install PostgreSQL 18 for ARM64, run setup in
-   external mode (provisioning with an administrator account), then repeat the API, lifecycle
-   and backup checks manually (`pg_dump` 18 on PATH).
+3. Windows ARM64 (not packaged; no bundled PostgreSQL): build on the machine with a Java 25
+   JDK for ARM64, install PostgreSQL 18 for ARM64, run setup in external mode (provisioning
+   with an administrator account), then repeat the API, lifecycle and backup checks manually
+   (`pg_dump` 18 on PATH).
 4. Record the report (`*.installer-smoke.md` next to the archive) and update
    `platform-support.md`.
