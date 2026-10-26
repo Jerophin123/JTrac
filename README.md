@@ -8,6 +8,7 @@
 **REA MCP** server, rebuilt on **Java 25, Spring Boot 4, React 19 and PostgreSQL 18**, and shipped as a
 self-contained server package with a guided setup wizard.
 
+[![CI](https://github.com/Jerophin123/JTrac/actions/workflows/ci.yml/badge.svg)](https://github.com/Jerophin123/JTrac/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-b4532a.svg)](LICENSE)
 ![Version](https://img.shields.io/badge/version-3.0.0-b4532a.svg)
 ![Java 25](https://img.shields.io/badge/Java-25-1d1a16.svg)
