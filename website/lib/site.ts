@@ -6,12 +6,11 @@ const repo = 'https://github.com/Jerophin123/JTrac';
 const doc = (path: string) => `${repo}/blob/main/${path}`;
 
 /**
- * Public address of this site, with a trailing slash (e.g. 'https://jtrac.example.com/').
- * Not decided yet: while null, the build emits no canonical URL, sitemap entries or absolute
- * share-image URLs rather than wrong ones. Set it before publishing; `pnpm check:site` then
- * requires all of them.
+ * Public address of this site, with a trailing slash (Vercel, custom domain). It drives the
+ * canonical URL, og:url, absolute share-image URLs, sitemap.xml and robots.txt; set it to null
+ * to emit none of them. `pnpm check:site` verifies all of them against this value.
  */
-export const siteUrl: string | null = null;
+export const siteUrl: string | null = 'https://www.jtrac.site/';
 
 /** Latest published release (checked on the Releases page). Update with each release. */
 export const latestRelease = { version: '3.0.0', url: `${repo}/releases/tag/v3.0.0` } as const;

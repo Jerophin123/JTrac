@@ -38,10 +38,9 @@ packages is missing or a download URL is malformed.
 
 ## SEO
 
-- **Site address:** set `siteUrl` in `lib/site.ts` before publishing (currently `null`,
-  host not decided). Until then the build emits no canonical, `og:url`, absolute share-image
-  URLs or sitemap entries rather than wrong ones; once set, all of them appear and
-  `pnpm check:site` requires them.
+- **Site address:** `siteUrl` in `lib/site.ts` is `https://www.jtrac.site/` (Vercel). It
+  drives the canonical URL, `og:url`, absolute share-image URLs, `sitemap.xml` and the
+  `Sitemap:` line in `robots.txt`; `pnpm check:site` requires all of them.
 - **Metadata** (`lib/seo.ts`): title (30-60 chars), description (70-160 chars), robots and
   googlebot directives, Open Graph and X cards, author, icons, web manifest.
 - **Structured data:** JSON-LD `SoftwareApplication` (version, OS, direct download URLs,
