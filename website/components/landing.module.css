@@ -1,0 +1,206 @@
+/*
+ * The product's shape language applied to the landing page. Every rule here follows a
+ * rule in jtac/frontend/src (cited per block) so the site and the product feel like one
+ * system: forward-leaning fills, two-corner containers and logo "speed strokes".
+ */
+
+/* Larger CTA size for the slanted product Button (ui/Button.module.css). */
+.lg {
+  block-size: 2.875rem;
+  padding-inline: calc(var(--space-6) + 6px);
+  font-size: 0.9375rem;
+}
+
+.lg::before {
+  border-radius: var(--radius-md);
+}
+
+/* Soft glow under the primary action, following its lean. */
+.glow::before {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 55%, transparent),
+    0 12px 36px -10px color-mix(in srgb, var(--color-accent) 70%, transparent);
+}
+
+/* Glass variant of the secondary Button for use over the cinematic background. */
+.glassButton {
+  color: var(--color-text);
+}
+
+.glassButton::before {
+  background: color-mix(in srgb, var(--color-surface) 60%, transparent);
+  border-color: var(--color-border-strong);
+  backdrop-filter: blur(14px);
+}
+
+.glassButton:hover::before {
+  background: var(--color-surface-hover);
+  border-color: var(--color-text-subtle);
+}
+
+/* Two forward-leaning speed strokes above section titles (ui/Page.module.css .heading::before). */
+.speed {
+  display: block;
+  inline-size: 1.75rem;
+  block-size: 4px;
+  margin-inline-start: 2px;
+  border-radius: 1px;
+  background: var(--color-accent);
+  box-shadow: 2.15rem 0 0 0 color-mix(in srgb, var(--color-accent) 40%, transparent);
+  transform: skewX(var(--slant-mark));
+}
+
+.speedCenter {
+  margin-inline: auto;
+  /* Optical centering: the second stroke extends the mark to the inline end. */
+  translate: -1.07rem 0;
+}
+
+/*
+ * Section nav items, styled as the product's tabs (ui/Tabs.module.css): a slanted hover fill
+ * behind the label and a slanted accent underline anchored under the active item.
+ */
+.navItem {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  block-size: 2.25rem;
+  padding-inline: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.navItem::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--radius-sm);
+  transform: skewX(var(--slant));
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.navItem::after {
+  content: '';
+  position: absolute;
+  inset-inline: var(--space-3);
+  inset-block-end: 0;
+  block-size: 2px;
+  border-radius: 1px;
+  background: transparent;
+  transform: skewX(var(--slant-mark));
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.navItem:hover {
+  color: var(--color-text);
+}
+
+.navItem:hover::before {
+  background: var(--color-surface-hover);
+}
+
+.navItem[aria-current='true'] {
+  color: var(--color-text);
+}
+
+.navItem[aria-current='true']::after {
+  background: var(--color-accent);
+}
+
+/* Full-width rows in the mobile menu: the underline becomes the sidebar's speed bar. */
+.navItemBlock {
+  inline-size: 100%;
+  block-size: 2.75rem;
+  padding-inline: var(--space-4);
+}
+
+.navItemBlock::after {
+  inset-inline: 0 auto;
+  inset-block: 0.6rem;
+  inline-size: 3px;
+  block-size: auto;
+}
+
+/* Icon tile: a slanted accent-soft fill behind an upright icon (Button's ::before pattern). */
+.iconTile {
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.5rem;
+  color: var(--color-accent-fg);
+}
+
+.iconTile::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline: 4px;
+  z-index: -1;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  transform: skewX(var(--slant));
+}
+
+/* Card in the product's two-corner shape with the tab's slanted underline on hover. */
+.card {
+  position: relative;
+  border-radius: var(--radius-shape);
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset-inline: var(--space-6);
+  inset-block-end: -1px;
+  block-size: 3px;
+  border-radius: 1px;
+  background: transparent;
+  transform: skewX(var(--slant-mark));
+  transition: background-color var(--duration-base) var(--ease-out);
+}
+
+.card:hover::after {
+  background: var(--color-accent);
+}
+
+/* Product label chips (ui/Badge.module.css .label) for technology names. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  block-size: 1.75rem;
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-sunken);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.chipDot {
+  flex: none;
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+
+/* Text link: the product's link color with an underline that thickens on hover (base.css). */
+.link {
+  color: var(--color-accent-fg);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+.link:hover {
+  text-decoration-thickness: 2px;
+}

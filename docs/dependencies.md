@@ -61,3 +61,22 @@ Verification: versions from the npm registry (`npm view`), peer ranges checked
 (`npm view <pkg> peerDependencies`), result checked with `pnpm peers check`
 → "No peer dependency issues found". Deliberate holds: TypeScript 5.9 (not 7.0) and
 ESLint 9 (not 10): see ADR 0003.
+
+## Landing page (`website/`, verified 2026-10-27)
+
+Static Next.js export; versions from `npm view <pkg> version peerDependencies`.
+
+| Dependency | Version | Purpose |
+|---|---|---|
+| `next` | 16.4.3 | static export of the landing page (`output: 'export'`) |
+| `react`, `react-dom` | 19.3.1 | UI runtime |
+| `tailwindcss`, `@tailwindcss/postcss` | 4.3.3 | utility CSS mapped to the product design tokens |
+| `motion` | 14.6.0 | entrance, reveal and scroll animations; respects reduced motion |
+| `lucide-react` | 1.61.0 | icons (same set as the SPA) |
+| `@fontsource-variable/ibm-plex-sans`, `@fontsource/ibm-plex-mono` | 5.3.0 | self-hosted product typefaces |
+| `@fontsource/ibm-plex-sans` (dev) | 5.3.0 | static WOFF for the build-time share image (the share-image renderer cannot read the variable WOFF2) |
+| `eslint` + `eslint-config-next` (dev) | 9.39.5 + 16.4.3 | lint (Next core-web-vitals + TypeScript rules) |
+| `typescript`, `@types/*` (dev) | 5.9.3 | type checking |
+
+`unrs-resolver`'s optional postinstall is declined in `website/pnpm-workspace.yaml`
+(`allowBuilds`); its prebuilt platform binary is used.

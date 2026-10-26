@@ -1,0 +1,50 @@
+/* Ported from jtac/frontend/src/ui/OrgMark.module.css for the landing-page replica. */
+.mark {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-on-accent-fg);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  /* Keeps very dark or very light brand colors visible on either theme. */
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-text) 14%, transparent);
+}
+
+.logo {
+  object-fit: cover;
+  background: var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-border);
+}
+
+.xs {
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  border-radius: var(--radius-full);
+}
+
+.xs.logo {
+  inline-size: 1rem;
+  block-size: 1rem;
+  border-radius: var(--radius-xs);
+}
+
+.sm {
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  font-size: var(--text-xs);
+}
+
+.md {
+  inline-size: 2rem;
+  block-size: 2rem;
+  font-size: var(--text-sm);
+}
+
+.lg {
+  inline-size: 3rem;
+  block-size: 3rem;
+  border-radius: var(--radius-md);
+  font-size: var(--text-lg);
+}

@@ -1,0 +1,3 @@
+allowBuilds:
+  # Optional postinstall that only rebuilds a native binary; the prebuilt package is used.
+  unrs-resolver: false

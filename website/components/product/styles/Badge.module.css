@@ -1,0 +1,130 @@
+/* Ported from jtac/frontend/src/ui/Badge.module.css for the landing-page replica. */
+.badge,
+.status,
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-inline-size: 100%;
+  block-size: 1.375rem;
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.neutral {
+  background: var(--color-surface-sunken);
+  color: var(--color-text-muted);
+}
+
+.accent {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-fg);
+}
+
+.success {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.warning {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.danger {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.info {
+  background: var(--color-info-soft);
+  color: var(--color-info);
+}
+
+.todo {
+  background: var(--color-cat-todo-soft);
+  color: var(--color-cat-todo);
+}
+
+.progress {
+  background: var(--color-cat-progress-soft);
+  color: var(--color-cat-progress);
+}
+
+.done {
+  background: var(--color-cat-done-soft);
+  color: var(--color-cat-done);
+}
+
+.canceled {
+  background: var(--color-cat-canceled-soft);
+  color: var(--color-cat-canceled);
+  text-decoration: line-through;
+}
+
+/* Shape marker: hollow circle (to do), half (in progress), filled (done), slashed (canceled). */
+.marker {
+  flex: none;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  border: 1.5px solid currentColor;
+  border-radius: var(--radius-full);
+}
+
+.marker[data-category='IN_PROGRESS'] {
+  box-shadow: inset 0.3rem 0 0 0 currentColor; /* left half filled */
+}
+
+.marker[data-category='DONE'] {
+  background: currentColor;
+}
+
+.marker[data-category='CANCELED'] {
+  border-radius: 2px;
+  transform: rotate(45deg);
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+}
+
+.priority {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+}
+
+.urgent {
+  color: var(--color-danger);
+}
+
+.high {
+  color: var(--color-warning);
+}
+
+.medium {
+  color: var(--color-info);
+}
+
+.low,
+.none {
+  color: var(--color-text-subtle);
+}
+
+.label {
+  background: var(--color-surface-sunken);
+  color: var(--color-text);
+  font-weight: var(--weight-regular);
+}
+
+.labelDot {
+  flex: none;
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-text-subtle);
+}

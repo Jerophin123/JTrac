@@ -1,0 +1,93 @@
+/*
+ * JTRAC product design tokens, generated from jtac/frontend/src/styles/tokens.css
+ * (base tokens + the dark theme). The accent is the JTRAC logo orange, applied the same
+ * way the product applies an organization brand color (--color-accent and friends).
+ * Shared by the landing page and the product replica so both speak one design language.
+ */
+:root {
+  --font-sans: 'IBM Plex Sans Variable', 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-md: 0.875rem;
+  --text-lg: 1rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.625rem;
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --tracking-tight: -0.011em;
+  --tracking-caps: 0.06em;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 999px;
+  --radius-shape: var(--radius-lg) var(--radius-xs);
+  --radius-shape-sm: var(--radius-md) 3px;
+  --slant: -12deg;
+  --slant-mark: var(--slant);
+  --sidebar-width: 15.5rem;
+  --shell-gap: 0.5rem;
+  --content-max: 72rem;
+  --content-wide: 96rem;
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --color-canvas: #141210;
+  --color-surface: #1c1916;
+  --color-surface-muted: #201d19;
+  --color-surface-sunken: #110f0d;
+  --color-surface-hover: #26221e;
+  --color-border: #2e2924;
+  --color-border-strong: #433c35;
+  --color-text: #eee8e1;
+  --color-text-muted: #aaa196;
+  --color-text-subtle: #9c9287;
+  --color-accent: #fc6f08;
+  --color-accent-hover: #ff8a33;
+  --color-accent-soft: #3a210d;
+  --color-accent-text: #ffa866;
+  --color-on-accent: #1a0e08;
+  --color-success: #6fbf8e;
+  --color-success-soft: #18291f;
+  --color-warning: #e2b05a;
+  --color-warning-soft: #2e2413;
+  --color-danger: #f08a7c;
+  --color-danger-soft: #36191a;
+  --color-info: #8cbcd6;
+  --color-info-soft: #172934;
+  --color-focus: #ff8a33;
+  --color-overlay: rgb(0 0 0 / 0.55);
+  --color-cat-todo: #c9c0b5;
+  --color-cat-todo-soft: #2a2622;
+  --color-cat-progress: #8cbcd6;
+  --color-cat-progress-soft: #172934;
+  --color-cat-done: #6fbf8e;
+  --color-cat-done-soft: #18291f;
+  --color-cat-canceled: #a59b90;
+  --color-cat-canceled-soft: #24211d;
+  --viz-1: #3987e5;
+  --viz-2: #d95926;
+  --viz-grid: #2e2924;
+  --shadow-float: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px rgb(0 0 0 / 0.35);
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-overlay: 0 2px 6px rgb(0 0 0 / 0.5), 0 24px 48px rgb(0 0 0 / 0.5);
+  /* Adaptive accent tokens: static values for this fixed brand color (dark theme). */
+  --color-accent-fg: var(--color-accent-text);
+  --color-on-accent-fg: var(--color-on-accent);
+  --color-accent-hover-fill: var(--color-accent-hover);
+  --color-focus-ring: var(--color-focus);
+  color-scheme: dark;
+}

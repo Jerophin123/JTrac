@@ -49,6 +49,24 @@ with `npm view <pkg> peerDependencies`, then `pnpm peers check` → no issues):
 
 Exact versions are pinned in `frontend/package.json`; `pnpm-lock.yaml` is committed.
 
+### Landing page (`website/`, 2026-10-27)
+
+A separate static site, not part of the server bundle: Next.js `output: 'export'`, no
+server code, no API calls. Pinned in `website/package.json`; `pnpm-lock.yaml` committed.
+
+| Package | Version | Note |
+|---|---|---|
+| Next.js / eslint-config-next | 16.4.3 | latest; peers `react ^19`, Node ≥ 20.9 |
+| React / React DOM | 19.3.1 | same as the SPA |
+| Tailwind CSS / @tailwindcss/postcss | 4.3.3 | utilities over the product tokens (`app/product-tokens.css`) |
+| motion | 14.6.0 | peers `react ^18 \|\| ^19`; honours reduced motion via `MotionConfig` |
+| lucide-react | 1.61.0 | same as the SPA |
+| @fontsource/ibm-plex-sans (dev) | 5.3.0 | static WOFF for the build-time share image |
+| TypeScript / ESLint | 5.9.3 / 9.39.5 | kept equal to the SPA (see above) |
+
+The site reuses the SPA's design tokens and CSS Modules (copied with source notes into
+`website/components/product/styles/`); change them in `frontend/` first, then re-copy.
+
 Release packaging (ADR 0009) adds the CycloneDX Gradle plugin 3.4.1 and the zonky
 PostgreSQL 18.6.0 binaries; versions and checksums are recorded in `docs/dependencies.md`.
 
