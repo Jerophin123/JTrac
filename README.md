@@ -6,7 +6,7 @@
   <img src="docs/assets/jtrac-logo-light.svg" alt="JTRAC logo" width="420">
 </picture>
 
-# JTrac
+# JTrac 3
 
 ### What if JTrac had been born today?
 
@@ -159,7 +159,7 @@ domain from scratch** on a modern stack.
 **What was *not* reused:** no legacy source, schema, templates or UI. JTrac shares ideas with its ancestor,
 not code. The result is an independent, Apache-licensed code base.
 
-| | JTrac 2.3.3 (legacy) | JTrac {VERSION} (this project) |
+| | JTrac 2.3.3 (legacy) | JTrac 3.0.0 (this project) |
 |---|---|---|
 | Runtime | Java 8 bytecode, Jetty 9.4 | Java 25, embedded Tomcat via Spring Boot 4.1 |
 | Web layer | Wicket 1.3.7 server-side pages | React 19 + TypeScript SPA, REST `/api/v1` with OpenAPI 3 |
