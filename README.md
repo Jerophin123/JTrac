@@ -13,7 +13,7 @@
 **An unofficial, imagined reboot of the classic JTrac issue tracker: what it could look like in the modern era.**
 
 This project imagines how JTrac might look and work if it were designed today. The last public JTrac
-binary (2.3.3) was studied with the **REA MCP** reverse-engineering server, and the idea was rebuilt from
+binary (2.3.3) was studied with the **[REA MCP](https://github.com/morluto/rea)** reverse-engineering server, and the idea was rebuilt from
 scratch on **Java 25, Spring Boot 4, React 19 and PostgreSQL 18**, shipped as a self-contained server
 package with a guided setup wizard.
 
@@ -24,7 +24,7 @@ package with a guided setup wizard.
 ![Spring Boot 4.1](https://img.shields.io/badge/Spring%20Boot-4.1-1d1a16.svg)
 ![React 19](https://img.shields.io/badge/React-19-1d1a16.svg)
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-1d1a16.svg)
-![Reverse-engineered with REA MCP](https://img.shields.io/badge/reverse--engineered%20with-REA%20MCP-b4532a.svg)
+[![Reverse-engineered with REA MCP](https://img.shields.io/badge/reverse--engineered%20with-REA%20MCP-b4532a.svg)](https://github.com/morluto/rea)
 ![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20Linux%20%7C%20macOS-1d1a16.svg)
 ![Unofficial reimagining](https://img.shields.io/badge/status-unofficial%20reimagining-fc6f08.svg)
 
@@ -137,9 +137,16 @@ self-host. Its last distribution (2.3.3) is a **binary-only** Java web applicati
 bytecode built on Wicket 1.3, Spring 2.5, Acegi Security 1.0, Hibernate 3.2, Lucene 2 and HSQLDB, with no
 buildable source in the distribution.
 
-This unofficial reimagining was created by **studying that binary with the REA MCP server**, a
-reverse-engineering toolkit exposed through the Model Context Protocol, and then **re-implementing the
+This unofficial reimagining was created by **studying that binary with the [REA MCP](https://github.com/morluto/rea) server**,
+a reverse-engineering toolkit exposed through the Model Context Protocol, and then **re-implementing the
 domain from scratch** on a modern stack.
+
+> **The tool behind the rebuild: REA.** [REA](https://github.com/morluto/rea) ("reverse engineer anything") is an open-source CLI
+> and MCP server (MIT licence) that lets you or an AI agent analyse native binaries, managed code such as Java
+> bytecode, web bundles and running apps. It's published on npm as
+> [`rea-agents`](https://www.npmjs.com/package/rea-agents); this project used version 6.7.0, started as an
+> MCP server with `npx -y rea-agents@6.7.0 mcp`. REA is a separate project by its own authors, not part of
+> JTrac.
 
 **How the reverse engineering worked**
 
@@ -11037,7 +11044,7 @@ No. It's an unofficial, independent reimagining of how JTrac could look in the m
 <details>
 <summary><b>What is REA MCP?</b></summary>
 
-A reverse-engineering toolkit exposed through the Model Context Protocol, so an AI assistant can inspect binaries, bytecode, web bundles and runtimes. It was used to analyse the binary-only JTrac 2.3.3 distribution and produce the verified feature and risk catalogue that drove this rebuild.
+[REA](https://github.com/morluto/rea) is an open-source reverse-engineering CLI and MCP server (npm: `rea-agents`), so an AI assistant can inspect binaries, bytecode, web bundles and runtimes. It was used to analyse the binary-only JTrac 2.3.3 distribution and produce the verified feature and risk catalogue that drove this rebuild.
 
 </details>
 
@@ -11364,7 +11371,7 @@ Try it, report bugs, improve docs, test a platform that isn't verified yet, or s
 | **Problem document** | An RFC 9457 JSON error with a stable `type` URN. |
 | **Project role** | A named set of permissions within a project (for example, maintainer or reporter). |
 | **Readiness** | The health endpoint `/actuator/health/readiness`, UP when the server and database are usable. |
-| **REA MCP** | The reverse-engineering MCP server used to analyse the legacy JTrac 2.3.3 binary. |
+| **REA MCP** | The reverse-engineering MCP server ([github.com/morluto/rea](https://github.com/morluto/rea)) used to analyse the legacy JTrac 2.3.3 binary. |
 | **Release gate** | Automated checks that fail a release if any file is unexpected or contains secrets. |
 | **Saved view** | A stored list, board or timeline configuration, personal or shared. |
 | **Schema owner** | The database role (`jtrac_owner`) that owns the schema and runs migrations. |
@@ -11527,7 +11534,8 @@ The same text is kept in [TERMS.md](TERMS.md). Privacy: [PRIVACY.md](PRIVACY.md)
 
 - **The original JTrac** project and its contributors, for a simple, workflow-driven tracker that inspired
   this one.
-- **REA MCP**, the reverse-engineering MCP server that made a binary-only legacy application understandable.
+- **[REA](https://github.com/morluto/rea)**, the reverse-engineering CLI and MCP server that made a binary-only legacy application
+  understandable.
 - **Spring** (Boot, Framework, Security, Modulith), **Hibernate**, **Flyway**, **PostgreSQL**, **Eclipse
   Temurin**, **React**, **TanStack**, **Vite**, **Vitest**, **Playwright**, **axe-core**, **lucide**, the
   **IBM Plex** fonts, **Apache Commons**, **Jakarta Mail / Eclipse Angus**, **CycloneDX** and
