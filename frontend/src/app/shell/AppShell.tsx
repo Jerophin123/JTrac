@@ -3,7 +3,7 @@ import { Link, Outlet, useNavigate, useParams } from '@tanstack/react-router';
 import { MailWarning, Menu, WifiOff } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { orgQuery, orgsQuery } from '../../api/queries';
-import { extractColorFromImage, generateOrgThemeCss } from '../../lib/colorExtractor';
+import { extractColorFromImage } from '../../lib/colorExtractor';
 import { publicConfigQueryOptions, sessionQueryKey, sessionQueryOptions, useIsServerAdmin } from '../../features/auth/session';
 import { CreateIssueDialog } from '../../features/issues/CreateIssueDialog';
 import { Button } from '../../ui/Button';
@@ -61,26 +61,17 @@ export function AppShell() {
 
   const effectiveColor = activeColor ?? (activeLogo ? extractedLogoColor : null);
 
+  // Organization theme: tokens.css derives every themed token from --org-color. Set through
+  // the DOM (CSSOM), which the production CSP allows; an injected <style> would be blocked.
   useEffect(() => {
-    const styleId = 'jtrac-org-theme';
-    let styleEl = document.getElementById(styleId) as HTMLStyleElement | null;
-
+    const root = document.documentElement;
     if (effectiveColor) {
-      if (!styleEl) {
-        styleEl = document.createElement('style');
-        styleEl.id = styleId;
-        document.head.appendChild(styleEl);
-      }
-      styleEl.textContent = generateOrgThemeCss(effectiveColor);
-    } else if (styleEl) {
-      styleEl.remove();
+      root.style.setProperty('--org-color', effectiveColor.trim().toLowerCase());
+      root.dataset.orgTheme = '';
     }
-
     return () => {
-      const el = document.getElementById(styleId);
-      if (el) {
-        el.remove();
-      }
+      root.style.removeProperty('--org-color');
+      delete root.dataset.orgTheme;
     };
   }, [effectiveColor]);
 
@@ -163,10 +154,10 @@ export function AppShell() {
     <div
       className={`${styles.shell ?? ''} theme-scope`}
       style={
-        currentOrg?.color
+        effectiveColor
           ? ({
-              '--color-accent': currentOrg.color,
-              '--color-focus': currentOrg.color,
+              '--color-accent': effectiveColor,
+              '--color-focus': effectiveColor,
             } as React.CSSProperties)
           : undefined
       }

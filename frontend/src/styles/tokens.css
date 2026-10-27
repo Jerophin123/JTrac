@@ -153,8 +153,44 @@
 }
 
 /*
+ * Organization theme. AppShell sets --org-color and [data-org-theme] on <html> through the
+ * DOM, which the production CSP (style-src 'self') allows; an injected <style> element would
+ * be blocked. Everything else is derived here from that one color.
+ */
+:root[data-org-theme] {
+  --color-accent: var(--org-color);
+  --color-accent-hover: color-mix(in srgb, var(--org-color) 85%, black);
+  --color-accent-soft: color-mix(in srgb, var(--org-color) 15%, #ffffff);
+  --color-accent-text: color-mix(in srgb, var(--org-color) 85%, black);
+  --color-on-accent: #ffffff;
+  --color-focus: var(--org-color);
+  --color-canvas: color-mix(in srgb, var(--org-color) 4%, #f8fafc);
+  --color-surface-muted: color-mix(in srgb, var(--org-color) 5%, #f1f5f9);
+  --color-surface-sunken: color-mix(in srgb, var(--org-color) 8%, #e2e8f0);
+  --color-surface-hover: color-mix(in srgb, var(--org-color) 9%, #edf2f7);
+  --color-border: color-mix(in srgb, var(--org-color) 14%, #cbd5e1);
+  --color-border-strong: color-mix(in srgb, var(--org-color) 22%, #94a3b8);
+}
+
+:root[data-org-theme][data-theme='dark'] {
+  --color-accent: var(--org-color);
+  --color-accent-hover: color-mix(in srgb, var(--org-color) 85%, white);
+  --color-accent-soft: color-mix(in srgb, var(--org-color) 22%, #000000);
+  --color-accent-text: color-mix(in srgb, var(--org-color) 75%, white);
+  --color-on-accent: #ffffff;
+  --color-focus: var(--org-color);
+  --color-canvas: color-mix(in srgb, var(--org-color) 6%, #0b0d12);
+  --color-surface: color-mix(in srgb, var(--org-color) 8%, #11141c);
+  --color-surface-muted: color-mix(in srgb, var(--org-color) 12%, #161b25);
+  --color-surface-sunken: color-mix(in srgb, var(--org-color) 4%, #080a0d);
+  --color-surface-hover: color-mix(in srgb, var(--org-color) 15%, #1b212e);
+  --color-border: color-mix(in srgb, var(--org-color) 18%, #222938);
+  --color-border-strong: color-mix(in srgb, var(--org-color) 26%, #303b50);
+}
+
+/*
  * Adaptive accent tokens. Organization branding can replace --color-accent and friends
- * with any color (see lib/colorExtractor.ts), so components never pair the raw brand color
+ * with any color (see the organization theme above), so components never pair the raw brand color
  * with a fixed text color. They use these derived tokens instead:
  *   --color-accent-fg         accent-colored text and state indicators on surfaces
  *   --color-on-accent-fg      text and icons on an accent fill (white or black,
@@ -205,13 +241,13 @@
    * neutral text follows the same tint. Lightness is clamped, which keeps every text token
    * at >= 4.5:1 on every surface whatever the brand color is.
    */
-  :root:has(#jtrac-org-theme) {
+  :root[data-org-theme] {
     --color-text: oklch(from color-mix(in oklab, var(--color-accent) 12%, #0f172a) min(l, 0.24) min(c, 0.03) h);
     --color-text-muted: oklch(from color-mix(in oklab, var(--color-accent) 12%, #475569) min(l, 0.44) min(c, 0.04) h);
     --color-text-subtle: oklch(from color-mix(in oklab, var(--color-accent) 10%, #64748b) min(l, 0.46) min(c, 0.04) h);
   }
 
-  :root[data-theme='dark']:has(#jtrac-org-theme) {
+  :root[data-theme='dark'][data-org-theme] {
     --color-text: oklch(from color-mix(in oklab, var(--color-accent) 8%, #f1f5f9) max(l, 0.93) min(c, 0.02) h);
     --color-text-muted: oklch(from color-mix(in oklab, var(--color-accent) 10%, #a7b3c4) max(l, 0.8) min(c, 0.035) h);
     --color-text-subtle: oklch(from color-mix(in oklab, var(--color-accent) 10%, #8e9bb0) max(l, 0.76) min(c, 0.035) h);
