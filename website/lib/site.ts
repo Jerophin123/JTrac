@@ -16,7 +16,7 @@ export const siteUrl: string | null = 'https://www.jtrac.site/';
 export const gaMeasurementId: string | null = 'G-3NT3JYGSES';
 
 /** Latest published release (checked on the Releases page). Update with each release. */
-export const latestRelease = { version: '3.0.2', url: `${repo}/releases/tag/v3.0.2` } as const;
+export const latestRelease = { version: '3.0.4', url: `${repo}/releases/tag/v3.0.4` } as const;
 
 const asset = (name: string) => `${repo}/releases/download/v${latestRelease.version}/${name}`;
 
@@ -41,11 +41,11 @@ const pkg = (id: DownloadId, os: Download['os'], arch: string, ext: string, size
 
 /** Direct links to the release assets (names and sizes from the GitHub release API). */
 export const downloads: Download[] = [
-  pkg('windows-x64', 'Windows', 'x64', 'zip', 153),
-  pkg('linux-x64', 'Linux', 'x64', 'tar.gz', 139),
-  pkg('linux-arm64', 'Linux', 'ARM64', 'tar.gz', 138),
-  pkg('macos-arm64', 'macOS', 'Apple Silicon', 'tar.gz', 234),
-  pkg('macos-x64', 'macOS', 'Intel', 'tar.gz', 236),
+  pkg('windows-x64', 'Windows', 'x64', 'zip', 151),
+  pkg('linux-x64', 'Linux', 'x64', 'tar.gz', 138),
+  pkg('linux-arm64', 'Linux', 'ARM64', 'tar.gz', 137),
+  pkg('macos-arm64', 'macOS', 'Apple Silicon', 'tar.gz', 233),
+  pkg('macos-x64', 'macOS', 'Intel', 'tar.gz', 235),
 ];
 
 export const checksums = asset('SHA256SUMS');
