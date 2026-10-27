@@ -3,7 +3,7 @@
 openapi: "3.1.0"
 info:
   title: JTRAC API
-  version: "3.0.2"
+  version: "3.0.4"
   summary: Project management and issue tracking platform API.
   description: |
     Contract-first API for JTRAC (see docs/adr/0006-api-contract-and-errors.md).

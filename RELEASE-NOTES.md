@@ -1,3 +1,24 @@
+# JTRAC 3.0.4
+
+Security hardening release. No database migrations: settings, secrets and data carry over
+unchanged.
+
+## Fixed
+
+- **The web UI no longer ships source maps.** Up to 3.0.2 the server served `*.js.map`
+  files, so a browser's developer tools showed the original frontend source tree and its
+  dependencies. They contained no credentials or local paths, but there was no reason to
+  publish them. Production builds now have none, and the release gate rejects any package
+  whose web UI contains a source map or a `sourceMappingURL` reference.
+
+## Upgrade notes
+
+From 3.0.0 or 3.0.2: unpack 3.0.4 next to the old folder, then run
+`jtrac update --from <old folder>` from the new one (see `docs/upgrades.md`). The update
+makes a verified backup first; no migrations are pending.
+
+---
+
 # JTRAC 3.0.2
 
 Maintenance release. No database migrations: settings, secrets and data carry over unchanged.

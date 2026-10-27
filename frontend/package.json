@@ -1,7 +1,7 @@
 {
   "name": "jtac-frontend",
   "private": true,
-  "version": "3.0.2",
+  "version": "3.0.4",
   "type": "module",
   "packageManager": "pnpm@12.10.1",
   "engines": {

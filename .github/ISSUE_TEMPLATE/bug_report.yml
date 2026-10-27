@@ -11,7 +11,7 @@ body:
     id: version
     attributes:
       label: JTrac version and package
-      placeholder: jtrac-3.0.2-linux-x64 (output of `jtrac version`)
+      placeholder: jtrac-3.0.4-linux-x64 (output of `jtrac version`)
     validations:
       required: true
   - type: dropdown

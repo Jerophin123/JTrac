@@ -4,6 +4,13 @@ All notable changes to JTrac are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [3.0.4] - 2026-10-27
+
+### Security
+
+- The web UI no longer ships source maps, so browser developer tools no longer show the
+  original frontend source. The release gate rejects packages that contain them.
+
 ## [3.0.2] - 2026-10-27
 
 ### Fixed
@@ -54,5 +61,6 @@ See `docs/platform-support.md` for the test status of each operating system and 
   previous database back automatically.
 - Answers files keep Windows paths and ignore a UTF-8 byte-order mark.
 
+[3.0.4]: https://github.com/Jerophin123/JTrac/releases/tag/v3.0.4
 [3.0.2]: https://github.com/Jerophin123/JTrac/releases/tag/v3.0.2
 [3.0.0]: https://github.com/Jerophin123/JTrac/releases/tag/v3.0.0

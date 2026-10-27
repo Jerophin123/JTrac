@@ -19,7 +19,7 @@ package with a guided setup wizard.
 
 [![CI](https://github.com/Jerophin123/JTrac/actions/workflows/ci.yml/badge.svg)](https://github.com/Jerophin123/JTrac/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-b4532a.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-3.0.2-b4532a.svg)
+![Version](https://img.shields.io/badge/version-3.0.4-b4532a.svg)
 ![Java 25](https://img.shields.io/badge/Java-25-1d1a16.svg)
 ![Spring Boot 4.1](https://img.shields.io/badge/Spring%20Boot-4.1-1d1a16.svg)
 ![React 19](https://img.shields.io/badge/React-19-1d1a16.svg)
@@ -166,7 +166,7 @@ domain from scratch** on a modern stack.
 **What was *not* reused:** no legacy source, schema, templates or UI. JTrac shares ideas with its ancestor,
 not code. The result is an independent, Apache-licensed code base.
 
-| | JTrac 2.3.3 (legacy) | JTrac 3.0.2 (this project) |
+| | JTrac 2.3.3 (legacy) | JTrac 3.0.4 (this project) |
 |---|---|---|
 | Runtime | Java 8 bytecode, Jetty 9.4 | Java 25, embedded Tomcat via Spring Boot 4.1 |
 | Web layer | Wicket 1.3.7 server-side pages | React 19 + TypeScript SPA, REST `/api/v1` with OpenAPI 3 |
@@ -261,20 +261,20 @@ not code. The result is an independent, Apache-licensed code base.
 
 ```powershell
 # Windows (PowerShell)
-Expand-Archive .\jtrac-3.0.2-windows-x64.zip -DestinationPath C:\JTRAC
-C:\JTRAC\jtrac-3.0.2-windows-x64\setup.bat
+Expand-Archive .\jtrac-3.0.4-windows-x64.zip -DestinationPath C:\JTRAC
+C:\JTRAC\jtrac-3.0.4-windows-x64\setup.bat
 ```
 
 ```bash
 # Linux
-tar -xzf jtrac-3.0.2-linux-x64.tar.gz && cd jtrac-3.0.2-linux-x64 && ./setup.sh
+tar -xzf jtrac-3.0.4-linux-x64.tar.gz && cd jtrac-3.0.4-linux-x64 && ./setup.sh
 ```
 
 ```bash
 # macOS (the package is not notarized: clear the quarantine flag once)
-tar -xzf jtrac-3.0.2-macos-arm64.tar.gz
-xattr -dr com.apple.quarantine jtrac-3.0.2-macos-arm64
-cd jtrac-3.0.2-macos-arm64 && ./setup.sh
+tar -xzf jtrac-3.0.4-macos-arm64.tar.gz
+xattr -dr com.apple.quarantine jtrac-3.0.4-macos-arm64
+cd jtrac-3.0.4-macos-arm64 && ./setup.sh
 ```
 
 **3. Answer the wizard**: choose the managed database, create the first administrator, pick a port,
@@ -425,11 +425,11 @@ then check the archive:
 
 ```powershell
 # Windows (PowerShell)
-(Get-FileHash .\jtrac-3.0.2-windows-x64.zip -Algorithm SHA256).Hash   # compare with the .sha256 file
+(Get-FileHash .\jtrac-3.0.4-windows-x64.zip -Algorithm SHA256).Hash   # compare with the .sha256 file
 ```
 ```sh
 # Linux / macOS
-sha256sum -c jtrac-3.0.2-linux-x64.tar.gz.sha256        # macOS: shasum -a 256 -c ...
+sha256sum -c jtrac-3.0.4-linux-x64.tar.gz.sha256        # macOS: shasum -a 256 -c ...
 ```
 
 #### 2. Unpack
@@ -437,12 +437,12 @@ sha256sum -c jtrac-3.0.2-linux-x64.tar.gz.sha256        # macOS: shasum -a 256 -
 Unpack into a folder you keep, owned by the account that will run JTRAC (not root /
 Administrator):
 
-- Windows: e.g. `C:\JTRAC\jtrac-3.0.2-windows-x64` (right-click > Extract All, or
+- Windows: e.g. `C:\JTRAC\jtrac-3.0.4-windows-x64` (right-click > Extract All, or
   `Expand-Archive`). Avoid `C:\Program Files` (needs admin rights to write logs there).
 - Linux: e.g. `~/jtrac` or `/opt/jtrac` (owned by a dedicated `jtrac` user):
-  `tar -xzf jtrac-3.0.2-linux-x64.tar.gz`
-- macOS: `tar -xzf jtrac-3.0.2-macos-arm64.tar.gz`, then
-  `xattr -dr com.apple.quarantine jtrac-3.0.2-macos-arm64` (the package is not notarized).
+  `tar -xzf jtrac-3.0.4-linux-x64.tar.gz`
+- macOS: `tar -xzf jtrac-3.0.4-macos-arm64.tar.gz`, then
+  `xattr -dr com.apple.quarantine jtrac-3.0.4-macos-arm64` (the package is not notarized).
 
 Nothing else needs to be installed: the package contains its Java runtime and, on most
 targets, PostgreSQL.
@@ -10786,12 +10786,14 @@ scripts).
 - Feature modules own their queries; cross-feature imports go through `src/ui` or `src/api`.
 - Drag-and-drop and command-palette libraries are selected in their milestones (M5),
   against accessibility and performance criteria.
-- **Source maps** are generated (`build.sourcemap: true`) and, when the SPA is packaged
-  with `-PwithFrontend`, served at `/assets/*.js.map`. Reviewed on 2026-10-24: they
-  contain only relative paths, the frontend source that is in this repository, and
-  open-source dependency code: no environment values, credentials or local paths.
-  `dist/` is never committed. Whether production should serve them (vs. `'hidden'`
-  maps uploaded to an error tracker) is an open decision for the deployment milestone.
+- **Source maps** are not generated for production (`build.sourcemap: false`, decided
+  2026-10-27, from 3.0.4). Until 3.0.2 they were generated and served at
+  `/assets/*.js.map`, which let anyone with browser developer tools rebuild the original
+  `src/` tree. A 2026-10-24 review had found no environment values, credentials or local
+  paths in them, but serving them gave no benefit to people running JTRAC. The release
+  gate fails a package whose web UI contains a `.map` file or a `sourceMappingURL`
+  reference. The Vite dev server still provides source maps for local development.
+  `dist/` is never committed.
 
 #### Alternatives considered
 
