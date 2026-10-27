@@ -47,12 +47,14 @@ scripts).
 - Feature modules own their queries; cross-feature imports go through `src/ui` or `src/api`.
 - Drag-and-drop and command-palette libraries are selected in their milestones (M5),
   against accessibility and performance criteria.
-- **Source maps** are generated (`build.sourcemap: true`) and, when the SPA is packaged
-  with `-PwithFrontend`, served at `/assets/*.js.map`. Reviewed on 2026-10-24: they
-  contain only relative paths, the frontend source that is in this repository, and
-  open-source dependency code: no environment values, credentials or local paths.
-  `dist/` is never committed. Whether production should serve them (vs. `'hidden'`
-  maps uploaded to an error tracker) is an open decision for the deployment milestone.
+- **Source maps** are not generated for production (`build.sourcemap: false`, decided
+  2026-10-27, from 3.0.4). Until 3.0.2 they were generated and served at
+  `/assets/*.js.map`, which let anyone with browser developer tools rebuild the original
+  `src/` tree. A 2026-10-24 review had found no environment values, credentials or local
+  paths in them, but serving them gave no benefit to people running JTRAC. The release
+  gate fails a package whose web UI contains a `.map` file or a `sourceMappingURL`
+  reference. The Vite dev server still provides source maps for local development.
+  `dist/` is never committed.
 
 ## Alternatives considered
 

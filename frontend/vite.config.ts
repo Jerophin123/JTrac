@@ -17,7 +17,9 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     target: 'es2023',
-    sourcemap: true,
+    // Production builds ship no source maps, so the browser can't rebuild the original
+    // source tree (ADR 0007). The release gate rejects any that slip into a package.
+    sourcemap: false,
   },
   test: {
     environment: 'jsdom',

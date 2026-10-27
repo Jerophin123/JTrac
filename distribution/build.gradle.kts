@@ -491,6 +491,14 @@ abstract class VerifyRelease : DefaultTask() {
                             if (Regex("(^|/)(secrets|admin-secrets)\\.properties$|\\.(pem|key|p12|pfx|jks|eml|pgdump)$|(^|/)\\.env$|application-secrets|application-test\\.ya?ml$|(^|/)data/").containsMatchIn(name)) {
                                 problems += "prohibited entry $name in $rel"
                             }
+                            // The web UI ships without source maps (ADR 0007): no .map files and no
+                            // sourceMappingURL comments pointing at them.
+                            val webAsset = name.startsWith("BOOT-INF/classes/static/")
+                            if (webAsset && name.endsWith(".map")) problems += "source map $name in $rel"
+                            if (webAsset && !entry.isDirectory && (name.endsWith(".js") || name.endsWith(".css"))) {
+                                val text = zip.getInputStream(entry).use { String(it.readAllBytes(), Charsets.UTF_8) }
+                                if (text.contains("sourceMappingURL=")) problems += "sourceMappingURL reference in $rel!/$name"
+                            }
                             val entryExt = name.substringAfterLast('.', "").lowercase(Locale.ROOT)
                             if (!entry.isDirectory && entryExt in setOf("properties", "yaml", "yml", "json", "xml", "txt", "html", "js", "sql") && entry.size < 5_000_000) {
                                 val text = zip.getInputStream(entry).use { String(it.readAllBytes(), Charsets.UTF_8) }
