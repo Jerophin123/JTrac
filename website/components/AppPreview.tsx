@@ -20,7 +20,7 @@ export function AppPreview() {
         className="pointer-events-none absolute inset-x-[8%] -top-16 bottom-0 -z-10 bg-[radial-gradient(60%_55%_at_50%_30%,color-mix(in_srgb,var(--color-accent)_22%,transparent),transparent_70%)] blur-2xl"
       />
       <motion.figure
-        aria-label="Interactive replica of the JTRAC web app with demo data"
+        aria-label="Interactive replica of the Jtrac web app with demo data"
         data-nosnippet
         style={reduce ? undefined : { rotateX, scale, y }}
         className="relative overflow-hidden rounded-(--radius-shape) border border-line-strong bg-canvas shadow-[0_40px_120px_-40px_rgb(0_0_0/0.9),var(--shadow-overlay)] [transform-origin:50%_0%]"

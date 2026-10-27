@@ -2,6 +2,7 @@
 
 import { FolderGit2, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import { usePathname } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
 import { links, sections } from '@/lib/site';
 import landing from './landing.module.css';
@@ -15,6 +16,9 @@ export function SiteNav() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState<string | null>(null);
   const menuId = useId();
+  // Sections live on the home page; elsewhere the links go back to it.
+  const home = usePathname() === '/';
+  const sectionHref = (id: string) => (home ? `#${id}` : `/#${id}`);
 
   // Glass background once scrolled, and scroll-spy: the active item is the last section whose
   // top has passed the bottom of the nav (the same offset in-page links scroll to).
@@ -68,7 +72,7 @@ export function SiteNav() {
           scrolled || open ? 'glass' : 'border border-transparent'
         }`}
       >
-        <a href="#top" className="flex items-center rounded-lg px-1.5 py-1.5" aria-label="JTRAC home">
+        <a href={home ? '#top' : '/'} className="flex items-center rounded-lg px-1.5 py-1.5" aria-label="Jtrac home">
           <Logo height={20} aria-hidden="true" role="presentation" />
         </a>
 
@@ -76,7 +80,7 @@ export function SiteNav() {
           {sections.map((s) => (
             <li key={s.id}>
               <a
-                href={`#${s.id}`}
+                href={sectionHref(s.id)}
                 aria-current={active === s.id ? 'true' : undefined}
                 className={landing.navItem}
               >
@@ -122,7 +126,7 @@ export function SiteNav() {
               {sections.map((s) => (
                 <li key={s.id}>
                   <a
-                    href={`#${s.id}`}
+                    href={sectionHref(s.id)}
                     onClick={() => setOpen(false)}
                     aria-current={active === s.id ? 'true' : undefined}
                     className={`${landing.navItem} ${landing.navItemBlock}`}

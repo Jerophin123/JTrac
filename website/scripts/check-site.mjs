@@ -1,7 +1,7 @@
 // Static checks on the exported landing page (run after `pnpm build`). No dependencies.
 // Fails on placeholder links, unknown destinations, missing anchors, pricing or backend
 // integrations, and external links that open a new tab without rel="noopener".
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -9,6 +9,18 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const html = readFileSync(join(root, 'out', 'index.html'), 'utf8');
 const failures = [];
 const fail = (msg) => failures.push(msg);
+
+// Subpages from lib/pages.ts ("features/", ...), each exported as out/<path>index.html.
+const pagePaths = [...readFileSync(join(root, 'lib', 'pages.ts'), 'utf8').matchAll(/^\s+path: '([^']+)',/gm)].map((m) => m[1]);
+if (pagePaths.length < 2) fail('lib/pages.ts lists fewer than two subpages');
+const pageHtml = Object.fromEntries(pagePaths.map((p) => [p, readFileSync(join(root, 'out', p, 'index.html'), 'utf8')]));
+/** An internal link such as "/download/" or "/#features" must reach an exported page (and id). */
+const checkInternal = (href, where) => {
+  const [path, hash] = href.split('#');
+  const file = join(root, 'out', path, path.endsWith('/') ? 'index.html' : '');
+  if (!existsSync(file)) fail(`${where}: internal link to missing page: ${href}`);
+  else if (hash && !readFileSync(file, 'utf8').includes(` id="${hash}"`)) fail(`${where}: internal link to missing id: ${href}`);
+};
 
 const allowedOrigins = ['https://github.com/Jerophin123/JTrac', 'https://sourceforge.net/projects/j-trac/'];
 const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
@@ -21,7 +33,8 @@ for (const tag of anchors) {
   else if (href === '' || href === '#') fail(`placeholder link: ${tag}`);
   else if (href.startsWith('#')) {
     if (!ids.has(href.slice(1))) fail(`in-page link to missing id: ${href}`);
-  } else if (!allowedOrigins.some((o) => href.startsWith(o))) fail(`unverified destination: ${href}`);
+  } else if (href.startsWith('/') && !href.startsWith('//')) checkInternal(href, 'home');
+  else if (!allowedOrigins.some((o) => href.startsWith(o))) fail(`unverified destination: ${href}`);
   else if (href.includes('/releases/download/')) {
     // Direct downloads stay in the tab and must point at a versioned release asset.
     if (!/\/releases\/download\/v\d+\.\d+\.\d+\/[\w.-]+$/.test(href)) fail(`malformed download link: ${href}`);
@@ -72,7 +85,7 @@ if (!ld) fail('missing JSON-LD');
 else {
   const graph = JSON.parse(ld[1])['@graph'] ?? [];
   const types = graph.map((g) => g['@type']);
-  for (const t of ['SoftwareApplication', 'SoftwareSourceCode', 'FAQPage']) if (!types.includes(t)) fail(`JSON-LD missing ${t}`);
+  for (const t of ['WebSite', 'Organization', 'WebPage', 'SoftwareApplication', 'SoftwareSourceCode', 'FAQPage']) if (!types.includes(t)) fail(`JSON-LD missing ${t}`);
   const visible = decode(text);
   for (const q of graph.find((g) => g['@type'] === 'FAQPage')?.mainEntity ?? []) {
     if (!visible.includes(q.name)) fail(`FAQ structured data not visible on page: ${q.name}`);
@@ -91,8 +104,37 @@ if (siteUrl) {
   if (meta('property', 'og:url') !== siteUrl) fail('og:url should be the site URL');
   if (!meta('property', 'og:image')?.startsWith(siteUrl)) fail('og:image should be absolute on the site');
   if (!sitemap.includes(`<loc>${siteUrl}</loc>`)) fail('sitemap.xml does not list the site URL');
+  for (const p of pagePaths) if (!sitemap.includes(`<loc>${siteUrl}${p}</loc>`)) fail(`sitemap.xml does not list ${siteUrl}${p}`);
   if (!robots.includes(`Sitemap: ${siteUrl}sitemap.xml`)) fail('robots.txt does not reference the sitemap');
 } else if (canonical || meta('property', 'og:url')) fail('canonical/og:url emitted without a site URL');
+
+// Each subpage: its own title, description, canonical and h1, and working links.
+const titles = new Set([title]);
+for (const [p, page] of Object.entries(pageHtml)) {
+  const ph = page.slice(0, page.indexOf('</head>'));
+  const pTitle = /<title>([^<]*)<\/title>/.exec(ph)?.[1];
+  const pDesc = /<meta name="description" content="([^"]*)"/.exec(ph)?.[1];
+  if (!pTitle || pTitle.length < 30 || pTitle.length > 60) fail(`${p}: title should be 30-60 characters: ${String(pTitle?.length)}`);
+  if (titles.has(pTitle)) fail(`${p}: title is not unique`);
+  titles.add(pTitle);
+  if (!pDesc || pDesc.length < 70 || pDesc.length > 160) fail(`${p}: description should be 70-160 characters: ${String(pDesc?.length)}`);
+  if ((page.match(/<h1\b/g)?.length ?? 0) !== 1) fail(`${p}: expected exactly one <h1>`);
+  if (!/<link rel="icon" href="\/favicon\.ico"/.test(ph)) fail(`${p}: missing favicon link`);
+  const pld = /<script type="application\/ld\+json">([\s\S]*?)<\/script>/.exec(page);
+  const pTypes = pld ? (JSON.parse(pld[1])['@graph'] ?? []).map((g) => g['@type']) : [];
+  for (const t of ['WebSite', 'WebPage', 'BreadcrumbList', 'SoftwareApplication']) if (!pTypes.includes(t)) fail(`${p}: JSON-LD missing ${t}`);
+  if (pTypes.includes('FAQPage')) fail(`${p}: FAQ structured data belongs on the home page only`);
+  if (siteUrl && /<link rel="canonical" href="([^"]+)"/.exec(ph)?.[1] !== `${siteUrl}${p}`) fail(`${p}: canonical should be ${siteUrl}${p}`);
+  for (const [, href] of page.matchAll(/<a\b[^>]*\shref="(\/[^/"][^"]*|\/)"/g)) checkInternal(href, p);
+}
+
+// Favicons: Google Search fetches /favicon.ico and wants square multiples of 48px.
+const ico = existsSync(join(root, 'out', 'favicon.ico')) ? readFileSync(join(root, 'out', 'favicon.ico')) : null;
+if (!ico || ico.readUInt32LE(0) !== 0x10000 || ico[6] !== 48) fail('out/favicon.ico missing or not a 48x48 ICO');
+for (const size of [48, 96, 192, 512]) if (!existsSync(join(root, 'out', 'icons', `icon-${String(size)}.png`))) fail(`missing icons/icon-${String(size)}.png`);
+if (!/<link rel="icon" href="\/favicon\.ico"/.test(head)) fail('favicon.ico is not linked');
+if (!existsSync(join(root, 'out', 'llms.txt'))) fail('missing llms.txt');
+if (!readdirSync(join(root, 'public')).some((f) => /^[0-9a-f]{32}\.txt$/.test(f))) fail('missing IndexNow key file in public/');
 
 // The Google tag is the only third-party script, and it must be on the page.
 const gaId = /export const gaMeasurementId: string \| null = '([^']+)'/.exec(readFileSync(join(root, 'lib', 'site.ts'), 'utf8'))?.[1];
@@ -121,4 +163,4 @@ if (failures.length) {
   console.error(`check-site: ${failures.length} problem(s)\n - ${failures.join('\n - ')}`);
   process.exit(1);
 }
-console.log(`check-site: OK (${anchors.length} links, ${downloadLinks.size} direct downloads, ${ids.size} ids; SEO: title ${String(title?.length)} chars, description ${String(description?.length)} chars, heading outline, JSON-LD, ${siteUrl ? `canonical ${siteUrl}` : "site URL not set (no canonical yet)"}; no pricing or backend references)`);
+console.log(`check-site: OK (${String(pagePaths.length + 1)} pages, ${anchors.length} links, ${downloadLinks.size} direct downloads, ${ids.size} ids; SEO: title ${String(title?.length)} chars, description ${String(description?.length)} chars, heading outline, JSON-LD, ${siteUrl ? `canonical ${siteUrl}` : "site URL not set (no canonical yet)"}; no pricing or backend references)`);

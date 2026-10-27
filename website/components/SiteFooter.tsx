@@ -1,4 +1,6 @@
-import { links, sections } from '@/lib/site';
+import Link from 'next/link';
+import { pages } from '@/lib/pages';
+import { links } from '@/lib/site';
 import { Logo } from './Logo';
 
 const groups: { title: string; items: { label: string; href: string }[] }[] = [
@@ -54,14 +56,14 @@ export function SiteFooter() {
           </nav>
         ))}
 
-        <nav aria-label="On this page">
-          <h2 className="eyebrow">On this page</h2>
+        <nav aria-label="Explore">
+          <h2 className="eyebrow">Explore</h2>
           <ul className="mt-4 grid gap-2.5">
-            {sections.map((s) => (
-              <li key={s.id}>
-                <a href={`#${s.id}`} className="text-sm text-muted transition-colors hover:text-snow">
-                  {s.label}
-                </a>
+            {pages.map((p) => (
+              <li key={p.path}>
+                <Link href={`/${p.path}`} className="text-sm text-muted transition-colors hover:text-snow">
+                  {p.label}
+                </Link>
               </li>
             ))}
           </ul>

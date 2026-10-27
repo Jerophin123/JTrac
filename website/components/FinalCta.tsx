@@ -20,10 +20,10 @@ export function FinalCta() {
           />
           <LogoMark size={44} aria-hidden="true" role="presentation" className="mx-auto" />
           <h2 id="final-cta-title" className="text-sheen mt-8 text-3xl font-bold tracking-[-0.035em] text-balance sm:text-5xl">
-            Ready to explore JTRAC?
+            Ready to explore Jtrac?
           </h2>
           <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-muted text-pretty sm:text-lg">
-            Start with the source, explore available releases, and see how JTRAC fits your workflow.
+            Start with the source, explore available releases, and see how Jtrac fits your workflow.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <DownloadButton className="w-full sm:w-auto" />

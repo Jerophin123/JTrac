@@ -13,7 +13,7 @@ import table from './styles/IssueTable.module.css';
 import timeline from './styles/TimelineView.module.css';
 
 /*
- * Replicas of JTRAC's Board, List, Timeline and Issue views (jtac/frontend/src/features),
+ * Replicas of Jtrac's Board, List, Timeline and Issue views (jtac/frontend/src/features),
  * rendered from demo data. Issue titles open the issue view; nothing talks to a server.
  */
 

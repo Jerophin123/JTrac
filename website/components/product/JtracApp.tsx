@@ -30,12 +30,12 @@ const NAV = [
 ];
 
 const PROJECTS = [
-  { key: 'JTRAC', name: 'JTRAC Platform', active: true },
+  { key: 'JTRAC', name: 'Jtrac Platform', active: true },
   { key: 'WEB', name: 'Website' },
   { key: 'OPS', name: 'Operations' },
 ];
 
-const PROJECT_NAME = 'JTRAC Platform';
+const PROJECT_NAME = 'Jtrac Platform';
 const VIEWER = 'Maya Kapoor';
 
 /** Static replica of the product sidebar (app/shell/Sidebar.tsx). Not interactive. */
@@ -102,7 +102,7 @@ function Sidebar() {
 }
 
 /**
- * Working replica of the JTRAC web app built from the product's own CSS Modules and demo
+ * Working replica of the Jtrac web app built from the product's own CSS Modules and demo
  * data. Visitors can switch Board / List / Timeline, open an issue and run its workflow
  * transitions. Everything is local state: nothing is saved and no server is contacted.
  */

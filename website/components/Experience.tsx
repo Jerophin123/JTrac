@@ -26,7 +26,7 @@ const rows = [
     title: 'See the work, then move it.',
     body: 'Drag issues across a board, with keyboard alternatives for every move. Switch to a filtered, sortable list or a timeline with milestones and “blocks” dependencies, and save the view for yourself or your team.',
     mock: (
-      <ProductFrame title="JTRAC Platform · Board" label="JTRAC board view with demo issues">
+      <ProductFrame title="Jtrac Platform · Board" label="Jtrac board view with demo issues">
         <BoardView issues={demoIssues} columns={['todo', 'progress', 'review']} style={{ gridAutoColumns: 'minmax(11.5rem, 1fr)', minBlockSize: 0 }} />
       </ProductFrame>
     ),
@@ -36,8 +36,8 @@ const rows = [
     title: 'Your process, enforced by the server.',
     body: 'Each status offers only the transitions its workflow allows, and some are limited to roles: in the Structured template only Administrators can Approve. Field rules make a field hidden, read-only, optional or required per status, here the assignee in review, and the server checks them on every read and write.',
     mock: (
-      <ProductFrame title="JTRAC-102 · Issue details" label="JTRAC issue details panel with workflow transitions and a required field">
-        <IssueView issue={reviewIssue} projectName="JTRAC Platform" compact />
+      <ProductFrame title="JTRAC-102 · Issue details" label="Jtrac issue details panel with workflow transitions and a required field">
+        <IssueView issue={reviewIssue} projectName="Jtrac Platform" compact />
       </ProductFrame>
     ),
   },
@@ -46,7 +46,7 @@ const rows = [
     title: 'Dates, milestones and what blocks what.',
     body: 'The timeline lays out scheduled issues against milestones and draws “blocks” dependencies, flagging work that is scheduled to start before its blocker ends. Dashboards then summarize progress, computed for each viewer so nobody sees what they cannot open.',
     mock: (
-      <ProductFrame title="JTRAC Platform · Timeline" label="JTRAC timeline view with demo issues, a milestone and a dependency">
+      <ProductFrame title="Jtrac Platform · Timeline" label="Jtrac timeline view with demo issues, a milestone and a dependency">
         <TimelineView issues={demoIssues} />
       </ProductFrame>
     ),

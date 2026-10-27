@@ -32,7 +32,7 @@ export function Downloads() {
           <SectionHeader
             id="download-title"
             eyebrow="Download"
-            title={`Download JTRAC ${latestRelease.version}`}
+            title={`Download Jtrac ${latestRelease.version}`}
             lede="One self-contained package per platform: the server, the jtrac command, a Java 25 runtime and, for the managed database mode, PostgreSQL. Unpack it and run setup."
           />
         </Reveal>

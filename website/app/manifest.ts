@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { seo } from '@/lib/seo';
+import { faviconSizes, seo } from '@/lib/seo';
 
 export const dynamic = 'force-static';
 
@@ -14,6 +14,7 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#110f0d',
     icons: [
       { src: 'icon.svg', type: 'image/svg+xml', sizes: 'any' },
+      ...faviconSizes.map((s) => ({ src: `icons/icon-${String(s)}.png`, type: 'image/png', sizes: `${String(s)}x${String(s)}` })),
       { src: 'apple-icon.png', type: 'image/png', sizes: '180x180' },
     ],
   };

@@ -48,7 +48,7 @@ export function ClassicFeatures() {
             id="classic-title"
             eyebrow="Then and now"
             title="The classic feature list, checked line by line."
-            lede="The original JTrac site listed what made it worth installing. Here is each of those features in JTRAC 3, including the ones that work differently or are not there yet."
+            lede="The original JTrac site listed what made it worth installing. Here is each of those features in Jtrac 3, including the ones that work differently or are not there yet."
           />
         </Reveal>
 
@@ -65,11 +65,11 @@ export function ClassicFeatures() {
             <div className={table.wrap}>
               <div className={table.scroller}>
                 <table className={table.table}>
-                  <caption className={base.visuallyHidden}>Features of the original JTrac and their status in JTRAC 3</caption>
+                  <caption className={base.visuallyHidden}>Features of the original JTrac and their status in Jtrac 3</caption>
                   <thead>
                     <tr>
                       <th scope="col">Classic JTrac</th>
-                      <th scope="col">JTRAC 3</th>
+                      <th scope="col">Jtrac 3</th>
                       <th scope="col" className={table.titleCol}>
                         How it works now
                       </th>

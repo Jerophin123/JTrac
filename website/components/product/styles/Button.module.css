@@ -1,6 +1,6 @@
 /* Ported from jtac/frontend/src/ui/Button.module.css for the landing-page replica. */
 /*
- * Buttons lean forward like the strokes of the JTRAC logo: the fill and border live on a
+ * Buttons lean forward like the strokes of the Jtrac logo: the fill and border live on a
  * skewed ::before layer, so the label stays upright and the focus ring follows the shape.
  */
 .button {

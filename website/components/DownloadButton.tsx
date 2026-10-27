@@ -1,6 +1,7 @@
 'use client';
 
 import { Download as DownloadIcon } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { type Download, type DownloadId, downloads } from '@/lib/site';
 import { ButtonLink } from './ui';
@@ -52,22 +53,23 @@ export function useDetectedDownload() {
 }
 
 /**
- * "Download JTRAC": a direct download of the visitor's package when it can be detected,
- * otherwise a jump to the download table. Never a detour through the Releases page.
+ * "Download Jtrac": a direct download of the visitor's package when it can be detected,
+ * otherwise the download table (on the home page) or the download page. Never a detour through the Releases page.
  */
 export function DownloadButton({ size = 'lg', className }: { size?: 'sm' | 'lg'; className?: string }) {
   const detected = useDetectedDownload();
+  const pathname = usePathname();
   const icon = <DownloadIcon size={size === 'sm' ? 16 : 17} aria-hidden="true" />;
   if (!detected) {
     return (
-      <ButtonLink href="#download" size={size} icon={icon} className={className}>
-        Download JTRAC
+      <ButtonLink href={pathname === '/' ? '#download' : '/download/'} size={size} icon={icon} className={className}>
+        Download Jtrac
       </ButtonLink>
     );
   }
   return (
     <ButtonLink href={detected.url} download={`${String(detected.sizeMb)} MB`} size={size} icon={icon} className={className}>
-      {size === 'sm' ? 'Download JTRAC' : `Download for ${detected.os}`}
+      {size === 'sm' ? 'Download Jtrac' : `Download for ${detected.os}`}
     </ButtonLink>
   );
 }

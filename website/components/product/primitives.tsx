@@ -8,7 +8,7 @@ import buttonStyles from './styles/Button.module.css';
 import orgStyles from './styles/OrgMark.module.css';
 
 /*
- * Markup replicas of JTRAC's UI primitives (jtac/frontend/src/ui): same structure,
+ * Markup replicas of Jtrac's UI primitives (jtac/frontend/src/ui): same structure,
  * same class names, same icons. Data comes from props only.
  */
 

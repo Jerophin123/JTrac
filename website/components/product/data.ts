@@ -1,6 +1,6 @@
 /**
- * Illustrative demo content for the JTRAC replica. These are NOT real repository issues;
- * every replica is labelled "Demo data". The workflow is JTRAC's real "Structured" project
+ * Illustrative demo content for the Jtrac replica. These are NOT real repository issues;
+ * every replica is labelled "Demo data". The workflow is Jtrac's real "Structured" project
  * template (statuses, transitions, Approve limited to Administrators, Assignee required in
  * In Progress and In Review), from WorkflowService.
  */

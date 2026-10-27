@@ -2,7 +2,7 @@
 
 /*
  * Tailwind names for the product's semantic tokens (app/product-tokens.css), so the landing
- * page and the product share one palette: warm stone neutrals and the JTRAC accent.
+ * page and the product share one palette: warm stone neutrals and the Jtrac accent.
  */
 @theme inline {
   --color-brand: var(--color-accent);

@@ -2,7 +2,7 @@
   "name": "jtrac-website",
   "private": true,
   "version": "3.0.0",
-  "description": "Static landing page for JTRAC (Next.js static export). Frontend only: no backend, no API calls.",
+  "description": "Static landing page for Jtrac (Next.js static export). Frontend only: no backend, no API calls.",
   "type": "module",
   "packageManager": "pnpm@12.10.1",
   "engines": {
@@ -13,7 +13,8 @@
     "build": "next build",
     "typecheck": "next typegen && tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
-    "check:site": "node scripts/check-site.mjs"
+    "check:site": "node scripts/check-site.mjs",
+    "indexnow": "node scripts/indexnow.mjs"
   },
   "dependencies": {
     "@fontsource-variable/ibm-plex-sans": "5.3.0",

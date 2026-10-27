@@ -5,7 +5,7 @@ interface LogoProps extends SVGProps<SVGSVGElement> {
   height?: number;
 }
 
-/** Official JTRAC wordmark (path data from logo.svg; same component as the product UI). */
+/** Official Jtrac wordmark (path data from logo.svg; same component as the product UI). */
 export function Logo({ height = 26, className, style, ...rest }: LogoProps) {
   return (
     <svg
@@ -14,7 +14,7 @@ export function Logo({ height = 26, className, style, ...rest }: LogoProps) {
       viewBox={wordmark.viewBox}
       style={{ aspectRatio: '16900 / 3950', ...style }}
       role="img"
-      aria-label="JTRAC"
+      aria-label="Jtrac"
       focusable="false"
       {...rest}
     >
@@ -32,7 +32,7 @@ export function Logo({ height = 26, className, style, ...rest }: LogoProps) {
   );
 }
 
-/** Official square JTRAC mark (path data from logo(2).svg). */
+/** Official square Jtrac mark (path data from logo(2).svg). */
 export function LogoMark({ size = 28, className, style, ...rest }: { size?: number } & SVGProps<SVGSVGElement>) {
   return (
     <svg
@@ -41,7 +41,7 @@ export function LogoMark({ size = 28, className, style, ...rest }: { size?: numb
       height={size}
       viewBox={mark.viewBox}
       role="img"
-      aria-label="JTRAC Mark"
+      aria-label="Jtrac Mark"
       focusable="false"
       style={{ ...style }}
       {...rest}

@@ -7,11 +7,13 @@ import type { Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { MotionProvider } from '@/components/Reveal';
-import { faq } from '@/lib/faq';
-import { buildMetadata, jsonLd, structuredData } from '@/lib/seo';
+import { buildMetadata } from '@/lib/seo';
 import { gaMeasurementId } from '@/lib/site';
 
-export const metadata = buildMetadata();
+// Defaults for routes without their own metadata (the 404 page): no canonical or index
+// directive, so a missing URL never claims to be the home page (Next adds noindex). Every
+// real page exports buildMetadata itself.
+export const metadata = { ...buildMetadata(), alternates: null, robots: null };
 
 export const viewport: Viewport = {
   themeColor: '#110f0d',
@@ -26,11 +28,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <noscript>
           <style>{'.motion-ssr{opacity:1!important;transform:none!important;filter:none!important}'}</style>
         </noscript>
-        <script
-          type="application/ld+json"
-          // Static, build-time JSON with "<" escaped (see jsonLd).
-          dangerouslySetInnerHTML={{ __html: jsonLd(structuredData(faq)) }}
-        />
         <MotionProvider>{children}</MotionProvider>
         {gaMeasurementId ? <GoogleAnalytics id={gaMeasurementId} /> : null}
       </body>

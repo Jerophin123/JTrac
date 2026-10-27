@@ -86,7 +86,7 @@ export function OpenSource() {
         </Reveal>
 
         <p className="mx-auto mt-10 max-w-2xl text-center text-xs leading-relaxed text-subtle">
-          This JTRAC is an unofficial, independent reimagining of the classic JTrac issue tracker. It is not affiliated with,
+          This Jtrac is an unofficial, independent reimagining of the classic JTrac issue tracker. It is not affiliated with,
           endorsed by or maintained by the{' '}
           <a href={links.original} target="_blank" rel="noopener noreferrer" className={landing.link}>
             original JTrac project
