@@ -16,7 +16,7 @@ export const siteUrl: string | null = 'https://www.jtrac.site/';
 export const gaMeasurementId: string | null = 'G-3NT3JYGSES';
 
 /** Latest published release (checked on the Releases page). Update with each release. */
-export const latestRelease = { version: '3.0.0', url: `${repo}/releases/tag/v3.0.0` } as const;
+export const latestRelease = { version: '3.0.2', url: `${repo}/releases/tag/v3.0.2` } as const;
 
 const asset = (name: string) => `${repo}/releases/download/v${latestRelease.version}/${name}`;
 
