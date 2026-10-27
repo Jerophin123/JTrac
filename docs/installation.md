@@ -10,11 +10,11 @@ then check the archive:
 
 ```powershell
 # Windows (PowerShell)
-(Get-FileHash .\jtrac-3.0.0-windows-x64.zip -Algorithm SHA256).Hash   # compare with the .sha256 file
+(Get-FileHash .\jtrac-3.0.2-windows-x64.zip -Algorithm SHA256).Hash   # compare with the .sha256 file
 ```
 ```sh
 # Linux / macOS
-sha256sum -c jtrac-3.0.0-linux-x64.tar.gz.sha256        # macOS: shasum -a 256 -c ...
+sha256sum -c jtrac-3.0.2-linux-x64.tar.gz.sha256        # macOS: shasum -a 256 -c ...
 ```
 
 ## 2. Unpack
@@ -22,12 +22,12 @@ sha256sum -c jtrac-3.0.0-linux-x64.tar.gz.sha256        # macOS: shasum -a 256 -
 Unpack into a folder you keep, owned by the account that will run JTRAC (not root /
 Administrator):
 
-- Windows: e.g. `C:\JTRAC\jtrac-3.0.0-windows-x64` (right-click > Extract All, or
+- Windows: e.g. `C:\JTRAC\jtrac-3.0.2-windows-x64` (right-click > Extract All, or
   `Expand-Archive`). Avoid `C:\Program Files` (needs admin rights to write logs there).
 - Linux: e.g. `~/jtrac` or `/opt/jtrac` (owned by a dedicated `jtrac` user):
-  `tar -xzf jtrac-3.0.0-linux-x64.tar.gz`
-- macOS: `tar -xzf jtrac-3.0.0-macos-arm64.tar.gz`, then
-  `xattr -dr com.apple.quarantine jtrac-3.0.0-macos-arm64` (the package is not notarized).
+  `tar -xzf jtrac-3.0.2-linux-x64.tar.gz`
+- macOS: `tar -xzf jtrac-3.0.2-macos-arm64.tar.gz`, then
+  `xattr -dr com.apple.quarantine jtrac-3.0.2-macos-arm64` (the package is not notarized).
 
 Nothing else needs to be installed: the package contains its Java runtime and, on most
 targets, PostgreSQL.

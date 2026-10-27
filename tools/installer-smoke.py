@@ -16,8 +16,8 @@ data directory and ports of its own and a controlled SMTP server (nothing is sen
  10  uninstall keeps the data; uninstall --delete-data removes it only with confirmation
 
 Usage:
-  python -I tools/installer-smoke.py --archive distribution/releases/3.0.0/jtrac-3.0.0-<target>.zip
-         --smtp-fixtures serverconfig/build/libs/serverconfig-3.0.0-test-fixtures.jar
+  python -I tools/installer-smoke.py --archive distribution/releases/3.0.2/jtrac-3.0.2-<target>.zip
+         --smtp-fixtures serverconfig/build/libs/serverconfig-3.0.2-test-fixtures.jar
          [--http-port 18080] [--db-port 55432] [--smtp-port 2525] [--keep]
 Writes a Markdown report next to the archive's verification folder and exits non-zero on failure.
 """

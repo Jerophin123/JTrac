@@ -4,6 +4,19 @@ All notable changes to JTrac are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [3.0.2] - 2026-10-27
+
+### Fixed
+
+- Organization branding is applied to the whole interface under the production
+  Content-Security-Policy (previously only part of it changed color).
+- A color extracted from an organization's logo now themes the whole interface.
+- The logo and favicon stay readable in a dark browser color scheme.
+
+### Changed
+
+- NOTICE and README describe the project as an unofficial reimagining of JTrac.
+
 ## [3.0.0] - 2026-10-26
 
 First release of this unofficial, modern-era reimagining of JTrac, as a self-contained
@@ -41,4 +54,5 @@ See `docs/platform-support.md` for the test status of each operating system and 
   previous database back automatically.
 - Answers files keep Windows paths and ignore a UTF-8 byte-order mark.
 
+[3.0.2]: https://github.com/Jerophin123/JTrac/releases/tag/v3.0.2
 [3.0.0]: https://github.com/Jerophin123/JTrac/releases/tag/v3.0.0

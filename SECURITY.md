@@ -14,7 +14,7 @@
 Use GitHub's private vulnerability reporting: open https://github.com/Jerophin123/JTrac/security/advisories/new
 ("Report a vulnerability"). Include:
 
-- the affected version and platform package (e.g. `jtrac-3.0.0-linux-x64`);
+- the affected version and platform package (e.g. `jtrac-3.0.2-linux-x64`);
 - a description and impact, and steps or a proof of concept to reproduce;
 - whether the issue is already public.
 

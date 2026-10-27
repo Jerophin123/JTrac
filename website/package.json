@@ -1,7 +1,7 @@
 {
   "name": "jtrac-website",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.0.2",
   "description": "Static landing page for Jtrac (Next.js static export). Frontend only: no backend, no API calls.",
   "type": "module",
   "packageManager": "pnpm@12.10.1",

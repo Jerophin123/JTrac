@@ -1,3 +1,26 @@
+# JTRAC 3.0.2
+
+Maintenance release. No database migrations: settings, secrets and data carry over unchanged.
+
+## Fixed
+
+- **Organization branding now applies everywhere in the production package.** The brand
+  color was applied through an injected `<style>` element, which the server's
+  Content-Security-Policy (`style-src 'self'`) blocks, so only part of the interface changed
+  color while navigation highlights, badges, surfaces and borders kept the default orange.
+  The theme is now derived in the stylesheet from a single color set through the DOM, which
+  the policy allows. The policy itself is unchanged.
+- A color taken from an organization's uploaded logo now themes the whole interface too.
+- The JTRAC logo and favicon stay readable when the browser uses a dark color scheme.
+
+## Upgrade notes
+
+From 3.0.0: unpack 3.0.2 next to the old folder, then run `jtrac update --from <old folder>`
+from the new one (see `docs/upgrades.md`). The update makes a verified backup first; no
+migrations are pending.
+
+---
+
 # JTRAC 3.0.0
 
 First release of JTRAC as a self-contained server package.
