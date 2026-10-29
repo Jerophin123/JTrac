@@ -23,6 +23,9 @@ jtac:
       tls: NONE
   attachments:
     directory: ./build/test-data/attachments
+  mcp:
+    # Every MockMvc request comes from one address; the limit itself is tested in McpRateLimitTests.
+    registrations-per-hour: 100000
   integrations:
     # Test-only fixture key (bytes 0..31), not a secret; production requires JTAC_SECRET_KEY.
     secret-key: AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=

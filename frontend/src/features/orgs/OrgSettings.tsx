@@ -2,6 +2,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { useNavigate } from '@tanstack/react-router';
 import {
   Bell,
+  Bot,
   Building2,
   MailPlus,
   Pipette,
@@ -51,6 +52,7 @@ import { Switch } from '../../ui/Switch';
 import { Segmented } from '../../ui/Tabs';
 import { useToast } from '../../ui/Toast';
 import { sessionQueryOptions } from '../auth/session';
+import { AgentConnectionsContent } from '../agents/AgentConnectionsPage';
 import styles from './OrgSettings.module.css';
 
 const PRESET_COLORS = ['#b4532a', '#2563eb', '#0d9488', '#16a34a', '#7c3aed', '#ea580c', '#e11d48', '#334155'];
@@ -92,12 +94,15 @@ export function OrgSettingsLayout({ children }: { children: ReactNode }) {
         },
         {
           label: 'Developers',
-          items: admin
-            ? [
-                { label: 'Webhooks', icon: <Webhook size={16} />, link: { to: '/$org/settings/webhooks' as const, params: { org } } },
-                { label: 'Audit log', icon: <ScrollText size={16} />, link: { to: '/$org/settings/audit' as const, params: { org } } },
-              ]
-            : [],
+          items: [
+            { label: 'AI agents (MCP)', icon: <Bot size={16} />, link: { to: '/$org/settings/agents', params: { org } } },
+            ...(admin
+              ? [
+                  { label: 'Webhooks', icon: <Webhook size={16} />, link: { to: '/$org/settings/webhooks' as const, params: { org } } },
+                  { label: 'Audit log', icon: <ScrollText size={16} />, link: { to: '/$org/settings/audit' as const, params: { org } } },
+                ]
+              : []),
+          ],
         },
       ]}
     >
@@ -994,4 +999,8 @@ export function AuditSettings() {
       </SettingsCard>
     </SettingsSection>
   );
+}
+
+export function AgentSettings() {
+  return <AgentConnectionsContent />;
 }

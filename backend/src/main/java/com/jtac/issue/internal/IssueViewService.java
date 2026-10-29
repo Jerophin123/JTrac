@@ -4,7 +4,13 @@ import com.jtac.field.FieldCatalog;
 import com.jtac.field.FieldDefinition;
 import com.jtac.identity.UserDirectory;
 import com.jtac.identity.UserSummary;
+import com.jtac.issue.IssueActivityEntry;
 import com.jtac.issue.IssueSummary;
+import com.jtac.issue.IssueView;
+import com.jtac.issue.IssueView.LinkView;
+import com.jtac.issue.IssueView.Permissions;
+import com.jtac.issue.IssueView.SubtaskView;
+import com.jtac.issue.IssueView.TransitionView;
 import com.jtac.issue.Priority;
 import com.jtac.organization.OrgContext;
 import com.jtac.project.ProjectAccess;
@@ -59,32 +65,6 @@ class IssueViewService {
         this.workflows = workflows;
         this.fields = fields;
         this.users = users;
-    }
-
-    record TransitionView(String id, String name, IssueSummary.StatusRef to) {
-    }
-
-    record LinkView(UUID id, String type, String direction, String key, String title, IssueSummary.StatusRef status) {
-    }
-
-    record SubtaskView(String key, String title, IssueSummary.StatusRef status, IssueSummary.Person assignee) {
-    }
-
-    record Permissions(boolean edit, boolean transition, boolean assign, boolean delete, boolean comment,
-            boolean attach, boolean manage) {
-    }
-
-    record IssueView(UUID id, String key, IssueSummary.Ref project, ProjectCatalog.IssueType type, String title,
-            String description, IssueSummary.StatusRef status, Priority priority, IssueSummary.Person assignee,
-            IssueSummary.Person reporter, SubtaskView parent, IssueSummary.Ref milestone, LocalDate startDate,
-            LocalDate dueDate, BigDecimal estimate, List<IssueSummary.LabelRef> labels, Map<String, Object> customValues,
-            Map<String, FieldAccess> fieldAccess, List<TransitionView> transitions, List<SubtaskView> subtasks,
-            List<LinkView> links, List<IssueSummary.Person> watchers, boolean watching, Permissions permissions,
-            Instant createdAt, Instant updatedAt, Instant resolvedAt, long version) {
-    }
-
-    record ActivityEntry(UUID id, String kind, String field, Object oldValue, Object newValue, IssueSummary.Person actor,
-            Instant at) {
     }
 
     @Transactional(readOnly = true)
@@ -192,7 +172,7 @@ class IssueViewService {
     }
 
     @Transactional(readOnly = true)
-    List<ActivityEntry> activity(ProjectContext ctx, IssueRecord issue) {
+    List<IssueActivityEntry> activity(ProjectContext ctx, IssueRecord issue) {
         Workflow workflow = workflows.published(ctx.projectId());
         FieldGuard guard = FieldGuard.of(workflow, issue.statusId(), ctx.roleIds(), fields.fields(ctx.projectId()));
         record Row(UUID id, String kind, String field, String oldValue, String newValue, UUID actor, Instant at) {
@@ -213,13 +193,13 @@ class IssueViewService {
             }
         });
         Map<UUID, UserSummary> persons = users.findAll(actors);
-        List<ActivityEntry> result = new ArrayList<>();
+        List<IssueActivityEntry> result = new ArrayList<>();
         for (Row row : rows) {
             boolean ruleable = row.field() != null && (row.field().startsWith("cf:") || Workflow.SYSTEM_FIELDS.contains(row.field()));
             if (ruleable && !guard.visible(row.field())) {
                 continue; // never reveal changes to fields hidden from this viewer
             }
-            result.add(new ActivityEntry(row.id(), row.kind(), row.field(), parse(row.oldValue()), parse(row.newValue()),
+            result.add(new IssueActivityEntry(row.id(), row.kind(), row.field(), parse(row.oldValue()), parse(row.newValue()),
                     person(persons, row.actor()), row.at()));
         }
         return result;

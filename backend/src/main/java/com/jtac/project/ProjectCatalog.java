@@ -30,4 +30,7 @@ public interface ProjectCatalog {
     List<Role> roles(UUID projectId);
 
     Optional<UUID> adminRoleId(UUID projectId);
+
+    /** The project's description (Markdown), if it has one. */
+    Optional<String> description(UUID projectId);
 }

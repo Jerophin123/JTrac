@@ -31,7 +31,7 @@ jobs:
           --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
     defaults:
       run:
-        working-directory: .
+        working-directory: jtac
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -64,15 +64,15 @@ jobs:
         with:
           name: backend-test-reports
           path: |
-            backend/build/reports/tests
-            serverconfig/build/reports/tests
-            launcher/build/reports/tests
+            jtac/backend/build/reports/tests
+            jtac/serverconfig/build/reports/tests
+            jtac/launcher/build/reports/tests
 
   frontend:
     runs-on: ubuntu-24.04
     defaults:
       run:
-        working-directory: frontend
+        working-directory: jtac/frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

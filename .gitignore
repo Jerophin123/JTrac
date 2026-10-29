@@ -1,22 +1,8 @@
-# Build outputs
-build/
-.gradle/
-frontend/dist/
-frontend/node_modules/
-frontend/test-results/
-frontend/playwright-report/
-node_modules/
-
-# Release packages are build outputs (attach them to GitHub releases, never commit them)
-distribution/releases/
-
-# Local runtime data: databases, mail, attachments, setup codes, generated keys
-/data/
-/config/
-backend/data/
-backend/config/
-
-# Secrets and machine-local configuration: never commit these
+# ---------------------------------------------------------------------------
+# Secrets and machine-local configuration — never commit these.
+# Database passwords live in %APPDATA%\postgresql\pgpass.conf or environment
+# variables (see jtac/docs/adr/0004-database-roles-and-migrations.md).
+# ---------------------------------------------------------------------------
 .env
 .env.*
 !.env.example
@@ -27,16 +13,55 @@ pgpass.conf
 *.p12
 *.pfx
 *.jks
-secrets.properties
-admin-secrets.properties
+**/config/secrets/
+application-secrets*.yaml
+application-secrets*.yml
 
-# IDE / OS
-.idea/
-*.iml
-.vscode/*
-!.vscode/extensions.json
+# OS / editors
 .DS_Store
 Thumbs.db
 desktop.ini
 *.swp
+*.swo
 *~
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+
+# Claude Code machine-local settings (shared settings.json may be committed)
+.claude/settings.local.json
+
+# Gradle / Java
+.gradle/
+.kotlin/
+build/
+out/
+*.class
+hs_err_pid*.log
+!gradle/wrapper/gradle-wrapper.jar
+
+# Node / frontend
+node_modules/
+dist/
+coverage/
+.vite/
+*.tsbuildinfo
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# Logs
+logs/
+*.log
+
+# JTAC runtime data (attachments, file-transport mail, generated dev secret key)
+jtac/data/
+jtac/backend/data/
+
+# Release archives are build outputs (published from CI), never committed.
+jtac/distribution/releases/
+
+# Staging copy for publishing the public repository
+publish/

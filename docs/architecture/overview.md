@@ -42,6 +42,7 @@ backend (`:8080`), so the browser still sees a single origin.
 | `reporting` | M8 | dashboards and aggregates | search |
 | `integration` | M9 | API tokens, webhooks, import/export | events, issue |
 | `admin`, `audit` | M2+/M7 | settings, audit events | read-only on others |
+| `mcp` | 3.x | AI agent connections: MCP endpoint, OAuth 2.1 server, agent tools (ADR 0010, docs/ai-agents.md) | public APIs of issue, collaboration, attachment, project, workflow, field, search, notification, planning, organization, identity, audit |
 
 Dependency rule: no cycles; only public module APIs; verified by `ModularityTests`.
 

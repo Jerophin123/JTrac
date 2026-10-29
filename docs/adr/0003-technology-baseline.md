@@ -15,7 +15,7 @@ sources: not chosen merely because it is the newest.
 
 | Component | Version | Verification |
 |---|---|---|
-| JDK | Temurin **25.0.4.1 LTS** (local install) | `java -version` on the dev machine |
+| JDK | Temurin **25.0.4.1 LTS** (`D:\Java\jdk-25`) | `java -version` on the dev machine |
 | Spring Boot | **4.1.2** | Official system requirements: "requires at least Java 17 and is compatible with versions up to and including Java 27"; Gradle "8.x (8.14 or later) and 9.x": https://docs.spring.io/spring-boot/system-requirements.html |
 | Spring Framework / Security | 7.0.10 / 7.1.2 (managed by Boot) | Boot 4.1.2 BOM `spring-boot-dependencies-4.1.2.pom` |
 | Spring Modulith | **2.1.2** | Boot 4.1 release highlights list Modulith 2.1 (https://spring.io/projects/release-highlights/); `spring-modulith-starter-test-2.1.2.pom` depends on `spring-boot-starter-test` **4.1.2** (Maven Central) |
@@ -69,6 +69,9 @@ The site reuses the SPA's design tokens and CSS Modules (copied with source note
 
 Release packaging (ADR 0009) adds the CycloneDX Gradle plugin 3.4.1 and the zonky
 PostgreSQL 18.6.0 binaries; versions and checksums are recorded in `docs/dependencies.md`.
+
+AI agent connections (ADR 0010, 2026-10-28) add the official MCP Java SDK 2.1.0
+(`mcp-core`, `mcp-json-jackson3`), compatible with Boot 4.1's Jackson 3 and Reactor versions.
 
 ## Consequences
 

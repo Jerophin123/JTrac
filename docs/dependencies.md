@@ -9,7 +9,7 @@ Compatibility rationale: ADR 0003.
 
 | Item | Version | Source of truth |
 |---|---|---|
-| JDK | Temurin 25.0.4.1 LTS | local install |
+| JDK | Temurin 25.0.4.1 LTS | local install `D:\Java\jdk-25` |
 | Gradle wrapper | 9.8.2 (SHA-256 `21bd5da2de49b642904077f38c0efdc7778e92b3ed0889392dca61b97e389607`) | https://docs.gradle.org/current/userguide/compatibility.html, https://services.gradle.org/versions/current |
 | Node.js / pnpm | 24.21.0 / 12.10.1 | local install |
 | PostgreSQL | 18.6 | https://www.postgresql.org/support/versioning/ |
@@ -32,6 +32,7 @@ Compatibility rationale: ADR 0003.
 | `spring-modulith-starter-test` | 2.1.2 | module verification and docs |
 | `angus-mail` (in `serverconfig`) | managed (2.0.5) | SMTP client for delivery and test emails (Jakarta Mail implementation already used by `spring-boot-starter-mail`) |
 | `greenmail-junit5` (test) | 2.1.14 | in-process SMTP server for mail integration tests |
+| `io.modelcontextprotocol.sdk:mcp-core` + `mcp-json-jackson3` | 2.1.0 (added 2026-10-28) | official MCP Java SDK: stateless Streamable HTTP servlet transport, schema types, tool input validation (ADR 0010). Brings `reactor-core` (Boot-managed 3.8.8) and `com.networknt:json-schema-validator` 3.0.6; its Jackson 3 module uses Boot's `jackson-databind` 3.1.7 (built against 3.1.4). Verified on Maven Central and by integration tests plus an end-to-end run with the official MCP TypeScript SDK 1.32.2 client |
 
 ## Packaging (release builds only, 2026-10-26)
 

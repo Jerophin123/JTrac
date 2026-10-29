@@ -18,6 +18,13 @@ info:
     under `/api/v1/me/tokens`). Token requests need no CSRF header and never use cookies.
     `read` tokens may only use GET; tokens can be restricted to one organization.
 
+    **AI agent connections (MCP).** Coding agents connect to `/mcp/c_<id>` (MCP Streamable
+    HTTP, stateless) and sign in with OAuth 2.1 at `/oauth/*` (dynamic registration, PKCE S256,
+    RFC 8707 resource binding), discovered through `/.well-known/oauth-authorization-server` and
+    `/.well-known/oauth-protected-resource/mcp/c_<id>`. Those endpoints follow the MCP and OAuth
+    specifications rather than this API's conventions; see docs/ai-agents.md. The user manages
+    connections and approves agents with the `agents` operations below.
+
     **Tenancy and permissions.** Everything under `/api/v1/orgs/{org}` requires membership of
     that organization; resources the caller may not see are reported as `not-found`. Workflow
     field rules apply to every response: hidden fields are null and listed in `hiddenFields`
@@ -46,6 +53,8 @@ tags:
     description: Sign-in, sessions, registration and account recovery
   - name: account
     description: My profile and API tokens
+  - name: agents
+    description: AI agent (MCP) connections and agent sign-in approval
   - name: organizations
     description: Organizations, members, invitations, teams and audit
   - name: projects
@@ -644,6 +653,403 @@ paths:
       responses:
         "204":
           description: No content
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/agent-connections/options":
+    get:
+      tags: [agents]
+      operationId: getAgentConnectionOptions
+      summary: Permissions, profiles and availability for agent connections
+      description: Requires a browser session; API tokens and agents are refused (forbidden).
+      security:
+        - session: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AgentConnectionOptions"
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/agent-connections":
+    get:
+      tags: [agents]
+      operationId: listAgentConnections
+      summary: List my AI agent connections
+      description: Requires a browser session; API tokens and agents are refused (forbidden).
+      security:
+        - session: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentConnection"
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+    post:
+      tags: [agents]
+      operationId: createAgentConnection
+      summary: Create an AI agent connection
+      description: Creates a connection for one organization with an opaque MCP URL. Without scopes the read-only Coding assistant profile is used. Requires a browser session; API tokens and agents are refused (forbidden).
+      security:
+        - session: []
+          csrf: []
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/CreateAgentConnection"
+      responses:
+        "201":
+          description: Created
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AgentConnection"
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/agent-connections/{id}":
+    get:
+      tags: [agents]
+      operationId: getAgentConnection
+      summary: Get an AI agent connection
+      description: Requires a browser session; API tokens and agents are refused (forbidden).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - session: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AgentConnection"
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+    patch:
+      tags: [agents]
+      operationId: updateAgentConnection
+      summary: Rename an agent connection or change its permissions
+      description: Permission changes apply to existing agent tokens at their next request. Requires a browser session; API tokens and agents are refused (forbidden).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - session: []
+          csrf: []
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/UpdateAgentConnection"
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AgentConnection"
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+    delete:
+      tags: [agents]
+      operationId: deleteAgentConnection
+      summary: Delete an agent connection (revokes all its tokens)
+      description: Requires a browser session; API tokens and agents are refused (forbidden).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - session: []
+          csrf: []
+      responses:
+        "204":
+          description: No content
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/agent-connections/{id}/rotate":
+    post:
+      tags: [agents]
+      operationId: rotateAgentConnection
+      summary: Give an agent connection a new URL
+      description: The old URL stops working and every agent must sign in again. Requires a browser session; API tokens and agents are refused (forbidden).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - session: []
+          csrf: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AgentConnection"
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/agent-connections/{id}/revoke":
+    post:
+      tags: [agents]
+      operationId: revokeAgentConnection
+      summary: Revoke an agent connection
+      description: All tokens stop working immediately. Requires a browser session; API tokens and agents are refused (forbidden).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - session: []
+          csrf: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AgentConnection"
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/agent-connections/{id}/agents":
+    get:
+      tags: [agents]
+      operationId: listConnectionAgents
+      summary: Agents currently signed in to a connection
+      description: Requires a browser session; API tokens and agents are refused (forbidden).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - session: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuthorizedAgent"
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/agent-connections/{id}/agents/{clientId}":
+    delete:
+      tags: [agents]
+      operationId: revokeConnectionAgent
+      summary: Sign one agent out of a connection
+      description: Requires a browser session; API tokens and agents are refused (forbidden).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - session: []
+          csrf: []
+      responses:
+        "204":
+          description: No content
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/agent-connections/{id}/activity":
+    get:
+      tags: [agents]
+      operationId: listAgentConnectionActivity
+      summary: Recent activity of a connection (tool names, outcomes, issue keys; never contents)
+      description: Requires a browser session; API tokens and agents are refused (forbidden).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+      security:
+        - session: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AgentActivityPage"
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/agent-authorizations/{handle}":
+    get:
+      tags: [agents]
+      operationId: getAgentAuthorization
+      summary: Describe a pending agent sign-in (the OAuth consent screen)
+      description: Only the owner of the connection named in the request sees it; anyone else gets not-found. Requires a browser session; API tokens and agents are refused (forbidden).
+      parameters:
+        - name: handle
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - session: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AgentConsent"
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/agent-authorizations/{handle}/approve":
+    post:
+      tags: [agents]
+      operationId: approveAgentAuthorization
+      summary: Approve an agent sign-in
+      description: Returns the agent's redirect URL carrying a one-time authorization code. Requires a browser session; API tokens and agents are refused (forbidden).
+      parameters:
+        - name: handle
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - session: []
+          csrf: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AgentDecision"
+        "4XX":
+          description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/agent-authorizations/{handle}/deny":
+    post:
+      tags: [agents]
+      operationId: denyAgentAuthorization
+      summary: Deny an agent sign-in
+      description: Returns the agent's redirect URL carrying error=access_denied. Requires a browser session; API tokens and agents are refused (forbidden).
+      parameters:
+        - name: handle
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - session: []
+          csrf: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AgentDecision"
         "4XX":
           description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
           content:
@@ -6729,6 +7135,242 @@ components:
       properties:
         filter:
           $ref: "#/components/schemas/IssueFilter"
+    AgentConnection:
+      type: object
+      required: [id, name, url, organization, scopes, profile, status, createdAt, authorizedAgents, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        url:
+          type: string
+          description: The connection's MCP URL. A locator, not a credential; agents still sign in with OAuth.
+        organization:
+          type: object
+          required: [id, slug, name]
+          properties:
+            id:
+              type: string
+              format: uuid
+            slug:
+              type: string
+            name:
+              type: string
+        scopes:
+          type: array
+          items:
+            type: string
+            enum: [issues:read, attachments:read, projects:read, notifications:read, reports:read, issues:comment, issues:write, issues:transition, reports:write]
+        profile:
+          type: string
+          enum: [ISSUE_READER, PROJECT_ANALYST, CODING_ASSISTANT, ISSUE_CONTRIBUTOR, CUSTOM]
+        status:
+          type: string
+          enum: [ACTIVE, EXPIRED, REVOKED]
+        createdAt:
+          type: string
+          format: date-time
+        lastUsedAt:
+          type: [string, "null"]
+          format: date-time
+          description: Time of the last successful, authorized agent request.
+        lastClient:
+          type: [string, "null"]
+          description: Name the last agent registered with (self-reported by the agent).
+        expiresAt:
+          type: [string, "null"]
+          format: date-time
+        rotatedAt:
+          type: [string, "null"]
+          format: date-time
+        revokedAt:
+          type: [string, "null"]
+          format: date-time
+        authorizedAgents:
+          type: integer
+          description: Agents with a currently valid sign-in.
+        version:
+          type: integer
+          format: int64
+    CreateAgentConnection:
+      type: object
+      required: [name, organizationId]
+      properties:
+        name:
+          type: string
+          maxLength: 80
+        organizationId:
+          type: string
+          format: uuid
+        scopes:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+            enum: [issues:read, attachments:read, projects:read, notifications:read, reports:read, issues:comment, issues:write, issues:transition, reports:write]
+        expiresInDays:
+          type: [integer, "null"]
+          enum: [30, 90, 365, null]
+    UpdateAgentConnection:
+      type: object
+      required: [version]
+      properties:
+        name:
+          type: string
+          maxLength: 80
+        scopes:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+            enum: [issues:read, attachments:read, projects:read, notifications:read, reports:read, issues:comment, issues:write, issues:transition, reports:write]
+        version:
+          type: integer
+          format: int64
+    AgentConnectionOptions:
+      type: object
+      required: [available, serverUrl, scopes, profiles, maxConnections]
+      properties:
+        available:
+          type: boolean
+        unavailableReason:
+          type: [string, "null"]
+        serverUrl:
+          type: string
+        scopes:
+          type: array
+          items:
+            type: object
+            required: [name, description, write]
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              write:
+                type: boolean
+        profiles:
+          type: array
+          items:
+            type: object
+            required: [key, label, scopes, isDefault]
+            properties:
+              key:
+                type: string
+              label:
+                type: string
+              scopes:
+                type: array
+                items:
+                  type: string
+              isDefault:
+                type: boolean
+        maxConnections:
+          type: integer
+    AuthorizedAgent:
+      type: object
+      required: [clientId, clientName, authorizedAt, lastRefreshedAt]
+      properties:
+        clientId:
+          type: string
+        clientName:
+          type: string
+        authorizedAt:
+          type: string
+          format: date-time
+        lastRefreshedAt:
+          type: string
+          format: date-time
+    AgentActivity:
+      type: object
+      required: [at, kind, name, outcome]
+      properties:
+        at:
+          type: string
+          format: date-time
+        kind:
+          type: string
+          enum: [TOOL, RESOURCE, PROMPT, AUTH]
+        name:
+          type: string
+        outcome:
+          type: string
+          enum: [OK, ERROR, DENIED, RATE_LIMITED]
+        target:
+          type: [string, "null"]
+        client:
+          type: [string, "null"]
+        durationMs:
+          type: [integer, "null"]
+    AgentActivityPage:
+      type: object
+      required: [items, page, size, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentActivity"
+        page:
+          type: integer
+        size:
+          type: integer
+        total:
+          type: integer
+          format: int64
+    AgentScopeView:
+      type: object
+      required: [name, description, write]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        write:
+          type: boolean
+    AgentConsent:
+      type: object
+      required: [clientName, redirectUri, redirectHost, redirectKind, connectionId, connectionName, organizationName,
+        organizationSlug, granted, notEnabled, expiresAt]
+      properties:
+        clientName:
+          type: string
+          description: Self-reported by the agent at registration; not verified.
+        redirectUri:
+          type: string
+        redirectHost:
+          type: string
+        redirectKind:
+          type: string
+          enum: [LOOPBACK, RECOGNISED, UNRECOGNISED]
+        connectionId:
+          type: string
+          format: uuid
+        connectionName:
+          type: string
+        organizationName:
+          type: string
+        organizationSlug:
+          type: string
+        granted:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentScopeView"
+        notEnabled:
+          type: array
+          description: Requested by the agent but not enabled on the connection.
+          items:
+            $ref: "#/components/schemas/AgentScopeView"
+        expiresAt:
+          type: string
+          format: date-time
+    AgentDecision:
+      type: object
+      required: [redirectUrl]
+      properties:
+        redirectUrl:
+          type: string
     TokenInfo:
       type: object
       required: [id, name, prefix, scopes, createdAt]

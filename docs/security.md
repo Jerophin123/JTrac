@@ -37,6 +37,20 @@
 5. Use an SMTP app password scoped to sending, not a personal mailbox password.
 6. Keep the package updated; check `tools/osv-scan.py` results in release notes.
 
+## AI agent connections (MCP)
+
+Agents connect to per-connection URLs (`/mcp/c_<random>`) and sign in with OAuth 2.1
+(PKCE S256, dynamic client registration, RFC 8707 audience binding, rotating refresh
+tokens with replay detection). Consent is given in the signed-in web app by the
+connection's owner only; every request re-checks account, membership, scopes, project
+permissions and field rules; writes are audited; tokens are stored hashed and never logged.
+Agent-facing endpoints require `jtac.public-url` to be HTTPS. Residual risks: a malicious
+program on the user's own computer can impersonate a local agent's loopback callback (the
+consent screen warns about this, as the MCP specification recommends); hosted agents'
+callback hosts are accepted by default (`jtac.mcp.https-redirects=ANY`) with a warning for
+unrecognised hosts; restrict with `ALLOWLIST` or `NONE`. Details: [ai-agents.md](ai-agents.md),
+ADR 0010.
+
 ## Known limitations and residual risks
 
 - Secret files are protected by file-system permissions (mode 600 / owner-only ACL). OS secret

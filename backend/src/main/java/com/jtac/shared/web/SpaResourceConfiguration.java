@@ -35,7 +35,9 @@ class SpaResourceConfiguration implements WebMvcConfigurer {
             if (requested != null) {
                 return requested;
             }
-            boolean serverPath = resourcePath.startsWith("api/") || resourcePath.startsWith("actuator/");
+            boolean serverPath = resourcePath.startsWith("api/") || resourcePath.startsWith("actuator/")
+                    || resourcePath.startsWith("mcp/") || resourcePath.startsWith("oauth/")
+                    || resourcePath.startsWith(".well-known/");
             boolean looksLikeFile = resourcePath.substring(resourcePath.lastIndexOf('/') + 1).contains(".");
             if (serverPath || looksLikeFile) {
                 return null;

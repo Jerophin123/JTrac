@@ -45,6 +45,7 @@ stopped, then restart.
 | `jtac.mail.*` | | see `smtp-configuration.md` |
 | `jtac.registration.mode` | `INVITE_ONLY` | or `OPEN` (self sign-up with email confirmation) |
 | `jtac.attachments.directory` | `<data>/attachments` | attachment storage |
+| `jtac.mcp.*` (`enabled`, `https-redirects`, `trusted-redirect-hosts`, `requests-per-minute`, …) | enabled, `ANY` | AI agent connections; need an `https://` public URL. See `ai-agents.md` |
 | `jtrac.storage.backup-dir` | `<data>/backups` | default backup location |
 | `jtrac.storage.log-dir`, `logging.file.name` | `<data>/logs`, `<data>/logs/jtrac.log` | logs (rotated by size) |
 | `jtac.legal.operator-name`, `operator-address`, `contact-email`, `grievance-officer-name`, `grievance-officer-email`, `jurisdiction` | empty | shown in the legal pages; erasure requests go to the grievance officer |

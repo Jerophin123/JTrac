@@ -26,7 +26,7 @@ import { sessionQueryKey, sessionQueryOptions, useCanCreateOrganizations } from 
 import { formatLegalDate, GrievanceEmail, useLegalInfo } from '../legal/legal';
 import styles from './AccountPages.module.css';
 
-function AccountLayout({ children }: { children: ReactNode }) {
+export function AccountLayout({ children }: { children: ReactNode }) {
   const { data: session } = useQuery(sessionQueryOptions);
   return (
     <SettingsLayout

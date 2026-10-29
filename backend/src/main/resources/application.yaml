@@ -149,6 +149,18 @@ jtac:
       timeout-seconds: ${JTRAC_SMTP_TIMEOUT:15}
   attachments:
     directory: ${JTRAC_ATTACHMENTS_DIR:${JTAC_ATTACHMENTS_DIR:./data/attachments}}
+  mcp:
+    # AI agent connections (MCP, docs/ai-agents.md). Requires public-url to be https://
+    # (or a loopback address in development); OAuth tokens never travel over plain HTTP.
+    enabled: ${JTRAC_MCP_ENABLED:true}
+    # Which HTTPS OAuth callbacks hosted agents may register: ANY (shown on the consent
+    # screen, with a warning unless the host is trusted), ALLOWLIST (trusted hosts only) or
+    # NONE (local agents with http://localhost callbacks only).
+    https-redirects: ${JTRAC_MCP_HTTPS_REDIRECTS:ANY}
+    trusted-redirect-hosts: ${JTRAC_MCP_TRUSTED_REDIRECT_HOSTS:antigravity.google,www.cursor.com}
+    access-token-ttl: 1h
+    refresh-token-ttl: 30d
+    requests-per-minute: ${JTRAC_MCP_REQUESTS_PER_MINUTE:240}
   integrations:
     # Base64 32-byte key encrypting webhook secrets. Without it a development key is
     # generated into ./data/secret.key (the prod profile requires it).

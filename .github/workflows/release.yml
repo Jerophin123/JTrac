@@ -29,7 +29,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     defaults:
       run:
-        working-directory: .
+        working-directory: jtac
         shell: bash
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +45,7 @@ jobs:
           python-version: "3.13"
       - run: corepack enable
       - name: Build the web UI
-        working-directory: frontend
+        working-directory: jtac/frontend
         run: |
           pnpm install --frozen-lockfile
           pnpm build
@@ -66,6 +66,6 @@ jobs:
         with:
           name: jtrac-${{ matrix.target }}
           path: |
-            distribution/releases/**
-            distribution/build/verification/**
+            jtac/distribution/releases/**
+            jtac/distribution/build/verification/**
           if-no-files-found: error

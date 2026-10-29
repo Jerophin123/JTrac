@@ -12,6 +12,11 @@ export default defineConfig({
     proxy: {
       '/api': backend,
       '/actuator': backend,
+      // AI agent connections: MCP endpoint and OAuth (agents reach the backend through Vite in development).
+      '/mcp': backend,
+      '/oauth': backend,
+      '/.well-known/oauth-authorization-server': backend,
+      '/.well-known/oauth-protected-resource': backend,
     },
   },
   build: {

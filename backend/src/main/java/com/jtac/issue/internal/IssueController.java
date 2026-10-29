@@ -1,9 +1,11 @@
 package com.jtac.issue.internal;
 
 import com.jtac.identity.CurrentUser;
+import com.jtac.issue.IssueActivityEntry;
 import com.jtac.issue.IssueFilter;
 import com.jtac.issue.IssueSearch;
 import com.jtac.issue.IssueSummary;
+import com.jtac.issue.IssueView;
 import com.jtac.issue.NewIssue;
 import com.jtac.issue.Priority;
 import com.jtac.organization.OrgContext;
@@ -82,7 +84,7 @@ class IssueController {
     // --- single issue --------------------------------------------------------------------
 
     @PostMapping(ORG + "/projects/{key}/issues")
-    ResponseEntity<IssueViewService.IssueView> create(CurrentUser user, @PathVariable String org, @PathVariable String key,
+    ResponseEntity<IssueView> create(CurrentUser user, @PathVariable String org, @PathVariable String key,
             @Valid @RequestBody CreateIssue body) {
         ProjectContext ctx = projects.require(organizations.require(user, org), key);
         IssueRecord created = issues.createIssue(ctx, new NewIssue(body.typeId(), body.title(), body.description(),
@@ -92,13 +94,13 @@ class IssueController {
     }
 
     @GetMapping(ISSUE)
-    IssueViewService.IssueView get(CurrentUser user, @PathVariable String org, @PathVariable String issueKey) {
+    IssueView get(CurrentUser user, @PathVariable String org, @PathVariable String issueKey) {
         Resolved r = resolve(user, org, issueKey);
         return views.view(r.ctx(), r.issue());
     }
 
     @PatchMapping(ISSUE)
-    IssueViewService.IssueView update(CurrentUser user, @PathVariable String org, @PathVariable String issueKey,
+    IssueView update(CurrentUser user, @PathVariable String org, @PathVariable String issueKey,
             @Valid @RequestBody UpdateIssue body) {
         Resolved r = resolve(user, org, issueKey);
         IssueRecord saved = issues.update(r.ctx(), r.issue(), body.changes(), body.version());
@@ -113,7 +115,7 @@ class IssueController {
     }
 
     @PostMapping(ISSUE + "/move")
-    IssueViewService.IssueView move(CurrentUser user, @PathVariable String org, @PathVariable String issueKey,
+    IssueView move(CurrentUser user, @PathVariable String org, @PathVariable String issueKey,
             @Valid @RequestBody Move body) {
         Resolved r = resolve(user, org, issueKey);
         IssueRecord moved = issues.move(r.ctx(), r.issue(), body.statusId(), body.afterId(), body.beforeId(), body.version());
@@ -121,13 +123,13 @@ class IssueController {
     }
 
     @GetMapping(ISSUE + "/activity")
-    List<IssueViewService.ActivityEntry> activity(CurrentUser user, @PathVariable String org, @PathVariable String issueKey) {
+    List<IssueActivityEntry> activity(CurrentUser user, @PathVariable String org, @PathVariable String issueKey) {
         Resolved r = resolve(user, org, issueKey);
         return views.activity(r.ctx(), r.issue());
     }
 
     @PostMapping(ISSUE + "/links")
-    ResponseEntity<IssueViewService.IssueView> link(CurrentUser user, @PathVariable String org, @PathVariable String issueKey,
+    ResponseEntity<IssueView> link(CurrentUser user, @PathVariable String org, @PathVariable String issueKey,
             @Valid @RequestBody NewLink body) {
         Resolved r = resolve(user, org, issueKey);
         Resolved target = resolve(user, org, body.targetKey());

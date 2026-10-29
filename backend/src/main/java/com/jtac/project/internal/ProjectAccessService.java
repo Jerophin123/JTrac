@@ -198,6 +198,13 @@ class ProjectAccessService implements ProjectAccess, ProjectCatalog {
                 .param("p", projectId).query(UUID.class).optional();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<String> description(UUID projectId) {
+        return jdbc.sql("SELECT description FROM project WHERE id = :p").param("p", projectId)
+                .query((rs, n) -> Optional.ofNullable(rs.getString("description"))).optional().flatMap(d -> d);
+    }
+
     // --- helpers -------------------------------------------------------------------------
 
     private List<Row> rows(UUID organizationId, UUID userId, OrgRole orgRole, String condition, Map<String, Object> extra) {

@@ -421,6 +421,238 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/agent-connections/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Permissions, profiles and availability for agent connections
+         * @description Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        get: operations["getAgentConnectionOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/agent-connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List my AI agent connections
+         * @description Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        get: operations["listAgentConnections"];
+        put?: never;
+        /**
+         * Create an AI agent connection
+         * @description Creates a connection for one organization with an opaque MCP URL. Without scopes the read-only Coding assistant profile is used. Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        post: operations["createAgentConnection"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/agent-connections/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get an AI agent connection
+         * @description Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        get: operations["getAgentConnection"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete an agent connection (revokes all its tokens)
+         * @description Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        delete: operations["deleteAgentConnection"];
+        options?: never;
+        head?: never;
+        /**
+         * Rename an agent connection or change its permissions
+         * @description Permission changes apply to existing agent tokens at their next request. Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        patch: operations["updateAgentConnection"];
+        trace?: never;
+    };
+    "/api/v1/me/agent-connections/{id}/rotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Give an agent connection a new URL
+         * @description The old URL stops working and every agent must sign in again. Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        post: operations["rotateAgentConnection"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/agent-connections/{id}/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Revoke an agent connection
+         * @description All tokens stop working immediately. Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        post: operations["revokeAgentConnection"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/agent-connections/{id}/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Agents currently signed in to a connection
+         * @description Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        get: operations["listConnectionAgents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/agent-connections/{id}/agents/{clientId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Sign one agent out of a connection
+         * @description Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        delete: operations["revokeConnectionAgent"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/agent-connections/{id}/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Recent activity of a connection (tool names, outcomes, issue keys; never contents)
+         * @description Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        get: operations["listAgentConnectionActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/agent-authorizations/{handle}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Describe a pending agent sign-in (the OAuth consent screen)
+         * @description Only the owner of the connection named in the request sees it; anyone else gets not-found. Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        get: operations["getAgentAuthorization"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/agent-authorizations/{handle}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve an agent sign-in
+         * @description Returns the agent's redirect URL carrying a one-time authorization code. Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        post: operations["approveAgentAuthorization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/agent-authorizations/{handle}/deny": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deny an agent sign-in
+         * @description Returns the agent's redirect URL carrying error=access_denied. Requires a browser session; API tokens and agents are refused (forbidden).
+         */
+        post: operations["denyAgentAuthorization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/orgs": {
         parameters: {
             query?: never;
@@ -2827,6 +3059,127 @@ export interface components {
         TimelineRequest: {
             filter?: components["schemas"]["IssueFilter"];
         };
+        AgentConnection: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @description The connection's MCP URL. A locator, not a credential; agents still sign in with OAuth. */
+            url: string;
+            organization: {
+                /** Format: uuid */
+                id: string;
+                slug: string;
+                name: string;
+            };
+            scopes: ("issues:read" | "attachments:read" | "projects:read" | "notifications:read" | "reports:read" | "issues:comment" | "issues:write" | "issues:transition" | "reports:write")[];
+            /** @enum {string} */
+            profile: "ISSUE_READER" | "PROJECT_ANALYST" | "CODING_ASSISTANT" | "ISSUE_CONTRIBUTOR" | "CUSTOM";
+            /** @enum {string} */
+            status: "ACTIVE" | "EXPIRED" | "REVOKED";
+            /** Format: date-time */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description Time of the last successful, authorized agent request.
+             */
+            lastUsedAt?: string | null;
+            /** @description Name the last agent registered with (self-reported by the agent). */
+            lastClient?: string | null;
+            /** Format: date-time */
+            expiresAt?: string | null;
+            /** Format: date-time */
+            rotatedAt?: string | null;
+            /** Format: date-time */
+            revokedAt?: string | null;
+            /** @description Agents with a currently valid sign-in. */
+            authorizedAgents: number;
+            /** Format: int64 */
+            version: number;
+        };
+        CreateAgentConnection: {
+            name: string;
+            /** Format: uuid */
+            organizationId: string;
+            scopes?: ("issues:read" | "attachments:read" | "projects:read" | "notifications:read" | "reports:read" | "issues:comment" | "issues:write" | "issues:transition" | "reports:write")[];
+            /** @enum {integer|null} */
+            expiresInDays?: 30 | 90 | 365 | null;
+        };
+        UpdateAgentConnection: {
+            name?: string;
+            scopes?: ("issues:read" | "attachments:read" | "projects:read" | "notifications:read" | "reports:read" | "issues:comment" | "issues:write" | "issues:transition" | "reports:write")[];
+            /** Format: int64 */
+            version: number;
+        };
+        AgentConnectionOptions: {
+            available: boolean;
+            unavailableReason?: string | null;
+            serverUrl: string;
+            scopes: {
+                name: string;
+                description: string;
+                write: boolean;
+            }[];
+            profiles: {
+                key: string;
+                label: string;
+                scopes: string[];
+                isDefault: boolean;
+            }[];
+            maxConnections: number;
+        };
+        AuthorizedAgent: {
+            clientId: string;
+            clientName: string;
+            /** Format: date-time */
+            authorizedAt: string;
+            /** Format: date-time */
+            lastRefreshedAt: string;
+        };
+        AgentActivity: {
+            /** Format: date-time */
+            at: string;
+            /** @enum {string} */
+            kind: "TOOL" | "RESOURCE" | "PROMPT" | "AUTH";
+            name: string;
+            /** @enum {string} */
+            outcome: "OK" | "ERROR" | "DENIED" | "RATE_LIMITED";
+            target?: string | null;
+            client?: string | null;
+            durationMs?: number | null;
+        };
+        AgentActivityPage: {
+            items: components["schemas"]["AgentActivity"][];
+            page: number;
+            size: number;
+            /** Format: int64 */
+            total: number;
+        };
+        AgentScopeView: {
+            name: string;
+            description: string;
+            write: boolean;
+        };
+        AgentConsent: {
+            /** @description Self-reported by the agent at registration; not verified. */
+            clientName: string;
+            redirectUri: string;
+            redirectHost: string;
+            /** @enum {string} */
+            redirectKind: "LOOPBACK" | "RECOGNISED" | "UNRECOGNISED";
+            /** Format: uuid */
+            connectionId: string;
+            connectionName: string;
+            organizationName: string;
+            organizationSlug: string;
+            granted: components["schemas"]["AgentScopeView"][];
+            /** @description Requested by the agent but not enabled on the connection. */
+            notEnabled: components["schemas"]["AgentScopeView"][];
+            /** Format: date-time */
+            expiresAt: string;
+        };
+        AgentDecision: {
+            redirectUrl: string;
+        };
         TokenInfo: {
             /** Format: uuid */
             id: string;
@@ -3857,6 +4210,442 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getAgentConnectionOptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentConnectionOptions"];
+                };
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    listAgentConnections: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentConnection"][];
+                };
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    createAgentConnection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAgentConnection"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentConnection"];
+                };
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getAgentConnection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentConnection"];
+                };
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    deleteAgentConnection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    updateAgentConnection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateAgentConnection"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentConnection"];
+                };
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    rotateAgentConnection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentConnection"];
+                };
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    revokeAgentConnection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentConnection"];
+                };
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    listConnectionAgents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthorizedAgent"][];
+                };
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    revokeConnectionAgent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                clientId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    listAgentConnectionActivity: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentActivityPage"];
+                };
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getAgentAuthorization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                handle: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentConsent"];
+                };
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    approveAgentAuthorization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                handle: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentDecision"];
+                };
+            };
+            /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    denyAgentAuthorization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                handle: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentDecision"];
+                };
             };
             /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
             "4XX": {

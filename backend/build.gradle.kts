@@ -30,6 +30,8 @@ dependencies {
     implementation(libs.spring.modulith.starter.jdbc)
     implementation(libs.bouncycastle.bcprov)
     implementation(libs.commons.csv)
+    implementation(libs.mcp.core)
+    implementation(libs.mcp.json.jackson3)
     implementation(project(":serverconfig"))
     runtimeOnly(libs.micrometer.registry.prometheus)
     runtimeOnly(libs.postgresql)

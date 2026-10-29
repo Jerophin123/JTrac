@@ -8,6 +8,7 @@
  * activity; read-only fields cannot be changed; required fields must be filled.
  *
  * <p>Public API: {@link com.jtac.issue.IssueAccess}, {@link com.jtac.issue.IssueSearch},
+ * {@link com.jtac.issue.IssueDetails}, {@link com.jtac.issue.IssueEditing},
  * {@link com.jtac.issue.IssueChanged} (domain event), and their value types.
  */
 @ApplicationModule(displayName = "Issues")

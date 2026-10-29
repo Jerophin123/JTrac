@@ -11,6 +11,7 @@ bouncycastle = "1.86"          # not managed by Boot; required by Spring Securit
 commons-csv = "1.14.1"         # CSV import/export (RFC 4180 parsing)
 greenmail = "2.1.14"           # in-process SMTP server for mail integration tests (Jakarta Mail 2.1)
 cyclonedx = "3.4.1"            # SBOM generation for release packages (Gradle 8.4+/9.x)
+mcp-sdk = "2.1.0"              # official MCP Java SDK; Jackson 3 module, servlet stateless transport
 
 [libraries]
 spring-boot-bom = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
@@ -32,6 +33,8 @@ spring-modulith-starter-jdbc = { module = "org.springframework.modulith:spring-m
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
 bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle" }
 commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commons-csv" }
+mcp-core = { module = "io.modelcontextprotocol.sdk:mcp-core", version.ref = "mcp-sdk" }
+mcp-json-jackson3 = { module = "io.modelcontextprotocol.sdk:mcp-json-jackson3", version.ref = "mcp-sdk" }
 greenmail-junit5 = { module = "com.icegreen:greenmail-junit5", version.ref = "greenmail" }
 angus-mail = { module = "org.eclipse.angus:angus-mail" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }

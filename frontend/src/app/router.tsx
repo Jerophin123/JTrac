@@ -12,6 +12,8 @@ import {
 import { orgQuery, projectQuery } from '../api/queries';
 import { AppearancePage, PrivacyPage as AccountPrivacyPage, ProfilePage, TokensPage } from '../features/account/AccountPages';
 import { ConsentGate } from '../features/legal/ConsentGate';
+import { AgentConnectionsPage } from '../features/agents/AgentConnectionsPage';
+import { ConnectAgentPage } from '../features/agents/ConnectAgentPage';
 import { ServerSettingsPage } from '../features/system/ServerSettingsPage';
 import { GrievancePage, PrivacyPage, TermsPage } from '../features/legal/LegalPages';
 import { AcceptInvitePage, ForgotPasswordPage, RegisterPage, ResetPasswordPage, VerifyEmailPage } from '../features/auth/AccountFlows';
@@ -27,6 +29,7 @@ import { IssuePage } from '../features/issues/IssuePage';
 import { InboxPage } from '../features/notifications/InboxPage';
 import { CreateOrgPage, OrgIndexPage } from '../features/orgs/OrgPages';
 import {
+  AgentSettings,
   AuditSettings,
   MembersSettings,
   NotificationSettings,
@@ -152,6 +155,34 @@ const inviteRoute = createRoute({
   },
 });
 
+/**
+ * The approval screen for an AI agent's OAuth sign-in (opened by the agent in the browser).
+ * Standalone (no app shell); a pending request needs a session, so signed-out users sign in first.
+ */
+const connectAgentRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/connect-agent',
+  validateSearch: (search: Record<string, unknown>): { request?: string; error?: string } => ({
+    request: typeof search.request === 'string' && search.request.length <= 100 ? search.request : undefined,
+    error: typeof search.error === 'string' && search.error.length <= 40 ? search.error : undefined,
+  }),
+  beforeLoad: async ({ context, location, search }) => {
+    if (!search.request) {
+      return;
+    }
+    const session = await context.queryClient.query(sessionQueryOptions);
+    if (!session) {
+      // eslint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router control flow
+      throw redirect({ to: '/login', search: { redirect: location.href }, replace: true });
+    }
+  },
+  component: function ConnectAgentRoute() {
+    const search = connectAgentRoute.useSearch();
+    const { data: session } = useQuery(sessionQueryOptions);
+    return session?.consentRequired ? <ConsentGate /> : <ConnectAgentPage request={search.request} error={search.error} />;
+  },
+});
+
 /** Everything below this pathless route requires a session. */
 const authenticatedRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -186,6 +217,11 @@ const indexRoute = createRoute({ getParentRoute: () => authenticatedRoute, path:
 const newOrgRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/new', component: () => <CreateOrgPage /> });
 const accountRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/account', component: ProfilePage });
 const tokensRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/account/tokens', component: TokensPage });
+const agentConnectionsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: '/account/ai-agent-connections',
+  component: AgentConnectionsPage,
+});
 const appearanceRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/account/appearance', component: AppearancePage });
 const serverSettingsRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/server/settings', component: ServerSettingsPage });
 const accountPrivacyRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/account/privacy', component: AccountPrivacyPage });
@@ -253,6 +289,7 @@ const orgSettingsChildren = [
   createRoute({ getParentRoute: () => orgSettingsRoute, path: 'notifications', component: NotificationSettings }),
   createRoute({ getParentRoute: () => orgSettingsRoute, path: 'webhooks', component: WebhookSettings }),
   createRoute({ getParentRoute: () => orgSettingsRoute, path: 'audit', component: AuditSettings }),
+  createRoute({ getParentRoute: () => orgSettingsRoute, path: 'agents', component: AgentSettings }),
 ] as const;
 
 const projectRoute = createRoute({
@@ -323,11 +360,13 @@ const routeTree = rootRoute.addChildren([
   termsRoute,
   privacyRoute,
   grievanceRoute,
+  connectAgentRoute,
   authenticatedRoute.addChildren([
     indexRoute,
     newOrgRoute,
     accountRoute,
     tokensRoute,
+    agentConnectionsRoute,
     appearanceRoute,
     accountPrivacyRoute,
     serverSettingsRoute,
