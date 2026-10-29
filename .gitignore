@@ -41,7 +41,7 @@ out/
 hs_err_pid*.log
 !gradle/wrapper/gradle-wrapper.jar
 
-# Node / frontend
+# Node / frontend / website
 node_modules/
 dist/
 coverage/
@@ -51,17 +51,27 @@ playwright-report/
 test-results/
 blob-report/
 playwright/.cache/
+.next/
+**/.next/
+next-env.d.ts
+**/next-env.d.ts
 
 # Logs
 logs/
 *.log
 
 # JTAC runtime data (attachments, file-transport mail, generated dev secret key)
+data/
+backend/data/
 jtac/data/
 jtac/backend/data/
 
 # Release archives are build outputs (published from CI), never committed.
+distribution/releases/
 jtac/distribution/releases/
 
 # Staging copy for publishing the public repository
 publish/
+
+# Legacy / local development subdirectory
+jtac/
