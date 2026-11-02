@@ -1,3 +1,44 @@
+# JTRAC 3.2.0
+
+Feature release: AI agent connections, enterprise single sign-on, a full-screen setup with
+mouse support, keyboard shortcuts, and a refreshed interface. Three database migrations,
+applied by `jtrac update` after a verified backup.
+
+## New
+
+- **AI agent connections (MCP).** Connect coding agents such as Claude Code, Codex, Gemini
+  CLI or Cursor to your issues. They sign in through the browser (OAuth 2.1 with PKCE) and
+  are read-only unless you allow more. Account › AI agents; see `docs/ai-agents.md`.
+- **UTCP (experimental).** A read-only tool manual and execution endpoint for agent runtimes
+  that speak the Universal Tool Calling Protocol; see `docs/utcp.md`.
+- **Enterprise single sign-on (OpenID Connect).** Entra ID, Okta, Keycloak, Google Workspace,
+  AD FS and other providers. Set it up in `setup` or with `jtrac configure sso`; setup checks
+  the provider before saving. Existing accounts are linked only by an email the provider has
+  verified; creating accounts on first sign-in and limiting email domains are opt-in. See
+  `docs/sso.md`.
+- **Full-screen setup.** `setup` and `jtrac configure` open a full-screen interface in the
+  terminal with keyboard and mouse support. Use `--plain` (or `JTRAC_PLAIN=1`) for the
+  line-by-line prompts, for example with a screen reader.
+- **Keyboard shortcuts** with a `?` overview and full customization (Account › Keyboard
+  shortcuts), a **collapsible sidebar**, **search in the sidebar** with live results, a richer
+  **My work** page, **About JTRAC**, and a **Cookie Policy**.
+
+## Changed
+
+- Server settings are now in Your account › Server (Server overview, Outgoing email); the old
+  `/server/settings` address redirects. The profile menu holds Profile & settings and Sign out.
+- All pages share one content width; the design follows the logo's shapes, with subtle motion
+  that respects the system "reduce motion" setting.
+
+## Upgrade notes
+
+From 3.0.x: unpack 3.2.0 next to the old folder, then run `jtrac update --from <old folder>`
+from the new one (see `docs/upgrades.md`). The update makes a verified backup, then applies
+migrations V9 to V11. Single sign-on stays off until you configure a provider. AI agent
+connections need an `https://` public address.
+
+---
+
 # JTRAC 3.0.4
 
 Security hardening release. No database migrations: settings, secrets and data carry over

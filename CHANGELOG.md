@@ -4,6 +4,55 @@ All notable changes to JTrac are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [3.2.0] - 2026-11-02
+
+### Added
+
+- **AI agent connections** over the Model Context Protocol (MCP): coding agents (Claude Code,
+  Codex, Gemini CLI, Cursor and other MCP clients) read issues and, only with permission,
+  comment, change fields and move issues. Browser sign-in with OAuth 2.1 and PKCE; read-only
+  by default. Account › AI agents. (ADR 0010, `docs/ai-agents.md`)
+- **UTCP** (Universal Tool Calling Protocol, experimental): a read-only tool manual and tool
+  execution endpoint for agent runtimes. (`docs/utcp.md`)
+- **Enterprise single sign-on** over OpenID Connect (Microsoft Entra ID, Okta, Keycloak, Google
+  Workspace, AD FS and others), configurable in `setup` and `jtrac configure sso`, with a
+  provider check before saving. Accounts are linked only by verified email; automatic account
+  creation and allowed email domains are opt-in. (ADR 0011, `docs/sso.md`)
+- **Full-screen setup** in the terminal for `setup` and `jtrac configure`, with keyboard and
+  mouse: steps sidebar, live activity, clickable fields, options and buttons. `--plain` or
+  `JTRAC_PLAIN=1` keeps the line-by-line prompts.
+- **Keyboard shortcuts** (`?` lists them), with customization under Account › Keyboard
+  shortcuts: change, remove or reset any shortcut, or turn single-key shortcuts off.
+- **Collapsible sidebar** (icon rail, `[`), and **search right in the sidebar** with results
+  as you type (`/`).
+- **My work** shows what needs you: overdue, due this week, in progress and done counters,
+  an "Up next" list grouped by due date, an inbox preview, open work by priority and project,
+  recently completed issues and your dashboards.
+- **About JTRAC** (Account › About JTRAC): version, the installation's operator, the legal
+  documents and open-source licenses.
+- **Cookie Policy** describing the two strictly necessary cookies and the preferences kept in
+  the browser (no tracking or analytics).
+
+### Changed
+
+- Server settings moved into Your account (Server overview, Outgoing email); the old address
+  redirects. The profile menu now holds Profile & settings and Sign out.
+- Every page uses the same content width.
+- The interface follows the logo's shape (rounded and pointed corners) and has subtle motion,
+  which respects the "reduce motion" setting.
+- The Privacy Notice lists every preference stored in the browser.
+
+### Fixed
+
+- Screen readers read the inbox count and search results with proper spacing.
+- The JTRAC mark is no longer clipped on status screens and in the collapsed sidebar.
+- A faint streak could appear next to the strokes above page titles.
+
+### Database
+
+- Migrations V9 (AI agent connections), V10 (UTCP) and V11 (single sign-on identities);
+  `jtrac update` applies them after a verified backup.
+
 ## [3.0.4] - 2026-10-27
 
 ### Security
