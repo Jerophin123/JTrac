@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,15 @@ class EnterpriseSsoTests {
 
     private final List<String> createdEmails = new ArrayList<>();
     private final List<String> createdSessions = new ArrayList<>();
+
+    /**
+     * SSO is refused until first-run setup has created an account; a fresh database (as in CI)
+     * has none, so each test starts with one of its own instead of relying on other tests' data.
+     */
+    @BeforeEach
+    void setupIsComplete() {
+        localAccount(true);
+    }
 
     @AfterEach
     void cleanup() {
