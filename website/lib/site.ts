@@ -16,7 +16,7 @@ export const siteUrl: string | null = 'https://www.jtrac.site/';
 export const gaMeasurementId: string | null = 'G-3NT3JYGSES';
 
 /** Latest published release (checked on the Releases page). Update with each release. */
-export const latestRelease = { version: '3.0.4', url: `${repo}/releases/tag/v3.0.4` } as const;
+export const latestRelease = { version: '3.2.0', url: `${repo}/releases/tag/v3.2.0` } as const;
 
 const asset = (name: string) => `${repo}/releases/download/v${latestRelease.version}/${name}`;
 
@@ -44,8 +44,8 @@ export const downloads: Download[] = [
   pkg('windows-x64', 'Windows', 'x64', 'zip', 151),
   pkg('linux-x64', 'Linux', 'x64', 'tar.gz', 138),
   pkg('linux-arm64', 'Linux', 'ARM64', 'tar.gz', 137),
-  pkg('macos-arm64', 'macOS', 'Apple Silicon', 'tar.gz', 233),
-  pkg('macos-x64', 'macOS', 'Intel', 'tar.gz', 235),
+  pkg('macos-arm64', 'macOS', 'Apple Silicon', 'tar.gz', 229),
+  pkg('macos-x64', 'macOS', 'Intel', 'tar.gz', 230),
 ];
 
 export const checksums = asset('SHA256SUMS');
