@@ -73,6 +73,17 @@ PostgreSQL 18.6.0 binaries; versions and checksums are recorded in `docs/depende
 AI agent connections (ADR 0010, 2026-10-28) add the official MCP Java SDK 2.1.0
 (`mcp-core`, `mcp-json-jackson3`), compatible with Boot 4.1's Jackson 3 and Reactor versions.
 
+Enterprise SSO (ADR 0011, 2026-11-02) adds `spring-boot-starter-oauth2-client`, managed by
+the Boot 4.1.2 BOM (Spring Security OAuth2 client/JOSE 7.1.2, Nimbus `oauth2-oidc-sdk`
+11.38.2 and `nimbus-jose-jwt` 10.9.1 as resolved by Gradle). There is no separate version
+to verify.
+
+The full-screen setup (2026-11-02) adds JLine 4.4.8 to the launcher only (`jline-terminal`,
+`jline-terminal-ffm`, BSD-3-Clause; released 2026-10-11, Java 11+, FFM provider JDK 22+).
+It provides raw input, mouse and resize handling on Unix terminals and the Windows console;
+the launcher restricts JLine to the `ffm` and `exec` providers so no native library is
+extracted, and the `jtrac` scripts pass `--enable-native-access=ALL-UNNAMED`.
+
 ## Consequences
 
 - Upgrading any listed component requires re-verifying compatibility and updating this

@@ -144,7 +144,7 @@
   place-items: center;
   inline-size: 2rem;
   block-size: 2rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-info-soft);
   color: var(--color-info);
 }
@@ -155,7 +155,7 @@
   place-items: center;
   inline-size: 1.5rem;
   block-size: 1.5rem;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-shape-xs);
 }
 
 .allowed {
@@ -210,7 +210,7 @@
   inset: 0;
   z-index: -1;
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-shape-xs);
   transform: skewX(var(--slant));
 }
 
@@ -294,7 +294,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-accent-soft);
   transform: skewX(var(--slant));
 }
@@ -335,7 +335,7 @@
   place-items: center;
   inline-size: 2.5rem;
   block-size: 2.5rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-success-soft);
   color: var(--color-success);
 }
@@ -376,7 +376,7 @@
   inset-inline: 4px;
   z-index: -1;
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-surface);
   transform: skewX(var(--slant));
 }

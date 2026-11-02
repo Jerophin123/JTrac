@@ -70,6 +70,16 @@ export type Webhook = S['Webhook'];
 export type WebhookWithSecret = S['WebhookWithSecret'];
 export type WebhookDelivery = S['WebhookDelivery'];
 export type ImportResult = S['ImportResult'];
+export type PublicConfig = S['PublicConfig'];
+export type SsoProvider = S['SsoProvider'];
+export type UtcpOptions = S['UtcpOptions'];
+export type UtcpSettings = S['UtcpSettings'];
+export type UtcpStatusResponse = S['UtcpStatusResponse'];
+export type UtcpActivity = S['UtcpActivity'];
+export type UtcpActivityPage = S['UtcpActivityPage'];
+export type UtcpManual = S['UtcpManual'];
+export type UtcpToolSummary = S['UtcpToolSummary'];
+export type UtcpExecuteRequest = S['UtcpExecuteRequest'];
 
 export const PRIORITIES = ['URGENT', 'HIGH', 'MEDIUM', 'LOW', 'NONE'] as const satisfies readonly NonNullable<Priority>[];
 export const CATEGORIES = ['TODO', 'IN_PROGRESS', 'DONE', 'CANCELED'] as const satisfies readonly StatusCategory[];

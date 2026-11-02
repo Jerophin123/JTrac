@@ -19,7 +19,7 @@ package with a guided setup wizard.
 
 [![CI](https://github.com/Jerophin123/JTrac/actions/workflows/ci.yml/badge.svg)](https://github.com/Jerophin123/JTrac/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-b4532a.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-3.0.4-b4532a.svg)
+![Version](https://img.shields.io/badge/version-3.2.0-b4532a.svg)
 ![Java 25](https://img.shields.io/badge/Java-25-1d1a16.svg)
 ![Spring Boot 4.1](https://img.shields.io/badge/Spring%20Boot-4.1-1d1a16.svg)
 ![React 19](https://img.shields.io/badge/React-19-1d1a16.svg)
@@ -166,7 +166,7 @@ domain from scratch** on a modern stack.
 **What was *not* reused:** no legacy source, schema, templates or UI. JTrac shares ideas with its ancestor,
 not code. The result is an independent, Apache-licensed code base.
 
-| | JTrac 2.3.3 (legacy) | JTrac 3.0.4 (this project) |
+| | JTrac 2.3.3 (legacy) | JTrac 3.2.0 (this project) |
 |---|---|---|
 | Runtime | Java 8 bytecode, Jetty 9.4 | Java 25, embedded Tomcat via Spring Boot 4.1 |
 | Web layer | Wicket 1.3.7 server-side pages | React 19 + TypeScript SPA, REST `/api/v1` with OpenAPI 3 |
@@ -261,20 +261,20 @@ not code. The result is an independent, Apache-licensed code base.
 
 ```powershell
 # Windows (PowerShell)
-Expand-Archive .\jtrac-3.0.4-windows-x64.zip -DestinationPath C:\JTRAC
-C:\JTRAC\jtrac-3.0.4-windows-x64\setup.bat
+Expand-Archive .\jtrac-3.2.0-windows-x64.zip -DestinationPath C:\JTRAC
+C:\JTRAC\jtrac-3.2.0-windows-x64\setup.bat
 ```
 
 ```bash
 # Linux
-tar -xzf jtrac-3.0.4-linux-x64.tar.gz && cd jtrac-3.0.4-linux-x64 && ./setup.sh
+tar -xzf jtrac-3.2.0-linux-x64.tar.gz && cd jtrac-3.2.0-linux-x64 && ./setup.sh
 ```
 
 ```bash
 # macOS (the package is not notarized: clear the quarantine flag once)
-tar -xzf jtrac-3.0.4-macos-arm64.tar.gz
-xattr -dr com.apple.quarantine jtrac-3.0.4-macos-arm64
-cd jtrac-3.0.4-macos-arm64 && ./setup.sh
+tar -xzf jtrac-3.2.0-macos-arm64.tar.gz
+xattr -dr com.apple.quarantine jtrac-3.2.0-macos-arm64
+cd jtrac-3.2.0-macos-arm64 && ./setup.sh
 ```
 
 **3. Answer the wizard**: choose the managed database, create the first administrator, pick a port,
@@ -425,11 +425,11 @@ then check the archive:
 
 ```powershell
 # Windows (PowerShell)
-(Get-FileHash .\jtrac-3.0.4-windows-x64.zip -Algorithm SHA256).Hash   # compare with the .sha256 file
+(Get-FileHash .\jtrac-3.2.0-windows-x64.zip -Algorithm SHA256).Hash   # compare with the .sha256 file
 ```
 ```sh
 # Linux / macOS
-sha256sum -c jtrac-3.0.4-linux-x64.tar.gz.sha256        # macOS: shasum -a 256 -c ...
+sha256sum -c jtrac-3.2.0-linux-x64.tar.gz.sha256        # macOS: shasum -a 256 -c ...
 ```
 
 #### 2. Unpack
@@ -437,12 +437,12 @@ sha256sum -c jtrac-3.0.4-linux-x64.tar.gz.sha256        # macOS: shasum -a 256 -
 Unpack into a folder you keep, owned by the account that will run JTRAC (not root /
 Administrator):
 
-- Windows: e.g. `C:\JTRAC\jtrac-3.0.4-windows-x64` (right-click > Extract All, or
+- Windows: e.g. `C:\JTRAC\jtrac-3.2.0-windows-x64` (right-click > Extract All, or
   `Expand-Archive`). Avoid `C:\Program Files` (needs admin rights to write logs there).
 - Linux: e.g. `~/jtrac` or `/opt/jtrac` (owned by a dedicated `jtrac` user):
-  `tar -xzf jtrac-3.0.4-linux-x64.tar.gz`
-- macOS: `tar -xzf jtrac-3.0.4-macos-arm64.tar.gz`, then
-  `xattr -dr com.apple.quarantine jtrac-3.0.4-macos-arm64` (the package is not notarized).
+  `tar -xzf jtrac-3.2.0-linux-x64.tar.gz`
+- macOS: `tar -xzf jtrac-3.2.0-macos-arm64.tar.gz`, then
+  `xattr -dr com.apple.quarantine jtrac-3.2.0-macos-arm64` (the package is not notarized).
 
 Nothing else needs to be installed: the package contains its Java runtime and, on most
 targets, PostgreSQL.
@@ -557,6 +557,11 @@ questions for each settings group live in `Sections.java` and are shared with
 
 #### Stages
 
+In an interactive terminal, setup and `jtrac configure` run full screen with keyboard and
+mouse support (steps sidebar, live activity, clickable fields, options and buttons); use
+`--plain` or `JTRAC_PLAIN=1` for line-by-line prompts. See
+[docs/setup-wizard.md](docs/setup-wizard.md#full-screen-setup-keyboard-and-mouse).
+
 | # | Stage | What happens |
 |---|---|---|
 | 1 | Welcome and mode | Checks OS/architecture; managed (bundled PostgreSQL) or external database. If JTRAC is already set up, it stops here and changes nothing. |
@@ -567,11 +572,12 @@ questions for each settings group live in `Sections.java` and are shared with
 | 6 | Public address and proxy | The URL people open (used in email links); whether a reverse proxy sets `X-Forwarded-*`. `https://` turns on Secure cookies. |
 | 7 | Outgoing email | SMTP host, TLS mode, port, sign-in, user, password, sender, reply-to, timeout, optional private CA file; sends a **real test email** and shows every step. On failure: change settings, save anyway, or continue in email-pending mode. See `smtp-configuration.md`. |
 | 8 | Accounts and sessions | Invite-only (default) or open self-registration; session length (default 8 h). |
-| 9 | Storage | Attachments, backups and logs directories (default under the data directory); optional legal operator details. |
-| 10 | Review | Shows the settings (secrets never shown) and validates everything; errors stop here with nothing applied. |
-| 11 | Bootstrap | Saves settings and secrets (owner-only files), initializes and starts the managed cluster, provisions roles/database/schema, verifies that the application role can't change the schema, applies migrations as the owner in a separate process, refuses to continue if the database already has accounts, creates the administrator. |
-| 12 | Start | Starts JTRAC and waits for `/actuator/health/readiness` to report UP. |
-| 13 | Done | Prints the address and the next commands. |
+| 9 | Single sign-on (optional) | OpenID Connect provider (Microsoft Entra ID, Okta, Google, Keycloak or any other): shows the redirect URI to register, then asks for the issuer URL, client id, client secret, automatic account creation, allowed email domains and whether to trust unverified emails. It then **checks the provider's discovery document** the way the server reads it at startup. On failure: change settings, save anyway, or skip. See [docs/sso.md](docs/sso.md). |
+| 10 | Storage | Attachments, backups and logs directories (default under the data directory); optional legal operator details. |
+| 11 | Review | Shows the settings (secrets never shown) and validates everything; errors stop here with nothing applied. |
+| 12 | Bootstrap | Saves settings and secrets (owner-only files), initializes and starts the managed cluster, provisions roles/database/schema, verifies that the application role can't change the schema, applies migrations as the owner in a separate process, refuses to continue if the database already has accounts, creates the administrator. |
+| 13 | Start | Starts JTRAC and waits for `/actuator/health/readiness` to report UP. |
+| 14 | Done | Prints the address and the next commands (and the SSO redirect URI, if configured). |
 
 #### Running it again
 
@@ -599,6 +605,7 @@ Windows paths like `C:\JTRAC\data` work as written. Secrets come from environmen
 | `JTRAC_SMTP_PASSWORD` | SMTP with sign-in |
 | `JTRAC_DB_OWNER_PASSWORD`, `JTRAC_DB_APP_PASSWORD` | external database |
 | `JTRAC_DB_ADMIN_PASSWORD` | external database with `database.provision=y` |
+| `JTRAC_SSO_CLIENT_SECRET` | single sign-on with `sso.enabled=y` |
 
 An invalid answer stops setup with the reason; unknown keys are listed at the end. Answer keys:
 `database.mode`, `database.port`, `database.host`, `database.name`, `database.owner-user`,
@@ -607,14 +614,17 @@ An invalid answer stops setup with the reason; unknown keys are listed at the en
 `http.behind-proxy`, `smtp.enabled`, `smtp.host`, `smtp.tls`, `smtp.port`, `smtp.auth`,
 `smtp.username`, `smtp.from`, `smtp.from-name`, `smtp.reply-to`, `smtp.timeout`,
 `smtp.private-ca`, `smtp.trusted-certificates`, `smtp.test`, `smtp.test.recipient`,
-`security.registration`, `security.session-hours`, `storage.attachments`,
+`security.registration`, `security.session-hours`, `sso.enabled`, `sso.provider`
+(`entra`, `okta`, `google`, `keycloak`, `oidc`), `sso.provider-id`, `sso.name`, `sso.issuer-uri`,
+`sso.client-id`, `sso.auto-provision`, `sso.allowed-domains`, `sso.trust-unverified-email`,
+`sso.check`, `storage.attachments`,
 `storage.backups`, `storage.logs`, `legal.configure`, `legal.*`, `confirm`, `start`.
 
 #### Changing settings later
 
 ```
 jtrac configure            # choose a group
-jtrac configure smtp       # or name it: http, smtp, security, storage, legal
+jtrac configure smtp       # or name it: http, smtp, security, storage, legal, sso
 ```
 
 The same questions and checks as setup; values are saved and, if JTRAC is running, you're
@@ -10687,7 +10697,8 @@ Credentials or tokens in `localStorage`/`sessionStorage` are exposed to any XSS.
   it is **not secure by default** and must be set to `true` for every HTTPS deployment.
 - Argon2id (with rehash-on-login via `DelegatingPasswordEncoder.upgradeEncoding`) is
   the intended upgrade from bcrypt.
-- No MFA, SSO (OIDC) or account recovery yet.
+- No MFA or account recovery yet. SSO over OpenID Connect was added later (ADR 0011); it
+  ends in the same session.
 
 #### Alternatives considered
 
@@ -11151,7 +11162,7 @@ With Argon2id (OWASP parameters). Legacy bcrypt hashes are upgraded on the next 
 <details>
 <summary><b>Is there single sign-on (SAML/OIDC)?</b></summary>
 
-Not in 3.0. Authentication is by email and password with sessions, plus API tokens for automation.
+OpenID Connect, yes: Entra ID, Okta, Keycloak, Google Workspace, AD FS and other OIDC providers (see [docs/sso.md](docs/sso.md)). SAML is not supported directly; put an OIDC bridge such as Keycloak in front of it. Email and password sign-in and API tokens keep working alongside SSO.
 
 </details>
 

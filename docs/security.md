@@ -5,6 +5,7 @@
 | Asset | Threats considered | Main controls |
 |---|---|---|
 | Accounts and sessions | credential stuffing, session theft, CSRF, account enumeration | Argon2id password hashing (bcrypt upgraded on sign-in); per-account/client sign-in throttling; HttpOnly SameSite=Lax session cookie, Secure with HTTPS; CSRF token on every state change; session fixation protection; generic sign-in and recovery responses |
+| Enterprise SSO (OIDC) | account takeover through an IdP, open sign-up through an IdP, open redirects, token leakage | links only by IdP-verified email (unconfirmed accounts get their password replaced); one identity per account and provider; provisioning off by default, optional domain allow-list; PKCE, state and nonce; redirect URI and return paths fixed to the public URL; fixed error codes; IdP tokens not retained (`sso.md`, ADR 0011) |
 | Tenant data | cross-organization access, privilege escalation | every protected operation authorizes in the service layer (organization membership, role, project access, field rules); tenant-isolation integration tests; database rejects cross-tenant references |
 | Server administration | non-admins creating organizations or changing SMTP | server-administrator flag checked server-side; session-only (no API tokens) for server settings; audited changes |
 | Content rendering | XSS | Markdown rendered with raw HTML escaped and URLs sanitized; strict CSP without inline scripts or styles |

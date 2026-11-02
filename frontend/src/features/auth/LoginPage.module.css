@@ -75,18 +75,20 @@
 .header::before {
   content: '';
   justify-self: start;
-  inline-size: 1.75rem;
+  /* Both strokes in one element: a gradient, not a box-shadow copy (which can leave a faint streak). */
+  inline-size: 3.9rem;
   block-size: 4px;
   margin-block-end: var(--space-2);
   margin-inline-start: 2px;
   border-radius: 1px;
-  background: var(--color-accent);
-  box-shadow: 2.15rem 0 0 0 color-mix(in srgb, var(--color-accent) 40%, transparent);
+  background: linear-gradient(to right, var(--color-accent) 0 1.75rem, transparent 1.75rem 2.15rem,
+    color-mix(in srgb, var(--color-accent) 40%, transparent) 2.15rem 3.9rem);
   transform: skewX(var(--slant-mark));
 }
 
 :global([dir='rtl']) .header::before {
-  box-shadow: -2.15rem 0 0 0 color-mix(in srgb, var(--color-accent) 40%, transparent);
+  background: linear-gradient(to left, var(--color-accent) 0 1.75rem, transparent 1.75rem 2.15rem,
+    color-mix(in srgb, var(--color-accent) 40%, transparent) 2.15rem 3.9rem);
 }
 
 .title {
@@ -178,7 +180,7 @@
   gap: var(--space-8);
   margin: var(--shell-gap);
   padding-block: clamp(var(--space-6), 7vh, var(--space-12));
-  border-radius: var(--radius-lg) var(--radius-xs);
+  border-radius: var(--radius-shape);
   /* Stays in view while a long form (first-run setup) scrolls beside it. */
   position: sticky;
   inset-block-start: var(--shell-gap);
@@ -255,7 +257,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
   transform: skewX(var(--slant));
 }
@@ -384,4 +386,53 @@
 .legal a:hover {
   color: var(--color-text);
   text-decoration: underline;
+}
+
+.ssoSection {
+  display: grid;
+  gap: var(--space-3);
+  margin-block-end: var(--space-2);
+}
+
+.ssoButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  inline-size: 100%;
+  min-block-size: 2.5rem;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-shape-sm);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+}
+
+.ssoButton:hover {
+  background: var(--color-surface-active);
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-block: var(--space-1);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-block-start: 1px solid var(--color-border);
 }

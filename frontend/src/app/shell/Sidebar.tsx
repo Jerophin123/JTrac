@@ -6,41 +6,57 @@ import {
   ChevronsUpDown,
   FolderKanban,
   House,
-  KeyRound,
   LayoutDashboard,
+  ListTodo,
   LogOut,
-  Palette,
+  PanelLeftClose,
+  PanelLeftOpen,
   Plus,
   Search,
-  Server,
   Settings,
-  ShieldCheck,
   UserRound,
   X,
 } from 'lucide-react';
 import { orgQuery, orgsQuery, projectsQuery, unreadQuery } from '../../api/queries';
 import { formatOrgRoleDescription } from '../../lib/roles';
-import { logout, useCanCreateOrganizations, useIsServerAdmin, type Session } from '../../features/auth/session';
+import { ariaKeyShortcuts, formatBindingText, useShortcutSettings } from '../../lib/shortcuts';
+import { logout, useCanCreateOrganizations, type Session } from '../../features/auth/session';
 import { Alert } from '../../ui/Alert';
 import { Avatar } from '../../ui/Avatar';
 import { Button } from '../../ui/Button';
-import { Logo } from '../../ui/Logo';
+import { Logo, LogoMark } from '../../ui/Logo';
 import { Menu } from '../../ui/Menu';
 import { OrgMark } from '../../ui/OrgMark';
 import styles from './Sidebar.module.css';
+import { SidebarSearch } from './SidebarSearch';
 
 interface SidebarProps {
   id: string;
   session: Session;
   open: boolean;
+  /** Collapsed to the icon rail (wide screens only). */
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
   onClose: () => void;
   onSignedOut: () => Promise<void>;
+  /** Opens the command palette (the collapsed rail's search button). */
   onOpenSearch: () => void;
 }
 
-export function Sidebar({ id, session, open, onClose, onSignedOut, onOpenSearch }: SidebarProps) {
+export function Sidebar({
+  id,
+  session,
+  open,
+  collapsed,
+  onToggleCollapsed,
+  onClose,
+  onSignedOut,
+  onOpenSearch,
+}: SidebarProps) {
+  const { activeBindingFor } = useShortcutSettings();
+  const toggleKeys = activeBindingFor('toggleSidebar');
+  const paletteKeys = activeBindingFor('commandPalette');
   const signOut = useMutation({ mutationFn: logout, onSuccess: onSignedOut });
-  const serverAdmin = useIsServerAdmin();
   const { org } = useParams({ strict: false });
   const navigate = useNavigate();
   const { data: orgDetail } = useQuery({
@@ -64,11 +80,30 @@ export function Sidebar({ id, session, open, onClose, onSignedOut, onOpenSearch 
     : undefined;
 
   return (
-    <aside id={id} className={styles.sidebar} data-open={open || undefined} aria-label="Sidebar">
+    <aside
+      id={id}
+      className={styles.sidebar}
+      data-open={open || undefined}
+      data-collapsed={collapsed || undefined}
+      aria-label="Sidebar"
+    >
       <div className={styles.brandRow}>
         <Link to="/" className={styles.brandLink} onClick={onClose} aria-label="JTRAC">
-          <Logo height={26} />
+          <Logo height={26} className={styles.brandFull} aria-hidden="true" />
+          <LogoMark size={26} className={styles.brandMark} aria-hidden="true" />
         </Link>
+        <button
+          type="button"
+          className={styles.collapseButton}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!collapsed}
+          aria-controls={id}
+          title={`${collapsed ? 'Expand' : 'Collapse'} sidebar${toggleKeys ? ` (${formatBindingText(toggleKeys)})` : ''}`}
+          aria-keyshortcuts={ariaKeyShortcuts(toggleKeys)}
+          onClick={onToggleCollapsed}
+        >
+          {collapsed ? <PanelLeftOpen size={16} aria-hidden="true" /> : <PanelLeftClose size={16} aria-hidden="true" />}
+        </button>
         <Button
           variant="ghost"
           size="sm"
@@ -79,18 +114,24 @@ export function Sidebar({ id, session, open, onClose, onSignedOut, onOpenSearch 
         />
       </div>
 
-      <OrgSwitcher current={org} onNavigate={onClose} />
+      <OrgSwitcher current={org} collapsed={collapsed} onNavigate={onClose} />
 
       {org && (
         <>
-          <button type="button" className={styles.searchButton} onClick={onOpenSearch}>
+          <div className={styles.searchSlot}>
+            <SidebarSearch org={org} onNavigate={onClose} />
+          </div>
+          <button
+            type="button"
+            className={styles.searchButton}
+            onClick={onOpenSearch}
+            title={`Search${paletteKeys ? ` (${formatBindingText(paletteKeys)})` : ''}`}
+            aria-keyshortcuts={ariaKeyShortcuts(paletteKeys)}
+          >
             <Search size={15} aria-hidden="true" />
-            <span>Search</span>
-            <kbd className={styles.kbd} aria-label="Control K">
-              Ctrl K
-            </kbd>
+            <span className={styles.label}>Search</span>
           </button>
-          <OrgNav org={org} onNavigate={onClose} />
+          <OrgNav org={org} collapsed={collapsed} onNavigate={onClose} />
           <ProjectList org={org} onNavigate={onClose} />
         </>
       )}
@@ -112,42 +153,18 @@ export function Sidebar({ id, session, open, onClose, onSignedOut, onOpenSearch 
                   },
                 ]
               : []),
-            { label: 'Profile', icon: <UserRound size={15} aria-hidden="true" />, onSelect: () => void navigate({ to: '/account' }).then(onClose) },
-            {
-              label: 'API tokens',
-              icon: <KeyRound size={15} aria-hidden="true" />,
-              onSelect: () => void navigate({ to: '/account/tokens' }).then(onClose),
-            },
-            ...(serverAdmin
-              ? [
-                  {
-                    label: 'Server settings',
-                    icon: <Server size={15} aria-hidden="true" />,
-                    onSelect: () => void navigate({ to: '/server/settings' }).then(onClose),
-                  },
-                ]
-              : []),
-            {
-              label: 'Privacy & data',
-              icon: <ShieldCheck size={15} aria-hidden="true" />,
-              onSelect: () => void navigate({ to: '/account/privacy' }).then(onClose),
-            },
-            {
-              label: 'Appearance',
-              icon: <Palette size={15} aria-hidden="true" />,
-              onSelect: () => void navigate({ to: '/account/appearance' }).then(onClose),
-            },
+            { label: 'Profile & settings', icon: <UserRound size={15} aria-hidden="true" />, onSelect: () => void navigate({ to: '/account' }).then(onClose) },
             { label: 'Sign out', icon: <LogOut size={15} aria-hidden="true" />, onSelect: () => { signOut.mutate(); } },
           ]}
           trigger={(props) => (
-            <button type="button" className={styles.user} {...props}>
+            <button type="button" className={styles.user} title={collapsed ? session.user.displayName : undefined} {...props}>
               <Avatar name={session.user.displayName} />
               <span className={styles.userText}>
                 <span className={styles.userName}>{session.user.displayName}</span>
                 <span className={styles.userEmail}>@{session.user.handle}</span>
                 {active && <span className={styles.userRole}>{formatOrgRoleDescription(active.role)}</span>}
               </span>
-              <ChevronsUpDown size={14} aria-hidden="true" />
+              <ChevronsUpDown size={14} aria-hidden="true" className={styles.chevron} />
             </button>
           )}
         />
@@ -173,7 +190,7 @@ function OrgIcon({
   return <OrgMark name={name} logoUrl={logoUrl} color={color} size={size === 'sm' ? 'xs' : 'sm'} />;
 }
 
-function OrgSwitcher({ current, onNavigate }: { current: string | undefined; onNavigate: () => void }) {
+function OrgSwitcher({ current, collapsed, onNavigate }: { current: string | undefined; collapsed: boolean; onNavigate: () => void }) {
   const { data: orgs } = useQuery(orgsQuery);
   const { data: orgDetail } = useQuery({
     ...orgQuery(current ?? ''),
@@ -207,65 +224,57 @@ function OrgSwitcher({ current, onNavigate }: { current: string | undefined; onN
           : []),
       ]}
       trigger={(props) => (
-        <button type="button" className={styles.orgButton} {...props}>
+        <button type="button" className={styles.orgButton} title={collapsed ? (active?.name ?? 'Choose organization') : undefined} {...props}>
           <OrgIcon name={active?.name ?? '?'} logoUrl={active?.logoUrl} color={active?.color} size="md" />
           <span className={styles.orgText}>
             <span className={styles.orgName}>{active?.name ?? 'Choose organization'}</span>
             {active && <span className={styles.orgRole}>{formatOrgRoleDescription(active.role)}</span>}
           </span>
-          <ChevronsUpDown size={14} aria-hidden="true" />
+          <ChevronsUpDown size={14} aria-hidden="true" className={styles.chevron} />
         </button>
       )}
     />
   );
 }
 
-function OrgNav({ org, onNavigate }: { org: string; onNavigate: () => void }) {
+function OrgNav({ org, collapsed, onNavigate }: { org: string; collapsed: boolean; onNavigate: () => void }) {
   const unread = useQuery(unreadQuery(org)).data?.count ?? 0;
+  const items = [
+    { to: '/$org', label: 'My work', icon: House, exact: true },
+    { to: '/$org/inbox', label: 'Inbox', icon: Bell, exact: false },
+    { to: '/$org/search', label: 'Issues', icon: ListTodo, exact: false },
+    { to: '/$org/dashboards', label: 'Dashboards', icon: LayoutDashboard, exact: false },
+    { to: '/$org/projects', label: 'Projects', icon: FolderKanban, exact: true },
+    { to: '/$org/settings', label: 'Organization settings', icon: Settings, exact: false },
+  ] as const;
   return (
     <nav aria-label="Primary" className={styles.nav}>
       <ul className={styles.navList}>
-        <li>
-          <Link to="/$org" params={{ org }} className={styles.navItem} activeOptions={{ exact: true }} onClick={onNavigate}>
-            <House size={16} aria-hidden="true" />
-            My work
-          </Link>
-        </li>
-        <li>
-          <Link to="/$org/inbox" params={{ org }} className={styles.navItem} onClick={onNavigate}>
-            <Bell size={16} aria-hidden="true" />
-            Inbox
-            {unread > 0 && (
-              <span className={styles.count} aria-label={`${String(unread)} unread`}>
-                {unread > 99 ? '99+' : unread}
-              </span>
-            )}
-          </Link>
-        </li>
-        <li>
-          <Link to="/$org/search" params={{ org }} className={styles.navItem} onClick={onNavigate}>
-            <Search size={16} aria-hidden="true" />
-            Issues
-          </Link>
-        </li>
-        <li>
-          <Link to="/$org/dashboards" params={{ org }} className={styles.navItem} onClick={onNavigate}>
-            <LayoutDashboard size={16} aria-hidden="true" />
-            Dashboards
-          </Link>
-        </li>
-        <li>
-          <Link to="/$org/projects" params={{ org }} className={styles.navItem} activeOptions={{ exact: true }} onClick={onNavigate}>
-            <FolderKanban size={16} aria-hidden="true" />
-            Projects
-          </Link>
-        </li>
-        <li>
-          <Link to="/$org/settings" params={{ org }} className={styles.navItem} onClick={onNavigate}>
-            <Settings size={16} aria-hidden="true" />
-            Settings
-          </Link>
-        </li>
+        {items.map(({ to, label, icon: Icon, exact }) => {
+          const count = to === '/$org/inbox' && unread > 0 ? unread : 0;
+          return (
+            <li key={to}>
+              <Link
+                to={to}
+                params={{ org }}
+                className={styles.navItem}
+                activeOptions={{ exact }}
+                title={collapsed ? (count > 0 ? `${label} (${String(count)} unread)` : label) : undefined}
+                onClick={onNavigate}
+              >
+                <Icon size={16} aria-hidden="true" />
+                <span className={styles.label}>{label}</span>
+                {/* Keeps the accessible name "Inbox 3 unread" rather than "Inbox3 unread"; flex ignores it visually. */}
+                {count > 0 && ' '}
+                {count > 0 && (
+                  <span className={styles.count} aria-label={`${String(count)} unread`}>
+                    {count > 99 ? '99+' : count}
+                  </span>
+                )}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );

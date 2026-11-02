@@ -1,12 +1,20 @@
 .region {
   position: fixed;
-  inset-block-end: var(--space-4);
-  inset-inline-end: var(--space-4);
+  inset-block-start: var(--space-6);
+  inset-inline-end: var(--space-6);
   z-index: 100;
   display: grid;
   gap: var(--space-2);
-  inline-size: min(24rem, calc(100vw - 2 * var(--space-4)));
+  inline-size: min(24rem, calc(100vw - 2 * var(--space-6)));
   pointer-events: none;
+}
+
+@media (max-width: 56rem) {
+  .region {
+    inset-block-start: var(--space-4);
+    inset-inline-end: var(--space-4);
+    inline-size: calc(100vw - 2 * var(--space-4));
+  }
 }
 
 .toast {
@@ -43,7 +51,7 @@
   place-items: center;
   padding: 2px;
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-xs);
   background: transparent;
   color: var(--color-text-muted);
   cursor: pointer;
@@ -55,13 +63,13 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .toast {
-    animation: rise var(--duration-base) var(--ease-out);
+    animation: dropIn var(--duration-base) var(--ease-out);
   }
 }
 
-@keyframes rise {
+@keyframes dropIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(-8px);
   }
 }

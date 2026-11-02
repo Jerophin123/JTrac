@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { LockKeyhole, Moon, Sun, Sunrise } from 'lucide-react';
+import { Building2, LockKeyhole, Moon, Sun, Sunrise } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -12,7 +12,7 @@ import { PasswordField } from '../../ui/PasswordField';
 import { TextField } from '../../ui/TextField';
 import { AuthLayout, authFormClass } from './AuthLayout';
 import styles from './LoginPage.module.css';
-import { login, sessionQueryKey, type Session } from './session';
+import { login, publicConfigQueryOptions, sessionQueryKey, type Session } from './session';
 import { setupStatusQueryOptions } from './setupApi';
 
 const loginSchema = z.object({
@@ -87,15 +87,40 @@ function SignedOutNotice() {
   );
 }
 
+/** Messages for the codes an SSO sign-in returns with (`/login?sso=<code>`, see SsoProvider in the API). */
+const SSO_ERRORS: Record<string, string> = {
+  cancelled: 'Single sign-on was cancelled at your identity provider.',
+  email_unverified: 'Your identity provider didn’t confirm your email address, so JTRAC can’t match it to an account.',
+  invalid_identity: 'Your identity provider didn’t send a usable account identifier.',
+  domain_not_allowed: 'Accounts from your email domain can’t use single sign-on here.',
+  no_account: 'There’s no JTRAC account for your email address yet. Ask an administrator to invite you.',
+  account_disabled: 'This account is disabled. Contact an administrator.',
+  identity_conflict: 'This account is already linked to a different identity at your provider. Contact an administrator.',
+  setup_required: 'JTRAC hasn’t been set up yet. Complete the first-run setup first.',
+};
+
+export function describeSsoError(code: string): string {
+  return SSO_ERRORS[code] ?? 'Single sign-on didn’t complete. Try again, or sign in with your password.';
+}
+
+/** Full-page navigation that starts the provider's sign-in, returning to `redirectTo` afterwards. */
+export function ssoHref(loginUrl: string, redirectTo: string | undefined): string {
+  return redirectTo && redirectTo !== '/' ? `${loginUrl}?redirect=${encodeURIComponent(redirectTo)}` : loginUrl;
+}
+
 interface LoginPageProps {
   redirectTo: string | undefined;
   signedOut: boolean;
+  /** Code from a failed single sign-on attempt. */
+  ssoError?: string;
 }
 
-export function LoginPage({ redirectTo, signedOut }: LoginPageProps) {
+export function LoginPage({ redirectTo, signedOut, ssoError }: LoginPageProps) {
   const queryClient = useQueryClient();
   const setupQuery = useQuery(setupStatusQueryOptions);
+  const configQuery = useQuery(publicConfigQueryOptions);
   const navigate = useNavigate();
+  const ssoProviders = configQuery.data?.ssoProviders ?? [];
   const {
     register,
     handleSubmit,
@@ -142,7 +167,22 @@ export function LoginPage({ redirectTo, signedOut }: LoginPageProps) {
         </Alert>
       )}
       {signedOut && !mutation.isError && <SignedOutNotice />}
+      {ssoError && !mutation.isError && <Alert tone="danger">{describeSsoError(ssoError)}</Alert>}
       {mutation.isError && <Alert tone="danger">{describeLoginError(mutation.error)}</Alert>}
+
+      {ssoProviders.length > 0 && (
+        <div className={styles.ssoSection}>
+          {ssoProviders.map((provider) => (
+            <a key={provider.id} href={ssoHref(provider.loginUrl, redirectTo)} className={styles.ssoButton}>
+              <Building2 size={16} aria-hidden="true" />
+              <span>Sign in with {provider.name}</span>
+            </a>
+          ))}
+          <div className={styles.divider}>
+            <span>or sign in with password</span>
+          </div>
+        </div>
+      )}
 
       <form className={authFormClass} onSubmit={(event) => void onSubmit(event)} noValidate>
         <TextField

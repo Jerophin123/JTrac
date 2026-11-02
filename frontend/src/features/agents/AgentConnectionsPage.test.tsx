@@ -49,6 +49,56 @@ const CONNECTION: AgentConnection = {
 
 const ORGS = [{ id: CONNECTION.organization.id, slug: 'acme', name: 'Acme', role: 'OWNER' }];
 
+const UTCP_OPTIONS = {
+  available: true,
+  utcpVersion: '1.0.1',
+  manualVersion: '1.0.0',
+  scopes: [
+    { name: 'issues:read', description: 'Read issues', category: 'Issues' },
+    { name: 'projects:read', description: 'Read projects', category: 'Projects' },
+  ],
+};
+
+const UTCP_SETTINGS = {
+  enabled: true,
+  state: 'ENABLED',
+  manualUrl: 'https://tracker.example.com/api/v1/utcp',
+  utcpVersion: '1.0.1',
+  manualVersion: '1.0.0',
+  lastUsedAt: null,
+  lastClient: null,
+  authorizedClients: 0,
+  toolCount: 24,
+};
+
+const UTCP_TOOLS = [
+  {
+    name: 'search_issues',
+    description: 'Search issues with full-text search',
+    category: 'Issues',
+    scope: 'issues:read',
+    inputs: {},
+    outputs: {},
+  },
+];
+
+const UTCP_ACTIVITY = {
+  items: [
+    {
+      id: '0190a6f0-0000-7000-8000-000000000001',
+      toolName: 'search_issues',
+      status: 'SUCCESS',
+      occurredAt: '2026-10-31T07:00:00Z',
+      durationMs: 42,
+      clientAgent: 'Test Agent',
+      targetIdentifier: 'TEST-1',
+    },
+  ],
+  page: 0,
+  size: 10,
+  total: 1,
+};
+
 function ok(data: unknown, status = 200) {
   return Promise.resolve({ data, response: new Response(null, { status }) }) as never;
 }
@@ -94,6 +144,10 @@ describe('AgentConnectionsPage', () => {
       if (path === '/api/v1/me/agent-connections/options') return ok(OPTIONS);
       if (path === '/api/v1/me/agent-connections') return ok(created ? [CONNECTION] : []);
       if (path === '/api/v1/orgs') return ok(ORGS);
+      if (path === '/api/v1/me/utcp/options') return ok(UTCP_OPTIONS);
+      if (path === '/api/v1/me/utcp/settings') return ok(UTCP_SETTINGS);
+      if (path === '/api/v1/me/utcp/activity') return ok(UTCP_ACTIVITY);
+      if (path === '/api/v1/utcp/tools') return ok(UTCP_TOOLS);
       return ok([]);
     }) as never);
     post.mockImplementation((() => {
@@ -121,6 +175,10 @@ describe('AgentConnectionsPage', () => {
   it('shows Connected only when the server reports a signed-in agent', async () => {
     get.mockImplementation(((path: string) => {
       if (path === '/api/v1/me/agent-connections/options') return ok(OPTIONS);
+      if (path === '/api/v1/me/utcp/options') return ok(UTCP_OPTIONS);
+      if (path === '/api/v1/me/utcp/settings') return ok(UTCP_SETTINGS);
+      if (path === '/api/v1/me/utcp/activity') return ok(UTCP_ACTIVITY);
+      if (path === '/api/v1/utcp/tools') return ok(UTCP_TOOLS);
       return ok([{ ...CONNECTION, authorizedAgents: 1, lastUsedAt: '2026-10-28T11:00:00Z', lastClient: 'Codex' }]);
     }) as never);
     renderPage();
@@ -131,10 +189,66 @@ describe('AgentConnectionsPage', () => {
   it('explains why connections are unavailable', async () => {
     get.mockImplementation(((path: string) => {
       if (path === '/api/v1/me/agent-connections/options') return ok({ ...OPTIONS, available: false, unavailableReason: 'AI agent connections require HTTPS.' });
+      if (path === '/api/v1/me/utcp/options') return ok(UTCP_OPTIONS);
+      if (path === '/api/v1/me/utcp/settings') return ok(UTCP_SETTINGS);
+      if (path === '/api/v1/me/utcp/activity') return ok(UTCP_ACTIVITY);
+      if (path === '/api/v1/utcp/tools') return ok(UTCP_TOOLS);
       return ok([]);
     }) as never);
     renderPage();
     expect(await screen.findByText('AI agent connections require HTTPS.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'New connection' })).toBeDisabled();
+  });
+
+  it('renders UTCP integration card as sibling with Experimental badge and discovery URL', async () => {
+    get.mockImplementation(((path: string) => {
+      if (path === '/api/v1/me/agent-connections/options') return ok(OPTIONS);
+      if (path === '/api/v1/me/agent-connections') return ok([]);
+      if (path === '/api/v1/orgs') return ok(ORGS);
+      if (path === '/api/v1/me/utcp/options') return ok(UTCP_OPTIONS);
+      if (path === '/api/v1/me/utcp/settings') return ok(UTCP_SETTINGS);
+      if (path === '/api/v1/me/utcp/activity') return ok(UTCP_ACTIVITY);
+      if (path === '/api/v1/utcp/tools') return ok(UTCP_TOOLS);
+      return ok([]);
+    }) as never);
+    renderPage();
+
+    // Sibling UTCP presence with Experimental badge
+    expect(await screen.findByText('Experimental')).toBeInTheDocument();
+    expect(screen.getByText('Connect UTCP-compatible AI agents directly to JTRAC tools through a standardized tool discovery and calling interface.')).toBeInTheDocument();
+
+    // Discovery URL display
+    expect(await screen.findByLabelText('UTCP manual (discovery URL)')).toHaveValue(UTCP_SETTINGS.manualUrl);
+    expect(screen.getByRole('button', { name: /Copy UTCP manual URL/i })).toBeInTheDocument();
+  });
+
+  it('allows disabling and enabling UTCP integration', async () => {
+    let enabled = true;
+    get.mockImplementation(((path: string) => {
+      if (path === '/api/v1/me/agent-connections/options') return ok(OPTIONS);
+      if (path === '/api/v1/me/agent-connections') return ok([]);
+      if (path === '/api/v1/orgs') return ok(ORGS);
+      if (path === '/api/v1/me/utcp/options') return ok(UTCP_OPTIONS);
+      if (path === '/api/v1/me/utcp/settings') return ok({ ...UTCP_SETTINGS, enabled, state: enabled ? 'ENABLED' : 'DISABLED' });
+      if (path === '/api/v1/me/utcp/activity') return ok(UTCP_ACTIVITY);
+      if (path === '/api/v1/utcp/tools') return ok(UTCP_TOOLS);
+      return ok([]);
+    }) as never);
+    post.mockImplementation(((path: string) => {
+      if (path === '/api/v1/me/utcp/disable') {
+        enabled = false;
+        return ok({ enabled: false, state: 'DISABLED' });
+      }
+      if (path === '/api/v1/me/utcp/enable') {
+        enabled = true;
+        return ok({ enabled: true, state: 'ENABLED' });
+      }
+      return ok({});
+    }) as never);
+    renderPage();
+
+    const disableBtn = await screen.findByRole('button', { name: 'Disable UTCP' });
+    await userEvent.click(disableBtn);
+    expect(post).toHaveBeenCalledWith('/api/v1/me/utcp/disable', {});
   });
 });

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { call } from '../../api/call';
 import { api } from '../../api/client';
 import { orgsQuery } from '../../api/queries';
-import type { AgentConnection, AgentConnectionOptions, AgentScope } from '../../api/types';
+import type { AgentConnection, AgentConnectionOptions, AgentScope, UtcpActivity, UtcpToolSummary } from '../../api/types';
 import { describeError } from '../../lib/errors';
 import { formatDate, formatDateTime, pluralize, timeAgo } from '../../lib/format';
 import { Alert } from '../../ui/Alert';
@@ -25,6 +25,13 @@ export const agentKeys = {
   list: ['me', 'agent-connections'] as const,
   agents: (id: string) => ['me', 'agent-connections', id, 'agents'] as const,
   activity: (id: string) => ['me', 'agent-connections', id, 'activity'] as const,
+};
+
+export const utcpKeys = {
+  options: ['me', 'utcp', 'options'] as const,
+  settings: ['me', 'utcp', 'settings'] as const,
+  activity: ['me', 'utcp', 'activity'] as const,
+  tools: ['utcp', 'tools'] as const,
 };
 
 const optionsQuery = { queryKey: agentKeys.options, queryFn: () => call(() => api.GET('/api/v1/me/agent-connections/options')) };
@@ -102,6 +109,7 @@ export function AgentConnectionsContent() {
           </SettingsCard>
         )}
       </SettingsSection>
+      <UtcpSection />
       {creating && options.data && (
         <CreateConnectionDialog
           options={options.data}
@@ -543,6 +551,308 @@ function SettingsTab({ connection, onDeleted }: { connection: AgentConnection; o
       >
         {null}
       </Dialog>
+    </div>
+  );
+}
+
+export function UtcpSection() {
+  const queryClient = useQueryClient();
+  const toast = useToast();
+  const settings = useQuery({
+    queryKey: utcpKeys.settings,
+    queryFn: () => call(() => api.GET('/api/v1/me/utcp/settings')),
+  });
+  const options = useQuery({
+    queryKey: utcpKeys.options,
+    queryFn: () => call(() => api.GET('/api/v1/me/utcp/options')),
+  });
+  const activity = useQuery({
+    queryKey: utcpKeys.activity,
+    queryFn: () => call(() => api.GET('/api/v1/me/utcp/activity', { params: { query: { size: 10 } } })),
+  });
+  const tools = useQuery({
+    queryKey: utcpKeys.tools,
+    queryFn: () => call(() => api.GET('/api/v1/utcp/tools')),
+  });
+
+  const [activeTab, setActiveTab] = useState<'instructions' | 'tools' | 'activity'>('instructions');
+
+  const enableMutation = useMutation({
+    mutationFn: () => call(() => api.POST('/api/v1/me/utcp/enable', {})),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: utcpKeys.settings });
+      toast.success('UTCP integration enabled.');
+    },
+    onError: (err) => {
+      toast.error(describeError(err));
+    },
+  });
+
+  const disableMutation = useMutation({
+    mutationFn: () => call(() => api.POST('/api/v1/me/utcp/disable', {})),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: utcpKeys.settings });
+      toast.success('UTCP integration disabled.');
+    },
+    onError: (err) => {
+      toast.error(describeError(err));
+    },
+  });
+
+  const isEnabled = settings.data?.enabled ?? true;
+  const manualUrl = settings.data?.manualUrl ?? (typeof window !== 'undefined' ? `${window.location.origin}/api/v1/utcp` : '/api/v1/utcp');
+
+  return (
+    <SettingsSection
+      title="UTCP"
+      layout="stacked"
+      description={
+        <div style={{ display: 'grid', gap: 'var(--space-2)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+            <span style={{ fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-md)' }}>UTCP</span>
+            <Badge tone="warning">Experimental</Badge>
+          </div>
+          <div>Connect UTCP-compatible AI agents directly to JTRAC tools through a standardized tool discovery and calling interface.</div>
+        </div>
+      }
+      actions={
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+          {settings.data && (
+            <Badge tone={isEnabled ? 'success' : 'neutral'}>
+              {isEnabled ? 'Enabled' : 'Disabled'}
+            </Badge>
+          )}
+          {isEnabled ? (
+            <Button
+              size="sm"
+              variant="secondary"
+              loading={disableMutation.isPending}
+              onClick={() => { disableMutation.mutate(); }}
+            >
+              Disable UTCP
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="primary"
+              loading={enableMutation.isPending}
+              onClick={() => { enableMutation.mutate(); }}
+            >
+              Enable UTCP
+            </Button>
+          )}
+        </div>
+      }
+    >
+      {options.data && !options.data.available && (
+        <Alert tone="warning">{options.data.unavailableReason}</Alert>
+      )}
+
+      {(settings.isPending || options.isPending) && <Skeleton lines={3} />}
+      {settings.isError && <Alert tone="danger">{describeError(settings.error)}</Alert>}
+
+      {settings.data && (
+        <SettingsCard>
+          <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
+            <div>
+              <div className={styles.urlRow}>
+                <Input
+                  label="UTCP manual (discovery URL)"
+                  value={manualUrl}
+                  readOnly
+                  onFocus={(e) => { e.target.select(); }}
+                />
+                <CopyButton value={manualUrl} label="Copy UTCP manual URL" />
+              </div>
+              <p className={styles.hint}>Pass this discovery manual URL to your UTCP client or agent runtime.</p>
+            </div>
+
+            <dl className={styles.facts}>
+              <dt>Protocol</dt>
+              <dd>
+                Universal Tool Calling Protocol (UTCP) v{settings.data.utcpVersion} <Badge tone="warning">Experimental</Badge>
+              </dd>
+              <dt>Status</dt>
+              <dd>
+                {isEnabled
+                  ? 'Enabled and listening for requests'
+                  : 'Disabled — tool executions are blocked'}
+              </dd>
+              <dt>Catalogue</dt>
+              <dd>{settings.data.toolCount} {settings.data.toolCount === 1 ? 'tool' : 'tools'} exposed</dd>
+              <dt>Activity</dt>
+              <dd>
+                {settings.data.lastUsedAt
+                  ? settings.data.lastClient
+                    ? `Last used ${timeAgo(settings.data.lastUsedAt)} by ${settings.data.lastClient}`
+                    : `Last used ${timeAgo(settings.data.lastUsedAt)}`
+                  : 'No UTCP agent has connected yet'}
+              </dd>
+            </dl>
+
+            <Segmented
+              label="UTCP details"
+              value={activeTab}
+              onChange={(tab) => { setActiveTab(tab); }}
+              options={[
+                { value: 'instructions', label: 'Connection guide' },
+                { value: 'tools', label: `Tools (${tools.data?.length ?? settings.data.toolCount})` },
+                { value: 'activity', label: 'Activity log' },
+              ]}
+            />
+
+            {activeTab === 'instructions' && (
+              <div className={styles.guide}>
+                <ol className={styles.steps}>
+                  <li>
+                    <p>
+                      <strong>Generate a personal API token</strong>
+                    </p>
+                    <p className={styles.hint}>
+                      Go to Account → Personal Tokens and create a token with read scopes (<code>issues:read</code>, <code>projects:read</code>, <code>attachments:read</code>, <code>reports:read</code>).
+                    </p>
+                  </li>
+                  <li>
+                    <p>
+                      <strong>Configure your UTCP client</strong>
+                    </p>
+                    <p className={styles.hint}>
+                      Point your client to the discovery manual. Authenticate using Bearer token authorization:
+                    </p>
+                    <div className={styles.codeBlock}>
+                      <pre>{JSON.stringify({
+                        name: 'jtrac',
+                        manual_url: manualUrl,
+                        auth: {
+                          auth_type: 'api_key',
+                          var_name: 'Authorization',
+                          location: 'header',
+                          api_key: 'Bearer ${JTRAC_API_TOKEN}',
+                        },
+                      }, null, 2)}</pre>
+                      <CopyButton
+                        value={JSON.stringify({
+                          name: 'jtrac',
+                          manual_url: manualUrl,
+                          auth: {
+                            auth_type: 'api_key',
+                            var_name: 'Authorization',
+                            location: 'header',
+                            api_key: 'Bearer ${JTRAC_API_TOKEN}',
+                          },
+                        }, null, 2)}
+                        label="Copy UTCP configuration"
+                      />
+                    </div>
+                  </li>
+                  <li>
+                    <p>
+                      <strong>Multi-tenant organization header (optional)</strong>
+                    </p>
+                    <p className={styles.hint}>
+                      If your user account belongs to multiple organizations, specify <code>X-JTRAC-Organization: &lt;slug&gt;</code> in headers, or leave it unset to use your default organization.
+                    </p>
+                  </li>
+                </ol>
+              </div>
+            )}
+
+            {activeTab === 'tools' && (
+              <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
+                {tools.data && (
+                  <UtcpToolList tools={tools.data} />
+                )}
+              </div>
+            )}
+
+            {activeTab === 'activity' && (
+              <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
+                {activity.isPending && <Skeleton lines={3} />}
+                {activity.isError && <Alert tone="danger">{describeError(activity.error)}</Alert>}
+                {activity.data && (
+                  <UtcpActivityTable items={activity.data.items} />
+                )}
+              </div>
+            )}
+          </div>
+        </SettingsCard>
+      )}
+    </SettingsSection>
+  );
+}
+
+function UtcpToolList({ tools }: { tools: UtcpToolSummary[] }) {
+  const categories = Array.from(new Set(tools.map((tool) => tool.category)));
+
+  return (
+    <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
+      {categories.map((cat) => {
+        const catTools = tools.filter((tool) => tool.category === cat);
+        return (
+          <div key={cat} style={{ display: 'grid', gap: 'var(--space-2)' }}>
+            <h4 className={styles.subheading}>{cat} ({catTools.length})</h4>
+            <div className={styles.tableWrap}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Tool</th>
+                    <th>Scope</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {catTools.map((tool) => (
+                    <tr key={tool.name}>
+                      <td><code>{tool.name}</code></td>
+                      <td><Badge tone="neutral">{tool.scope}</Badge></td>
+                      <td style={{ whiteSpace: 'normal' }}>{tool.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function UtcpActivityTable({ items }: { items: UtcpActivity[] }) {
+  if (items.length === 0) {
+    return <p className={styles.hint}>No tool calls recorded yet. Activity will appear here when an agent invokes a tool.</p>;
+  }
+
+  return (
+    <div className={styles.tableWrap}>
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Tool</th>
+            <th>Target</th>
+            <th>Client</th>
+            <th>Status</th>
+            <th>Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((it) => (
+            <tr key={it.id}>
+              <td>{timeAgo(it.occurredAt)}</td>
+              <td><code>{it.toolName}</code></td>
+              <td>{(it.target ?? '') === '' ? '—' : it.target}</td>
+              <td>{(it.client ?? '') === '' ? 'UTCP client' : it.client}</td>
+              <td>
+                <Badge tone={it.outcome === 'OK' ? 'success' : 'danger'}>
+                  {it.outcome}
+                </Badge>
+              </td>
+              <td>{it.durationMs != null ? `${it.durationMs}ms` : '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

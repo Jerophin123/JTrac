@@ -1,6 +1,7 @@
 package com.jtrac.launcher;
 
 import com.jtrac.serverconfig.ConfigValidator;
+import com.jtrac.serverconfig.OidcDiscovery;
 import com.jtrac.serverconfig.PortCheck;
 import com.jtrac.serverconfig.Problem;
 import com.jtrac.serverconfig.ServerConfig;
@@ -24,6 +25,123 @@ final class Sections {
 
     /** Result of the SMTP section: the settings and the (possibly unchanged) password. */
     record Smtp(SmtpSettings settings, String password) {
+    }
+
+    /** Result of the single sign-on section: the settings and the (possibly unchanged) client secret. */
+    record Sso(ServerConfig.Sso settings, String clientSecret) {
+        @Override
+        public String toString() {
+            return "Sso[" + settings + ", ****]";
+        }
+    }
+
+    /** A well-known identity provider: suggested id and label, issuer (exact or an example), and setup hints. */
+    private record IdpPreset(String id, String label, String issuer, boolean exactIssuer, boolean trustEmail, String note) {
+    }
+
+    private static final List<IdpPreset> IDP_PRESETS = List.of(
+            new IdpPreset("entra", "Microsoft Entra ID", "https://login.microsoftonline.com/<tenant id>/v2.0", false, true,
+                    "Use your tenant id (not common/organizations). Entra usually omits email_verified, so its email claim is "
+                            + "trusted; add the optional 'email' claim under Token configuration."),
+            new IdpPreset("okta", "Okta", "https://<your org>.okta.com", false, false,
+                    "Create an OIDC Web Application; use the org URL or an authorization server such as .../oauth2/default."),
+            new IdpPreset("google", "Google", "https://accounts.google.com", true, false,
+                    "Create an OAuth client (Web application). Limit the email domains to your Workspace domains."),
+            new IdpPreset("keycloak", "Keycloak", "https://<host>/realms/<realm>", false, false,
+                    "Create a confidential OpenID Connect client with the standard flow enabled."),
+            new IdpPreset("oidc", "Single sign-on", "https://<identity provider>", false, false,
+                    "Any OpenID Connect provider (Ping, Auth0, AD FS at https://<host>/adfs, ...). Register a web application."));
+
+    /**
+     * Single sign-on with one OpenID Connect provider (docs/sso.md). The issuer is checked the
+     * way the server reads it at startup, so a wrong value can't keep JTRAC from starting.
+     */
+    static Sso sso(Prompter p, ServerConfig.Sso current, String currentSecret, String publicUrl, String suggestedDomain) {
+        Out.info("Single sign-on lets people sign in with your organization's identity provider (Microsoft Entra ID, Okta,");
+        Out.info("Google Workspace, Keycloak or any OpenID Connect provider). Password sign-in stays available.");
+        if (!p.askYesNo("sso.enabled", "Set up single sign-on now", current.enabled())) {
+            Out.info("No single sign-on. Add it later with `jtrac configure sso`.");
+            return new Sso(ServerConfig.Sso.DISABLED, "");
+        }
+        while (true) {
+            ServerConfig.Sso was = current;
+            String presetDefault = IDP_PRESETS.stream().anyMatch(pr -> pr.id().equals(was.providerId()))
+                    ? was.providerId() : was.enabled() ? "oidc" : "entra";
+            String presetId = p.askChoice("sso.provider", "Identity provider", IDP_PRESETS.stream()
+                    .map(pr -> new String[] {pr.id(), pr.label()}).toList(), presetDefault);
+            IdpPreset preset = IDP_PRESETS.stream().filter(pr -> pr.id().equals(presetId)).findFirst().orElseThrow();
+            Out.info(preset.note());
+            String id = p.ask("sso.provider-id", "Short id for this provider (part of the redirect URI)",
+                    was.enabled() && !IDP_PRESETS.stream().anyMatch(pr -> pr.id().equals(was.providerId()))
+                            ? was.providerId() : preset.id(),
+                    v -> ssoError(new ServerConfig.Sso(true, v, "x", "https://x.example", "x", false, "", false), "sso.providerId"));
+            boolean same = was.enabled() && was.providerId().equals(id);
+            String label = p.ask("sso.name", "Sign-in button label (Sign in with ...)", same ? was.providerName() : preset.label(),
+                    v -> ssoError(new ServerConfig.Sso(true, id, v, "https://x.example", "x", false, "", false), "sso.providerName"));
+            Out.ok("Register this redirect URI at the identity provider: "
+                    + new ServerConfig.Sso(true, id, label, "", "", false, "", false).redirectUri(publicUrl));
+            String issuer = p.ask("sso.issuer-uri", "Issuer URL (e.g. " + preset.issuer() + ")",
+                    same ? was.issuerUri() : preset.exactIssuer() ? preset.issuer() : null,
+                    v -> ssoError(new ServerConfig.Sso(true, id, label, v, "x", false, "", false), "sso.issuerUri"));
+            String clientId = p.ask("sso.client-id", "Client (application) id", same ? was.clientId() : null,
+                    v -> ssoError(new ServerConfig.Sso(true, id, label, issuer, v, false, "", false), "sso.clientId"));
+            String secret = currentSecret;
+            boolean keep = currentSecret != null && !currentSecret.isEmpty() && !p.unattended()
+                    && p.askYesNo("sso.keep-secret", "Keep the saved client secret", true);
+            if (!keep) {
+                secret = p.askSecret("sso.client-secret", "JTRAC_SSO_CLIENT_SECRET", "Client secret", false, false, null);
+            }
+            Out.info("People who already have an account (matched by verified email) can always use single sign-on.");
+            boolean autoProvision = p.askYesNo("sso.auto-provision",
+                    "Also create an account for anyone the provider signs in", same && was.autoProvision());
+            String domains = p.ask("sso.allowed-domains", "Allowed email domains (comma-separated, blank for any)",
+                    same ? was.allowedDomains() : suggestedDomain == null ? "" : suggestedDomain,
+                    v -> ssoError(new ServerConfig.Sso(true, id, label, issuer, clientId, false, v, false), "sso.allowedDomains"));
+            boolean trust = p.askYesNo("sso.trust-unverified-email",
+                    "Trust the provider's email addresses without an email_verified claim",
+                    same ? was.trustUnverifiedEmail() : preset.trustEmail());
+            ServerConfig.Sso settings = new ServerConfig.Sso(true, id, label, issuer, clientId, autoProvision, domains.strip(), trust);
+            List<Problem> problems = ConfigValidator.validateSso(settings, secret, publicUrl);
+            if (ConfigValidator.hasErrors(problems)) {
+                problems.stream().filter(Problem::isError).forEach(e -> Out.fail(e.message()));
+                if (p.unattended()) {
+                    throw new SetupException("The single sign-on settings are invalid.");
+                }
+                current = settings;
+                currentSecret = secret;
+                continue;
+            }
+            showWarnings(problems);
+            if (p.askYesNo("sso.check", "Check the identity provider now (JTRAC can't start if it can't load it)", true)) {
+                OidcDiscovery.Result result = OidcDiscovery.check(issuer);
+                if (result.ok()) {
+                    Out.ok(result.message());
+                } else {
+                    Out.fail(result.message());
+                    if (p.unattended()) {
+                        throw new SetupException("The identity provider check failed: " + result.message());
+                    }
+                    String next = p.askChoice("sso.after-failure", "What now", List.of(
+                            new String[] {"retry", "Change the single sign-on settings"},
+                            new String[] {"keep", "Save these settings anyway (JTRAC won't start until the provider is reachable)"},
+                            new String[] {"skip", "Skip single sign-on for now"}), "retry");
+                    if (next.equals("retry")) {
+                        current = settings;
+                        currentSecret = secret;
+                        continue;
+                    }
+                    if (next.equals("skip")) {
+                        return new Sso(ServerConfig.Sso.DISABLED, "");
+                    }
+                }
+            }
+            return new Sso(settings, secret);
+        }
+    }
+
+    /** The first error the shared rules report for {@code field} of a (partly filled) SSO setting. */
+    private static Optional<String> ssoError(ServerConfig.Sso candidate, String field) {
+        return errors(ConfigValidator.validateSso(candidate, "x", null), field);
     }
 
     static ServerConfig.Http http(Prompter p, ServerConfig.Http current, boolean checkPort) {

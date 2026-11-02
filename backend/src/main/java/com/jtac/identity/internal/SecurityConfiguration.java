@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
@@ -110,7 +112,9 @@ class SecurityConfiguration {
         @Bean
         SecurityFilterChain securityFilterChain(HttpSecurity http, ProblemSecurityHandlers problems,
                 SecurityContextRepository securityContextRepository, CsrfTokenRepository csrfTokenRepository,
-                UserAccountService accounts, ApiTokenAuthenticationFilter apiTokens) throws Exception {
+                UserAccountService accounts, ApiTokenAuthenticationFilter apiTokens, EnterpriseSsoService sso,
+                ObjectProvider<ClientRegistrationRepository> clientRegistrations, SsoUrls ssoUrls,
+                EnterpriseOAuth2SuccessHandler ssoSuccess, EnterpriseOAuth2FailureHandler ssoFailure) throws Exception {
             String auth = ApiPaths.V1 + "/auth";
             http
                     .securityContext(context -> context.securityContextRepository(securityContextRepository))
@@ -118,7 +122,10 @@ class SecurityConfiguration {
                     .addFilterBefore(new ActiveAccountFilter(accounts), AnonymousAuthenticationFilter.class)
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                     .csrf(csrf -> csrf.spa().csrfTokenRepository(csrfTokenRepository)
-                            .ignoringRequestMatchers(ApiTokenAuthenticationFilter::hasBearerToken))
+                            .ignoringRequestMatchers(
+                                    ApiTokenAuthenticationFilter::hasBearerToken,
+                                    request -> request.getRequestURI().startsWith(ApiPaths.V1 + "/utcp/")
+                            ))
                     .authorizeHttpRequests(authorize -> authorize
                             .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/liveness",
                                     "/actuator/health/readiness").permitAll()
@@ -129,6 +136,9 @@ class SecurityConfiguration {
                                     auth + "/verify-email/resend", auth + "/password-reset",
                                     auth + "/password-reset/confirm").permitAll()
                             .requestMatchers(ApiPaths.V1 + "/public/**").permitAll()
+                            .requestMatchers("/oauth2/authorization/**", "/login/oauth2/code/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, ApiPaths.V1 + "/utcp", ApiPaths.V1 + "/utcp/manual",
+                                    ApiPaths.V1 + "/utcp/tools", ApiPaths.V1 + "/utcp/tools/*").permitAll()
                             .requestMatchers("/api/**").authenticated()
                             // Everything else is the static single-page application.
                             .anyRequest().permitAll())
@@ -150,6 +160,21 @@ class SecurityConfiguration {
                                     "frame-ancestors 'none'")))
                             .referrerPolicy(referrer -> referrer.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                             .frameOptions(frame -> frame.deny()));
+
+            // Enterprise SSO (docs/sso.md): only while an OpenID Connect provider is registered.
+            if (sso.available()) {
+                ClientRegistrationRepository registrations = clientRegistrations.getObject();
+                http.oauth2Login(oauth2 -> oauth2
+                        // The SPA owns /login; this also stops Spring generating its own login page.
+                        .loginPage("/login")
+                        .clientRegistrationRepository(registrations)
+                        .authorizedClientRepository(new DiscardingAuthorizedClientRepository())
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .authorizationRequestResolver(new SsoAuthorizationRequestResolver(registrations, ssoUrls)))
+                        .successHandler(ssoSuccess)
+                        .failureHandler(ssoFailure));
+            }
+
             return http.build();
         }
 

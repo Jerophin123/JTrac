@@ -27,13 +27,13 @@
 
 .markdown code {
   padding: 0.1em 0.35em;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-xs);
   background: var(--color-surface-sunken);
 }
 
 .markdown pre {
   padding: var(--space-3);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-surface-sunken);
   overflow-x: auto;
 }

@@ -17,7 +17,7 @@
   cursor: pointer;
   transition:
     color var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .button::before {
@@ -27,7 +27,7 @@
   inset-inline: 4px;
   z-index: -1;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   transform: skewX(var(--slant));
   transition:
     background-color var(--duration-fast) var(--ease-out),
@@ -43,8 +43,14 @@
   outline-offset: 2px;
 }
 
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+/* A soft squeeze on press; the spring easing above makes the release bounce back. */
 .button:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
+  transition-duration: 60ms;
 }
 
 .button:disabled {

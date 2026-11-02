@@ -4,30 +4,29 @@ import { MailWarning, Menu, WifiOff } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { orgQuery, orgsQuery } from '../../api/queries';
 import { extractColorFromImage } from '../../lib/colorExtractor';
+import { useShortcuts } from '../../lib/shortcuts';
+import { readSidebarCollapsed, saveSidebarCollapsed } from '../../lib/sidebar';
 import { publicConfigQueryOptions, sessionQueryKey, sessionQueryOptions, useIsServerAdmin } from '../../features/auth/session';
 import { CreateIssueDialog } from '../../features/issues/CreateIssueDialog';
 import { Button } from '../../ui/Button';
 import { Logo } from '../../ui/Logo';
 import { CommandPalette } from '../CommandPalette';
+import { ShortcutsDialog } from '../ShortcutsDialog';
 import { useRealtime } from '../realtime';
 import styles from './AppShell.module.css';
 import { Sidebar } from './Sidebar';
+import { SIDEBAR_SEARCH_ID } from './SidebarSearch';
 
 const NAV_ID = 'primary-navigation';
-
-function isTyping(target: EventTarget | null): boolean {
-  return (
-    target instanceof HTMLElement &&
-    (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.closest('dialog') !== null)
-  );
-}
 
 /** Authenticated application frame: floating sidebar + content. Rendered only with a session. */
 export function AppShell() {
   const { data: session } = useQuery(sessionQueryOptions);
   const [navOpen, setNavOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(readSidebarCollapsed);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -98,24 +97,52 @@ export function AppShell() {
     }
   }, [session, navigate]);
 
-  useEffect(() => {
-    if (!org) {
-      return undefined;
+
+  const openPalette = () => {
+    setPaletteOpen(true);
+  };
+
+  // "/" jumps into the sidebar search when it is on screen; otherwise (collapsed rail, closed
+  // drawer) the command palette offers the same search.
+  const focusSearch = () => {
+    const field = document.getElementById(SIDEBAR_SEARCH_ID);
+    if (field instanceof HTMLInputElement && field.offsetParent !== null && field.getClientRects().length > 0) {
+      field.focus();
+    } else {
+      openPalette();
     }
-    const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault();
-        setPaletteOpen(true);
-      } else if (event.key === 'c' && !event.ctrlKey && !event.metaKey && !event.altKey && !isTyping(event.target)) {
-        event.preventDefault();
-        setCreateOpen(true);
-      }
-    };
-    document.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [org]);
+  };
+
+  const toggleCollapsed = () => {
+    setCollapsed((value) => {
+      saveSidebarCollapsed(!value);
+      return !value;
+    });
+  };
+
+  // Every keyboard shortcut (lib/shortcuts.ts); keys are customizable under Account › Keyboard shortcuts.
+  useShortcuts({
+    toggleSidebar: toggleCollapsed,
+    showShortcuts: () => {
+      setShortcutsOpen(true);
+    },
+    goAccount: () => void navigate({ to: '/account' }),
+    ...(org
+      ? {
+          commandPalette: openPalette,
+          focusSearch,
+          createIssue: () => {
+            setCreateOpen(true);
+          },
+          goMyWork: () => void navigate({ to: '/$org', params: { org } }),
+          goInbox: () => void navigate({ to: '/$org/inbox', params: { org } }),
+          goIssues: () => void navigate({ to: '/$org/search', params: { org } }),
+          goDashboards: () => void navigate({ to: '/$org/dashboards', params: { org } }),
+          goProjects: () => void navigate({ to: '/$org/projects', params: { org } }),
+          goSettings: () => void navigate({ to: '/$org/settings', params: { org } }),
+        }
+      : {}),
+  });
 
   const completeSignOut = async () => {
     signingOut.current = true;
@@ -153,6 +180,7 @@ export function AppShell() {
   return (
     <div
       className={`${styles.shell ?? ''} theme-scope`}
+      data-sidebar={collapsed ? 'collapsed' : undefined}
       style={
         effectiveColor
           ? ({
@@ -186,11 +214,13 @@ export function AppShell() {
         id={NAV_ID}
         session={session}
         open={navOpen}
+        collapsed={collapsed}
+        onToggleCollapsed={toggleCollapsed}
         onClose={closeNav}
         onSignedOut={completeSignOut}
         onOpenSearch={() => {
           closeNav();
-          setPaletteOpen(true);
+          openPalette();
         }}
       />
       {navOpen && (
@@ -208,6 +238,13 @@ export function AppShell() {
         <Outlet />
       </main>
 
+      <ShortcutsDialog
+        open={shortcutsOpen}
+        onClose={() => {
+          setShortcutsOpen(false);
+        }}
+      />
+
       {org && (
         <>
           <OrgRealtime org={org} />
@@ -219,6 +256,9 @@ export function AppShell() {
             }}
             onCreateIssue={() => {
               setCreateOpen(true);
+            }}
+            onShowShortcuts={() => {
+              setShortcutsOpen(true);
             }}
           />
           <CreateIssueDialog
@@ -268,7 +308,7 @@ function EmailPendingNotice() {
       <MailWarning size={16} aria-hidden="true" />
       <span>
         Email isn’t set up: invitations, password resets and notifications are waiting in the queue.{' '}
-        <Link to="/server/settings">Set up email</Link>
+        <Link to="/account/server/email">Set up email</Link>
       </span>
     </div>
   );

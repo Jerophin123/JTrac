@@ -20,6 +20,7 @@ dependencies {
     implementation(libs.spring.modulith.api)
     implementation(libs.spring.boot.starter.webmvc)
     implementation(libs.spring.boot.starter.security)
+    implementation(libs.spring.boot.starter.oauth2.client)
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.spring.boot.starter.data.jpa)

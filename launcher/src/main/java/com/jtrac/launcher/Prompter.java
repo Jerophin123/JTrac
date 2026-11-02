@@ -28,10 +28,25 @@ class Prompter {
     interface Check extends Function<String, Optional<String>> {
     }
 
+    /**
+     * An interactive screen that asks instead of the console (the full-screen setup). Each
+     * method returns only an answer that passed {@code check}.
+     */
+    interface Screen {
+        String text(String question, String defaultValue, Check check);
+
+        boolean yesNo(String question, boolean defaultValue);
+
+        String choice(String question, List<String[]> options, String defaultKey);
+
+        String secret(String question, boolean confirm, boolean allowBlank, Check check);
+    }
+
     private final Map<String, String> answers;
     private final Set<String> used = new HashSet<>();
     private final BufferedReader stdin;
     private final Console console;
+    private Screen screen;
 
     private Prompter(Map<String, String> answers) {
         this.answers = answers;
@@ -68,12 +83,24 @@ class Prompter {
         return answers != null;
     }
 
+    /** Asks through {@code screen} from now on (null: the console again). Answers files still win. */
+    void attach(Screen next) {
+        this.screen = next;
+    }
+
+    private boolean onScreen() {
+        return answers == null && screen != null;
+    }
+
     /** Keys in the answers file that no question used (probably typos). */
     List<String> unusedAnswers() {
         return answers == null ? List.of() : answers.keySet().stream().filter(k -> !used.contains(k)).sorted().toList();
     }
 
     String ask(String key, String question, String defaultValue, Check check) {
+        if (onScreen()) {
+            return screen.text(question, defaultValue, check);
+        }
         while (true) {
             String answer;
             if (answers != null) {
@@ -111,6 +138,9 @@ class Prompter {
     }
 
     boolean askYesNo(String key, String question, boolean defaultValue) {
+        if (onScreen()) {
+            return screen.yesNo(question, defaultValue);
+        }
         String value = ask(key, question + " (y/n)", defaultValue ? "y" : "n", v -> {
             String lower = v.toLowerCase(Locale.ROOT);
             return List.of("y", "yes", "n", "no", "true", "false").contains(lower) ? Optional.empty() : Optional.of("Answer y or n.");
@@ -121,6 +151,9 @@ class Prompter {
 
     /** Asks to pick one of the options (1-based numbers or the option key). */
     String askChoice(String key, String question, List<String[]> options, String defaultKey) {
+        if (onScreen()) {
+            return screen.choice(question, options, defaultKey);
+        }
         if (answers == null) {
             for (int i = 0; i < options.size(); i++) {
                 Out.info("  " + (i + 1) + ") " + options.get(i)[1]);
@@ -166,6 +199,9 @@ class Prompter {
             }
             Out.info(question + ": ****");
             return value;
+        }
+        if (onScreen()) {
+            return screen.secret(question, confirm, allowBlank, check);
         }
         while (true) {
             String first = readSecret("   " + question + ": ");

@@ -7,6 +7,16 @@
   display: grid;
 }
 
+/*
+ * A full-width trigger gets a menu exactly as wide as it, so the two line up. It never gets
+ * narrower than the usual minimum (the collapsed sidebar's small triggers still open a
+ * readable menu).
+ */
+.block > .menu {
+  inline-size: max(100%, 11rem);
+  max-inline-size: max(100%, min(20rem, calc(100vw - 2 * var(--space-4))));
+}
+
 .menu {
   position: absolute;
   inset-block-start: calc(100% + 4px);
@@ -28,6 +38,8 @@
 .top {
   inset-block-start: auto;
   inset-block-end: calc(100% + 4px);
+  --menu-from: calc(-1 * var(--rise));
+  transform-origin: bottom;
 }
 
 .end {
@@ -46,7 +58,7 @@
   min-block-size: 2rem;
   padding: var(--space-1) var(--space-2);
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-xs);
   background: transparent;
   color: var(--color-text);
   text-align: start;
@@ -111,4 +123,22 @@
 
 .danger .icon {
   color: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .menu {
+    transform-origin: top;
+    animation: menuIn var(--duration-base) var(--ease-out) backwards;
+  }
+
+  .item {
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+}
+
+@keyframes menuIn {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--menu-from, var(--rise)))) scale(0.97);
+  }
 }

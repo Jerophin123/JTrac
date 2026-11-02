@@ -27,3 +27,8 @@ if (typeof window !== 'undefined' && typeof window.matchMedia !== 'function') {
       }) as unknown as MediaQueryList,
   });
 }
+
+// jsdom has no layout, so no scrollIntoView; lists keep the highlighted option in view with it.
+if (typeof Element !== 'undefined' && typeof Element.prototype.scrollIntoView !== 'function') {
+  Element.prototype.scrollIntoView = () => undefined;
+}

@@ -339,6 +339,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/system/about": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Application version for the About page (any signed-in user)
+         * @description The running JTRAC version and, when the build recorded it, when it was built. Signed-in users only, so anonymous visitors can't fingerprint the server.
+         */
+        get: operations["getAbout"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/system/mail": {
         parameters: {
             query?: never;
@@ -647,6 +667,230 @@ export interface paths {
          * @description Returns the agent's redirect URL carrying error=access_denied. Requires a browser session; API tokens and agents are refused (forbidden).
          */
         post: operations["denyAgentAuthorization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/utcp/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Permissions, options and availability for UTCP integration
+         * @description Returns UTCP options and availability. Requires an authenticated session.
+         */
+        get: operations["getUtcpOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/utcp/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get UTCP integration settings
+         * @description Returns the user and organization UTCP configuration and status.
+         */
+        get: operations["getUtcpSettings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/utcp/enable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Enable UTCP integration
+         * @description Enables the native UTCP provider for this organization.
+         */
+        post: operations["enableUtcp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/utcp/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Disable UTCP integration
+         * @description Disables the native UTCP provider for this organization.
+         */
+        post: operations["disableUtcp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/utcp/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get UTCP tool execution activity log
+         * @description Returns real audit log entries of UTCP tool calls.
+         */
+        get: operations["getUtcpActivity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/utcp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Discover the UTCP manual
+         * @description Returns the official Universal Tool Calling Protocol (UTCP) manual declaring provider info, tool definitions and HTTP call templates.
+         */
+        get: operations["getUtcpManual"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/utcp/manual": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Discover the UTCP manual (alias)
+         * @description Alias path to retrieve the official UTCP manual.
+         */
+        get: operations["getUtcpManualAlias"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/utcp/tools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all exposed UTCP tools
+         * @description Returns summaries and input schemas of all available UTCP tools.
+         */
+        get: operations["listUtcpTools"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/utcp/tools/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get UTCP tool definition
+         * @description Returns the definition and schema of a specific UTCP tool.
+         */
+        get: operations["getUtcpTool"];
+        put?: never;
+        /**
+         * Call a UTCP tool
+         * @description Invokes a UTCP tool directly using parameters in the request body.
+         */
+        post: operations["callUtcpTool"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/utcp/execute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unified execution endpoint for UTCP tools
+         * @description Executes a specified UTCP tool with arguments.
+         */
+        post: operations["executeUtcp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/utcp/attachments/{issueKey}/{attachmentId}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Securely download an issue attachment
+         * @description Downloads an attachment file with verified ownership and access control.
+         */
+        get: operations["downloadUtcpAttachment"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2074,6 +2318,68 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        UtcpOptions: {
+            available: boolean;
+            unavailableReason?: string | null;
+            experimental: boolean;
+            manualUrl: string;
+            utcpVersion: string;
+            supportedCategories: string[];
+            totalTools: number;
+        };
+        UtcpSettings: {
+            serverEnabled: boolean;
+            enabled: boolean;
+            /** @enum {string} */
+            state: "DISABLED" | "CONFIGURING" | "ENABLED" | "CONNECTED" | "ERROR";
+            manualUrl: string;
+            providerName: string;
+            utcpVersion: string;
+            manualVersion: string;
+            /** Format: date-time */
+            lastUsedAt?: string | null;
+            lastClient?: string | null;
+            toolCount: number;
+        };
+        UtcpStatusResponse: {
+            status: string;
+            state: string;
+        };
+        UtcpActivity: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            occurredAt: string;
+            toolName: string;
+            /** @enum {string} */
+            outcome: "OK" | "ERROR" | "DENIED" | "RATE_LIMITED";
+            target?: string | null;
+            client?: string | null;
+            durationMs?: number | null;
+        };
+        UtcpActivityPage: {
+            items: components["schemas"]["UtcpActivity"][];
+            total: number;
+            page: number;
+            size: number;
+        };
+        UtcpManual: {
+            utcp_version: string;
+            manual_version: string;
+            tools: Record<string, never>[];
+        };
+        UtcpToolSummary: {
+            name: string;
+            description: string;
+            category: string;
+            scope: string;
+            inputs?: Record<string, never>;
+            outputs?: Record<string, never>;
+        };
+        UtcpExecuteRequest: {
+            tool: string;
+            arguments?: Record<string, never>;
+        };
         AcceptResult: {
             organizationSlug: string;
         };
@@ -2836,7 +3142,26 @@ export interface components {
             registrationOpen: boolean;
             /** @description False while outgoing email is not configured (email pending); password resets can't be emailed. */
             emailEnabled: boolean;
+            /** @description Enterprise identity providers (OpenID Connect) offered for sign-in; empty while SSO is off. */
+            ssoProviders: components["schemas"]["SsoProvider"][];
             legal: components["schemas"]["LegalInfo"];
+        };
+        SsoProvider: {
+            /** @description Registration key (spring.security.oauth2.client.registration.<id>). */
+            id: string;
+            /** @description Display name for the sign-in button (client-name, or the id). */
+            name: string;
+            /** @description Relative URL that starts the browser sign-in (a full-page navigation, not an API call). Append `?redirect=/path` to return to a same-origin path afterwards. A failed or refused sign-in returns to `/login?sso=<code>` with code `cancelled`, `failed`, `invalid_identity`, `email_unverified`, `domain_not_allowed`, `no_account`, `account_disabled`, `identity_conflict` or `setup_required`. */
+            loginUrl: string;
+        };
+        AboutInfo: {
+            /** @description The running JTRAC version ("development" outside a release build). */
+            version: string;
+            /**
+             * Format: date-time
+             * @description When this version was built, if the build recorded it.
+             */
+            buildTime?: string | null;
         };
         ServerInfo: {
             version: string;
@@ -4036,6 +4361,35 @@ export interface operations {
             };
         };
     };
+    getAbout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AboutInfo"];
+                };
+            };
+            /** @description Client error (see `type`): unauthenticated, csrf-rejected. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     getMailSettings: {
         parameters: {
             query?: never;
@@ -4648,6 +5002,379 @@ export interface operations {
                 };
             };
             /** @description Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited. */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getUtcpOptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UtcpOptions"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getUtcpSettings: {
+        parameters: {
+            query?: {
+                organizationId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UtcpSettings"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    enableUtcp: {
+        parameters: {
+            query?: {
+                organizationId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UtcpStatusResponse"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    disableUtcp: {
+        parameters: {
+            query?: {
+                organizationId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UtcpStatusResponse"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getUtcpActivity: {
+        parameters: {
+            query?: {
+                organizationId?: string;
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UtcpActivityPage"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getUtcpManual: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UtcpManual"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getUtcpManualAlias: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UtcpManual"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    listUtcpTools: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UtcpToolSummary"][];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    getUtcpTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UtcpToolSummary"];
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    callUtcpTool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description Tool execution result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    executeUtcp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UtcpExecuteRequest"];
+            };
+        };
+        responses: {
+            /** @description Tool execution result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Client error */
+            "4XX": {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    downloadUtcpAttachment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                issueKey: string;
+                attachmentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attachment binary content */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+            /** @description Client error */
             "4XX": {
                 headers: {
                     [name: string]: unknown;

@@ -15,7 +15,7 @@
   inset: 0;
   z-index: -1;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-surface-sunken);
   transform: skewX(var(--slant));
 }
@@ -52,7 +52,7 @@
   inset-block: 0;
   inset-inline: 2px;
   z-index: -1;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-shape-xs);
   transform: skewX(var(--slant));
 }
 
@@ -68,4 +68,25 @@
 .option:has(.input:focus-visible)::before {
   outline: 2px solid var(--color-focus-ring);
   outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .option:has(.input:checked)::before {
+    animation: optionIn var(--duration-slow) var(--ease-spring);
+  }
+
+  .option svg {
+    transition: transform var(--duration-base) var(--ease-spring);
+  }
+
+  .option:hover svg {
+    transform: rotate(-12deg) scale(1.08);
+  }
+}
+
+@keyframes optionIn {
+  from {
+    opacity: 0.4;
+    transform: skewX(var(--slant)) scale(0.8);
+  }
 }

@@ -72,7 +72,7 @@
   inset: 0;
   z-index: -1;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-surface-sunken);
   transform: skewX(var(--slant));
 }
@@ -99,7 +99,7 @@
   inset-block: 0;
   inset-inline: 3px;
   z-index: -1;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-shape-xs);
   transform: skewX(var(--slant));
 }
 
@@ -114,4 +114,32 @@
 .segment[aria-checked='true']::before {
   background: var(--color-surface);
   box-shadow: var(--shadow-raised);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .segment::before {
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .segment[aria-checked='true']::before {
+    animation: segmentIn var(--duration-slow) var(--ease-spring);
+  }
+
+  /* The active tab's stroke draws out from its centre. */
+  .tab[data-status='active']::after {
+    animation: strokeIn var(--duration-slow) var(--ease-spring);
+  }
+}
+
+@keyframes segmentIn {
+  from {
+    opacity: 0.4;
+    transform: skewX(var(--slant)) scale(0.86);
+  }
+}
+
+@keyframes strokeIn {
+  from {
+    transform: skewX(var(--slant-mark)) scaleX(0.2);
+  }
 }

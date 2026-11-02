@@ -84,6 +84,8 @@ public final class ConfigStore {
 
     public void saveConfig(ServerConfig config) throws IOException {
         Map<String, String> merged = new LinkedHashMap<>(read(settingsFile()));
+        String previousSso = merged.getOrDefault(ConfigMapper.SSO_PROVIDER_ID, "").strip();
+        merged.keySet().removeIf(key -> ConfigMapper.isSsoProviderKey(key, previousSso));
         merged.putAll(ConfigMapper.toProperties(config));
         write(settingsFile(), merged, SETTINGS_HEADER, false);
     }

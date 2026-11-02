@@ -8,7 +8,7 @@
    * different width and the navigation shifted sideways from page to page.
    */
   inline-size: 100%;
-  max-inline-size: var(--content-wide);
+  max-inline-size: var(--content-max);
   margin-inline: auto;
 }
 
@@ -21,17 +21,19 @@
 .top::before {
   content: '';
   justify-self: start;
-  inline-size: 1.75rem;
+  /* Both strokes in one element: a gradient, not a box-shadow copy (which can leave a faint streak). */
+  inline-size: 3.9rem;
   block-size: 4px;
   margin-inline-start: 2px;
   border-radius: 1px;
-  background: var(--color-accent);
-  box-shadow: 2.15rem 0 0 0 color-mix(in srgb, var(--color-accent) 40%, transparent);
+  background: linear-gradient(to right, var(--color-accent) 0 1.75rem, transparent 1.75rem 2.15rem,
+    color-mix(in srgb, var(--color-accent) 40%, transparent) 2.15rem 3.9rem);
   transform: skewX(var(--slant-mark));
 }
 
 :global([dir='rtl']) .top::before {
-  box-shadow: -2.15rem 0 0 0 color-mix(in srgb, var(--color-accent) 40%, transparent);
+  background: linear-gradient(to left, var(--color-accent) 0 1.75rem, transparent 1.75rem 2.15rem,
+    color-mix(in srgb, var(--color-accent) 40%, transparent) 2.15rem 3.9rem);
 }
 
 .title {
@@ -106,7 +108,7 @@
   inset-block: 0;
   inset-inline: 7px 0;
   z-index: -1;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   transform: skewX(var(--slant));
   transition: background-color var(--duration-fast) var(--ease-out);
 }
@@ -527,5 +529,17 @@
 
   .section {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .navItem[data-status='active']::after {
+    animation: settingsBarIn var(--duration-slow) var(--ease-spring);
+  }
+}
+
+@keyframes settingsBarIn {
+  from {
+    transform: skewX(var(--slant)) scaleY(0);
   }
 }

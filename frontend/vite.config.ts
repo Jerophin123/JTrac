@@ -17,6 +17,9 @@ export default defineConfig({
       '/oauth': backend,
       '/.well-known/oauth-authorization-server': backend,
       '/.well-known/oauth-protected-resource': backend,
+      // Enterprise SSO: sign-in start and the identity provider's callback (docs/sso.md).
+      '/oauth2/authorization': backend,
+      '/login/oauth2/code': backend,
     },
   },
   build: {

@@ -49,3 +49,33 @@
   border-color: color-mix(in srgb, var(--color-info) 25%, transparent);
   color: var(--color-info);
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .alert {
+    animation: alertIn var(--duration-base) var(--ease-out) backwards;
+  }
+
+  /* A tiny head-shake for errors (symmetric, so it reads the same in RTL). */
+  .danger {
+    animation: alertIn var(--duration-base) var(--ease-out) backwards, nudge 360ms ease-in-out 120ms;
+  }
+}
+
+@keyframes alertIn {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--rise) / 2));
+  }
+}
+
+@keyframes nudge {
+  20%,
+  60% {
+    transform: translateX(-3px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(3px);
+  }
+}

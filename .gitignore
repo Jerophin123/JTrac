@@ -73,5 +73,6 @@ jtac/distribution/releases/
 # Staging copy for publishing the public repository
 publish/
 
-# Legacy / local development subdirectory
-jtac/
+# Legacy / local development subdirectory (anchored: an unanchored `jtac/` also
+# matched backend/src/main/java/com/jtac/ and hid every new Java source file)
+/jtac/

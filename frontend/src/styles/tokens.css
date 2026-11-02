@@ -41,25 +41,35 @@
   --radius-full: 999px;
   /*
    * Shape language taken from the JTRAC logo: forward-leaning strokes with one rounded
-   * and one sharp diagonal end. Containers round two opposite corners (like the logo's
-   * strokes) and controls lean forward by --slant.
+   * and one sharp diagonal end. Containers, controls and tiles round the top-left and
+   * bottom-right corners and keep the top-right and bottom-left pointed (like the logo's
+   * strokes); controls also lean forward by --slant. Only circular things (avatars, dots,
+   * spinners, pills) use --radius-full.
    */
-  --radius-shape: var(--radius-lg) var(--radius-xs);
-  --radius-shape-sm: var(--radius-md) 3px;
+  /* Just enough rounding to soften the sharp corners without reading as round. */
+  --radius-point: 2px;
+  --radius-shape: var(--radius-lg) var(--radius-point);
+  --radius-shape-sm: var(--radius-md) var(--radius-point);
+  --radius-shape-xs: var(--radius-sm) var(--radius-point);
   /* One angle for every slanted element, so all edges run parallel. */
   --slant: -12deg;
   --slant-mark: var(--slant);
 
   /* Layout */
   --sidebar-width: 15.5rem;
+  --sidebar-rail: 3.75rem;
   --shell-gap: 0.5rem;
   --content-max: 72rem;
-  --content-wide: 96rem;
 
   /* Motion */
   --duration-fast: 120ms;
   --duration-base: 180ms;
+  --duration-slow: 320ms;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* A small overshoot, so things settle the way a hand puts them down. */
+  --ease-spring: cubic-bezier(0.34, 1.32, 0.64, 1);
+  /* Entrance distance: enough to read as movement, never as a jump. */
+  --rise: 6px;
 
   /* Color: light */
   --color-canvas: #f5f3ef;

@@ -30,7 +30,7 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-shape-sm);
 }
 
 .row:hover {
@@ -140,7 +140,7 @@
 
 .value {
   padding: 0 var(--space-1);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-xs);
   background: var(--color-surface-sunken);
   color: var(--color-text);
 }

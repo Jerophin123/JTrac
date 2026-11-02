@@ -6,6 +6,25 @@ spring:
     username: ${JTRAC_TEST_DB_USER:${JTAC_TEST_DB_USER:jtac_app}}
     hikari:
       maximum-pool-size: 4
+  security:
+    oauth2:
+      client:
+        # Fixture OpenID Connect provider for the SSO tests: explicit endpoints (no discovery,
+        # nothing is contacted) and a public client (no secret).
+        registration:
+          testidp:
+            client-name: Test IdP
+            client-id: jtrac-test
+            authorization-grant-type: authorization_code
+            # Without issuer discovery Spring has no default; JTRAC replaces this template with the public URL.
+            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+            scope: openid,email,profile
+        provider:
+          testidp:
+            authorization-uri: https://idp.example.test/authorize
+            token-uri: https://idp.example.test/token
+            jwk-set-uri: https://idp.example.test/jwks
+            user-name-attribute: sub
 
 jtac:
   public-url: http://localhost:5173

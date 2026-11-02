@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import styles from './Page.module.css';
 
 interface PageHeaderProps {
@@ -26,11 +26,17 @@ export function Page({ children, wide = false }: { children: ReactNode; wide?: b
 }
 
 export function Panel({ title, actions, children, padded = true }: { title?: ReactNode; actions?: ReactNode; children: ReactNode; padded?: boolean }) {
+  // Named by its title, so assistive technology lists the panel as a landmark region.
+  const titleId = useId();
   return (
-    <section className={styles.panel}>
+    <section className={styles.panel} aria-labelledby={title ? titleId : undefined}>
       {(title ?? actions) && (
         <header className={styles.panelHeader}>
-          {title && <h2 className={styles.panelTitle}>{title}</h2>}
+          {title && (
+            <h2 id={titleId} className={styles.panelTitle}>
+              {title}
+            </h2>
+          )}
           {actions && <div className={styles.actions}>{actions}</div>}
         </header>
       )}

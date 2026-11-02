@@ -3,7 +3,7 @@
   place-items: center;
   inline-size: 2rem;
   block-size: 2rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-accent-soft);
   color: var(--color-accent-fg);
 }
@@ -38,7 +38,7 @@
   margin: 0;
   padding: var(--space-3);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-shape-sm);
 }
 
 .scopeGroup legend {
@@ -71,7 +71,7 @@
   align-items: start;
   gap: var(--space-2);
   padding: var(--space-2);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-surface-sunken);
 }
 
@@ -188,7 +188,7 @@
   margin: 0;
   padding: var(--space-3);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-shape-sm);
   font-size: var(--text-sm);
 }
 

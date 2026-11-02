@@ -3,7 +3,7 @@
 openapi: "3.1.0"
 info:
   title: JTRAC API
-  version: "3.0.4"
+  version: "3.2.0"
   summary: Project management and issue tracking platform API.
   description: |
     Contract-first API for JTRAC (see docs/adr/0006-api-contract-and-errors.md).
@@ -55,6 +55,8 @@ tags:
     description: My profile and API tokens
   - name: agents
     description: AI agent (MCP) connections and agent sign-in approval
+  - name: utcp
+    description: Universal Tool Calling Protocol (UTCP) native provider and tool execution (Experimental)
   - name: organizations
     description: Organizations, members, invitations, teams and audit
   - name: projects
@@ -500,6 +502,27 @@ paths:
                 $ref: "#/components/schemas/ServerInfo"
         "4XX":
           description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/system/about":
+    get:
+      tags: [system]
+      operationId: getAbout
+      summary: Application version for the About page (any signed-in user)
+      description: The running JTRAC version and, when the build recorded it, when it was built. Signed-in users only, so anonymous visitors can't fingerprint the server.
+      security:
+        - session: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/AboutInfo"
+        "4XX":
+          description: "Client error (see `type`): unauthenticated, csrf-rejected."
           content:
             "application/problem+json":
               schema:
@@ -1052,6 +1075,338 @@ paths:
                 $ref: "#/components/schemas/AgentDecision"
         "4XX":
           description: "Client error (see `type`): validation-failed, unauthenticated, forbidden, csrf-rejected, not-found (also for resources the caller may not know about), conflict, version-conflict, payload-too-large, rate-limited."
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/utcp/options":
+    get:
+      tags: [utcp]
+      operationId: getUtcpOptions
+      summary: Permissions, options and availability for UTCP integration
+      description: Returns UTCP options and availability. Requires an authenticated session.
+      security:
+        - session: []
+        - bearer: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UtcpOptions"
+        "4XX":
+          description: "Client error"
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/utcp/settings":
+    get:
+      tags: [utcp]
+      operationId: getUtcpSettings
+      summary: Get UTCP integration settings
+      description: Returns the user and organization UTCP configuration and status.
+      parameters:
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      security:
+        - session: []
+        - bearer: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UtcpSettings"
+        "4XX":
+          description: "Client error"
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/utcp/enable":
+    post:
+      tags: [utcp]
+      operationId: enableUtcp
+      summary: Enable UTCP integration
+      description: Enables the native UTCP provider for this organization.
+      parameters:
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      security:
+        - session: []
+          csrf: []
+        - bearer: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UtcpStatusResponse"
+        "4XX":
+          description: "Client error"
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/utcp/disable":
+    post:
+      tags: [utcp]
+      operationId: disableUtcp
+      summary: Disable UTCP integration
+      description: Disables the native UTCP provider for this organization.
+      parameters:
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      security:
+        - session: []
+          csrf: []
+        - bearer: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UtcpStatusResponse"
+        "4XX":
+          description: "Client error"
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/me/utcp/activity":
+    get:
+      tags: [utcp]
+      operationId: getUtcpActivity
+      summary: Get UTCP tool execution activity log
+      description: Returns real audit log entries of UTCP tool calls.
+      parameters:
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: size
+          in: query
+          required: false
+          schema:
+            type: integer
+      security:
+        - session: []
+        - bearer: []
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UtcpActivityPage"
+        "4XX":
+          description: "Client error"
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/utcp":
+    get:
+      tags: [utcp]
+      operationId: getUtcpManual
+      summary: Discover the UTCP manual
+      description: Returns the official Universal Tool Calling Protocol (UTCP) manual declaring provider info, tool definitions and HTTP call templates.
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UtcpManual"
+        "4XX":
+          description: "Client error"
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/utcp/manual":
+    get:
+      tags: [utcp]
+      operationId: getUtcpManualAlias
+      summary: Discover the UTCP manual (alias)
+      description: Alias path to retrieve the official UTCP manual.
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UtcpManual"
+        "4XX":
+          description: "Client error"
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/utcp/tools":
+    get:
+      tags: [utcp]
+      operationId: listUtcpTools
+      summary: List all exposed UTCP tools
+      description: Returns summaries and input schemas of all available UTCP tools.
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UtcpToolSummary"
+        "4XX":
+          description: "Client error"
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/utcp/tools/{name}":
+    get:
+      tags: [utcp]
+      operationId: getUtcpTool
+      summary: Get UTCP tool definition
+      description: Returns the definition and schema of a specific UTCP tool.
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UtcpToolSummary"
+        "4XX":
+          description: "Client error"
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+    post:
+      tags: [utcp]
+      operationId: callUtcpTool
+      summary: Call a UTCP tool
+      description: Invokes a UTCP tool directly using parameters in the request body.
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - session: []
+          csrf: []
+        - bearer: []
+      requestBody:
+        required: false
+        content:
+          "application/json":
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Tool execution result
+          content:
+            "application/json":
+              schema:
+                type: object
+        "4XX":
+          description: "Client error"
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/utcp/execute":
+    post:
+      tags: [utcp]
+      operationId: executeUtcp
+      summary: Unified execution endpoint for UTCP tools
+      description: Executes a specified UTCP tool with arguments.
+      security:
+        - session: []
+          csrf: []
+        - bearer: []
+      requestBody:
+        required: true
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/UtcpExecuteRequest"
+      responses:
+        "200":
+          description: Tool execution result
+          content:
+            "application/json":
+              schema:
+                type: object
+        "4XX":
+          description: "Client error"
+          content:
+            "application/problem+json":
+              schema:
+                $ref: "#/components/schemas/Problem"
+  "/api/v1/utcp/attachments/{issueKey}/{attachmentId}/download":
+    get:
+      tags: [utcp]
+      operationId: downloadUtcpAttachment
+      summary: Securely download an issue attachment
+      description: Downloads an attachment file with verified ownership and access control.
+      parameters:
+        - name: issueKey
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: attachmentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      security:
+        - session: []
+        - bearer: []
+      responses:
+        "200":
+          description: Attachment binary content
+          content:
+            "application/octet-stream":
+              schema:
+                type: string
+                format: binary
+        "4XX":
+          description: "Client error"
           content:
             "application/problem+json":
               schema:
@@ -5180,6 +5535,137 @@ components:
       scheme: bearer
       description: "API token (`jtac_...`)."
   schemas:
+    UtcpOptions:
+      type: object
+      required: [available, experimental, manualUrl, utcpVersion, supportedCategories, totalTools]
+      properties:
+        available:
+          type: boolean
+        unavailableReason:
+          type: string
+          nullable: true
+        experimental:
+          type: boolean
+        manualUrl:
+          type: string
+        utcpVersion:
+          type: string
+        supportedCategories:
+          type: array
+          items:
+            type: string
+        totalTools:
+          type: integer
+    UtcpSettings:
+      type: object
+      required: [serverEnabled, enabled, state, manualUrl, providerName, utcpVersion, manualVersion, toolCount]
+      properties:
+        serverEnabled:
+          type: boolean
+        enabled:
+          type: boolean
+        state:
+          type: string
+          enum: [DISABLED, CONFIGURING, ENABLED, CONNECTED, ERROR]
+        manualUrl:
+          type: string
+        providerName:
+          type: string
+        utcpVersion:
+          type: string
+        manualVersion:
+          type: string
+        lastUsedAt:
+          type: string
+          format: date-time
+          nullable: true
+        lastClient:
+          type: string
+          nullable: true
+        toolCount:
+          type: integer
+    UtcpStatusResponse:
+      type: object
+      required: [status, state]
+      properties:
+        status:
+          type: string
+        state:
+          type: string
+    UtcpActivity:
+      type: object
+      required: [id, occurredAt, toolName, outcome]
+      properties:
+        id:
+          type: string
+          format: uuid
+        occurredAt:
+          type: string
+          format: date-time
+        toolName:
+          type: string
+        outcome:
+          type: string
+          enum: [OK, ERROR, DENIED, RATE_LIMITED]
+        target:
+          type: string
+          nullable: true
+        client:
+          type: string
+          nullable: true
+        durationMs:
+          type: integer
+          nullable: true
+    UtcpActivityPage:
+      type: object
+      required: [items, total, page, size]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/UtcpActivity"
+        total:
+          type: integer
+        page:
+          type: integer
+        size:
+          type: integer
+    UtcpManual:
+      type: object
+      required: [utcp_version, manual_version, tools]
+      properties:
+        utcp_version:
+          type: string
+        manual_version:
+          type: string
+        tools:
+          type: array
+          items:
+            type: object
+    UtcpToolSummary:
+      type: object
+      required: [name, description, category, scope]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        scope:
+          type: string
+        inputs:
+          type: object
+        outputs:
+          type: object
+    UtcpExecuteRequest:
+      type: object
+      required: [tool]
+      properties:
+        tool:
+          type: string
+        arguments:
+          type: object
     AcceptResult:
       type: object
       required: [organizationSlug]
@@ -6683,15 +7169,49 @@ components:
             enum: [BROWSE, CREATE_ISSUES, EDIT_ISSUES, TRANSITION_ISSUES, ASSIGN_ISSUES, DELETE_ISSUES, COMMENT, DELETE_ANY_COMMENT, MANAGE_ATTACHMENTS, MANAGE_PROJECT]
     PublicConfig:
       type: object
-      required: [registrationOpen, emailEnabled, legal]
+      required: [registrationOpen, emailEnabled, ssoProviders, legal]
       properties:
         registrationOpen:
           type: boolean
         emailEnabled:
           type: boolean
           description: False while outgoing email is not configured (email pending); password resets can't be emailed.
+        ssoProviders:
+          type: array
+          description: Enterprise identity providers (OpenID Connect) offered for sign-in; empty while SSO is off.
+          items:
+            $ref: "#/components/schemas/SsoProvider"
         legal:
           $ref: "#/components/schemas/LegalInfo"
+    SsoProvider:
+      type: object
+      required: [id, name, loginUrl]
+      properties:
+        id:
+          type: string
+          description: Registration key (spring.security.oauth2.client.registration.<id>).
+        name:
+          type: string
+          description: Display name for the sign-in button (client-name, or the id).
+        loginUrl:
+          type: string
+          description: >-
+            Relative URL that starts the browser sign-in (a full-page navigation, not an API call).
+            Append `?redirect=/path` to return to a same-origin path afterwards. A failed or refused
+            sign-in returns to `/login?sso=<code>` with code `cancelled`, `failed`, `invalid_identity`,
+            `email_unverified`, `domain_not_allowed`, `no_account`, `account_disabled`,
+            `identity_conflict` or `setup_required`.
+    AboutInfo:
+      type: object
+      required: [version]
+      properties:
+        version:
+          type: string
+          description: The running JTRAC version ("development" outside a release build).
+        buildTime:
+          type: [string, "null"]
+          format: date-time
+          description: When this version was built, if the build recorded it.
     ServerInfo:
       type: object
       required: [version, publicUrl, javaVersion]

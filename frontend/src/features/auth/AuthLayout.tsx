@@ -71,6 +71,7 @@ export function AuthLayout({ title, subtitle, children, footer, note, greeting, 
         <nav className={styles.legal} aria-label="Legal">
           <Link to="/legal/terms">Terms</Link>
           <Link to="/legal/privacy">Privacy</Link>
+          <Link to="/legal/cookies">Cookies</Link>
           <Link to="/legal/grievance">Grievances</Link>
         </nav>
         {/* After the form in the DOM so keyboard users reach the form first; placed in the corner by CSS. */}

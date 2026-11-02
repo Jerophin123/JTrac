@@ -1,0 +1,43 @@
+.binding {
+  display: inline-flex;
+  align-items: center;
+}
+
+.caps,
+.chord {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.caps {
+  gap: var(--space-1);
+}
+
+.key {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding-inline: 4px;
+  /* Flat, flush caps: an even hairline, no raised bottom edge or shadow. */
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-shape-xs);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-medium);
+  line-height: 1;
+}
+
+.then {
+  margin-inline: 2px;
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.off {
+  color: var(--color-text-subtle);
+  font-size: var(--text-sm);
+}

@@ -2,7 +2,7 @@
   display: inline-grid;
   place-items: center;
   flex: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-accent);
   color: var(--color-on-accent-fg);
   font-weight: var(--weight-semibold);
@@ -26,7 +26,7 @@
 .xs.logo {
   inline-size: 1rem;
   block-size: 1rem;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-shape-xs);
 }
 
 .sm {
@@ -44,6 +44,6 @@
 .lg {
   inline-size: 3rem;
   block-size: 3rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-shape);
   font-size: var(--text-lg);
 }

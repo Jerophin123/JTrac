@@ -11,7 +11,7 @@
 .bare {
   display: grid;
   min-inline-size: 0;
-  border-bottom-left-radius: var(--radius-xs);
+  border-bottom-left-radius: var(--radius-point);
   border-bottom-right-radius: var(--radius-lg);
   overflow: hidden;
 }
@@ -48,6 +48,10 @@
 
 .table tbody tr:last-child td {
   border-block-end: 0;
+}
+
+.table tbody tr {
+  transition: background-color var(--duration-fast) var(--ease-out);
 }
 
 .table tbody tr:hover {

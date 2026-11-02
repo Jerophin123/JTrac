@@ -77,7 +77,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-accent-soft);
   transform: skewX(var(--slant));
 }

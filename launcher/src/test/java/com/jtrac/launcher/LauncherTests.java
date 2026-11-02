@@ -11,6 +11,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import com.jtrac.serverconfig.ServerConfig;
+import com.sun.net.httpserver.HttpServer;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -18,6 +22,68 @@ class LauncherTests {
 
     @TempDir
     Path dir;
+
+    @Test
+    void unattendedSetupConfiguresSingleSignOnAndChecksTheProvider() throws IOException {
+        HttpServer idp = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
+        String issuer = "http://127.0.0.1:" + idp.getAddress().getPort() + "/realms/acme";
+        byte[] discovery = ("{\"issuer\":\"" + issuer + "\",\"authorization_endpoint\":\"" + issuer + "/auth\","
+                + "\"token_endpoint\":\"" + issuer + "/token\",\"jwks_uri\":\"" + issuer + "/certs\"}").getBytes(StandardCharsets.UTF_8);
+        idp.createContext("/realms/acme/.well-known/openid-configuration", exchange -> {
+            exchange.sendResponseHeaders(200, discovery.length);
+            exchange.getResponseBody().write(discovery);
+            exchange.close();
+        });
+        idp.start();
+        try {
+            Path answers = dir.resolve("answers.properties");
+            Files.writeString(answers, """
+                    sso.enabled=y
+                    sso.provider=keycloak
+                    sso.issuer-uri=%s
+                    sso.client-id=jtrac
+                    sso.client-secret=test-only-secret
+                    sso.auto-provision=y
+                    sso.allowed-domains=acme.example
+                    sso.check=y
+                    """.formatted(issuer), StandardCharsets.UTF_8);
+            Prompter p = Prompter.fromFile(answers);
+
+            Sections.Sso sso = Sections.sso(p, ServerConfig.Sso.DISABLED, "", "https://jtrac.acme.example", "");
+
+            assertThat(sso.settings()).isEqualTo(new ServerConfig.Sso(true, "keycloak", "Keycloak", issuer, "jtrac", true,
+                    "acme.example", false));
+            assertThat(sso.clientSecret()).isEqualTo("test-only-secret");
+            assertThat(p.unusedAnswers()).isEmpty();
+        } finally {
+            idp.stop(0);
+        }
+    }
+
+    @Test
+    void unattendedSingleSignOnStopsWhenTheProviderCantBeLoaded() throws IOException {
+        Path answers = dir.resolve("answers.properties");
+        Files.writeString(answers, """
+                sso.enabled=y
+                sso.provider=oidc
+                sso.issuer-uri=http://127.0.0.1:1/unreachable
+                sso.client-id=jtrac
+                sso.client-secret=test-only-secret
+                """, StandardCharsets.UTF_8);
+        Prompter p = Prompter.fromFile(answers);
+
+        assertThatThrownBy(() -> Sections.sso(p, ServerConfig.Sso.DISABLED, "", "https://jtrac.example.com", ""))
+                .isInstanceOf(SetupException.class).hasMessageContaining("identity provider check failed");
+    }
+
+    @Test
+    void singleSignOnIsOffUnlessAsked() throws IOException {
+        Path answers = dir.resolve("answers.properties");
+        Files.writeString(answers, "sso.enabled=n" + System.lineSeparator(), StandardCharsets.UTF_8);
+
+        assertThat(Sections.sso(Prompter.fromFile(answers), ServerConfig.Sso.DISABLED, "", "https://x.example", "").settings())
+                .isEqualTo(ServerConfig.Sso.DISABLED);
+    }
 
     @Test
     void parsesCommandsFlagsAndPositionals() {

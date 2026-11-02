@@ -15,4 +15,5 @@ if [ ! -x "$JTRAC_JAVA" ]; then
   echo "JTRAC: the bundled Java runtime is missing from $JTRAC_HOME/runtime. The package is incomplete." >&2
   exit 1
 fi
-exec "$JTRAC_JAVA" -Djtrac.home="$JTRAC_HOME" -Dfile.encoding=UTF-8 -cp "$JTRAC_HOME/lib/launcher/*" com.jtrac.launcher.Launcher "$@"
+# --enable-native-access: the full-screen setup reads the terminal through Java's FFM API.
+exec "$JTRAC_JAVA" -Djtrac.home="$JTRAC_HOME" -Dfile.encoding=UTF-8 --enable-native-access=ALL-UNNAMED -cp "$JTRAC_HOME/lib/launcher/*" com.jtrac.launcher.Launcher "$@"

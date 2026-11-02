@@ -1,8 +1,10 @@
-# AI agent connections (MCP)
+# AI agent connections (MCP and UTCP)
 
-JTRAC lets AI coding agents work with your issues through the
-[Model Context Protocol](https://modelcontextprotocol.io). An agent can search and read
-issues, comments, history and attachments, get a structured brief of an issue, and, only if
+JTRAC lets AI coding agents work with your issues through two standardized protocols:
+1. **Model Context Protocol (MCP)**: Dynamic OAuth2 PKCE browser sign-in for interactive agent workflows.
+2. **Universal Tool Calling Protocol (UTCP) `Experimental`**: Native protocol adapter exposing standardized JSON-RPC/HTTP tool calling with provider discovery manuals for agent runtimes. See the full [UTCP Documentation](utcp.md).
+
+An agent can search and read issues, comments, history and attachments, get a structured brief of an issue, and, only if
 you allow it, comment, change fields, move issues through the workflow and record fix
 reports. The agent does the code work in your repository; JTRAC provides the issue context.
 

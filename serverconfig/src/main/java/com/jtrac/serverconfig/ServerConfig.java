@@ -4,7 +4,8 @@ package com.jtrac.serverconfig;
  * Everything an operator configures for one JTRAC installation, except secrets (see
  * {@link Secrets}). Immutable; change a section with the {@code with*} methods.
  */
-public record ServerConfig(Http http, Database database, SmtpSettings smtp, Security security, Storage storage, Legal legal) {
+public record ServerConfig(Http http, Database database, SmtpSettings smtp, Security security, Storage storage, Legal legal,
+        Sso sso) {
 
     /** Where the web application listens and how users reach it. */
     public record Http(String bindAddress, int port, String publicUrl, boolean behindProxy) {
@@ -48,29 +49,54 @@ public record ServerConfig(Http http, Database database, SmtpSettings smtp, Secu
         public static final Legal EMPTY = new Legal("", "", "", "", "", "");
     }
 
+    /**
+     * Enterprise single sign-on with one OpenID Connect provider (docs/sso.md); the client
+     * secret is in {@link Secrets}. Further providers can be added to the settings file by
+     * hand: this section only manages the registration named {@code providerId}.
+     *
+     * @param providerId       registration id, part of the redirect URI {@code /login/oauth2/code/<id>}
+     * @param providerName     label of the sign-in button
+     * @param issuerUri        OpenID Connect issuer; JTRAC reads its discovery document at startup
+     * @param allowedDomains   comma-separated email domains; blank accepts any
+     */
+    public record Sso(boolean enabled, String providerId, String providerName, String issuerUri, String clientId,
+            boolean autoProvision, String allowedDomains, boolean trustUnverifiedEmail) {
+
+        public static final Sso DISABLED = new Sso(false, "", "", "", "", false, "", false);
+
+        /** The redirect URI to register at the identity provider. */
+        public String redirectUri(String publicUrl) {
+            return (publicUrl == null ? "" : publicUrl.strip().replaceAll("/+$", "")) + "/login/oauth2/code/" + providerId;
+        }
+    }
+
     public enum RegistrationMode { INVITE_ONLY, OPEN }
 
     public ServerConfig withHttp(Http value) {
-        return new ServerConfig(value, database, smtp, security, storage, legal);
+        return new ServerConfig(value, database, smtp, security, storage, legal, sso);
     }
 
     public ServerConfig withDatabase(Database value) {
-        return new ServerConfig(http, value, smtp, security, storage, legal);
+        return new ServerConfig(http, value, smtp, security, storage, legal, sso);
     }
 
     public ServerConfig withSmtp(SmtpSettings value) {
-        return new ServerConfig(http, database, value, security, storage, legal);
+        return new ServerConfig(http, database, value, security, storage, legal, sso);
     }
 
     public ServerConfig withSecurity(Security value) {
-        return new ServerConfig(http, database, smtp, value, storage, legal);
+        return new ServerConfig(http, database, smtp, value, storage, legal, sso);
     }
 
     public ServerConfig withStorage(Storage value) {
-        return new ServerConfig(http, database, smtp, security, value, legal);
+        return new ServerConfig(http, database, smtp, security, value, legal, sso);
     }
 
     public ServerConfig withLegal(Legal value) {
-        return new ServerConfig(http, database, smtp, security, storage, value);
+        return new ServerConfig(http, database, smtp, security, storage, value, sso);
+    }
+
+    public ServerConfig withSso(Sso value) {
+        return new ServerConfig(http, database, smtp, security, storage, legal, value);
     }
 }

@@ -14,6 +14,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.time.Instant;
 import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,6 +51,15 @@ class SystemController {
                 props == null ? "development" : props.getVersion(), publicUrl, Runtime.version().toString()));
     }
 
+    /** The version for the About page: any signed-in user (all of /api requires a session). */
+    @GetMapping("/about")
+    ResponseEntity<AboutInfo> about() {
+        BuildProperties props = build.getIfAvailable();
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(props == null
+                ? new AboutInfo("development", null)
+                : new AboutInfo(props.getVersion(), props.getTime()));
+    }
+
     @GetMapping("/mail")
     ResponseEntity<MailView> mail(CurrentUser user) {
         return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(MailView.of(system.mailStatus(user)));
@@ -72,6 +82,9 @@ class SystemController {
     }
 
     record ServerInfo(String version, String publicUrl, String javaVersion) {
+    }
+
+    record AboutInfo(String version, Instant buildTime) {
     }
 
     /** SMTP settings as the API sends and receives them; the password is never returned. */

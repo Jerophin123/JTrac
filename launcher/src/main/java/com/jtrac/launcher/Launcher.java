@@ -64,14 +64,16 @@ public final class Launcher {
                 Out.line("JTRAC " + installation.version() + " (" + Platform.current().id() + ", Java " + Runtime.version() + ")");
                 yield 0;
             }
-            case "setup" -> new SetupWizard(prompter, installation).run(!args.flags.containsKey("no-start"));
+            case "setup" -> withScreen(args, prompter, "JTRAC is set up", "Setup stopped",
+                    () -> new SetupWizard(prompter, installation).run(!args.flags.containsKey("no-start")));
             case "start" -> lifecycle.start(Duration.ofSeconds(Long.parseLong(args.flags.getOrDefault("timeout", "180"))));
             case "stop" -> lifecycle.stop();
             case "restart" -> lifecycle.restart();
             case "status" -> lifecycle.status();
             case "run" -> lifecycle.run();
             case "logs" -> lifecycle.logs(Integer.parseInt(args.flags.getOrDefault("lines", "100")), args.flags.containsKey("follow"));
-            case "configure" -> maintenance.configure(args.positional.isEmpty() ? null : args.positional.getFirst());
+            case "configure" -> withScreen(args, prompter, "Settings saved", "Settings were not changed",
+                    () -> maintenance.configure(args.positional.isEmpty() ? null : args.positional.getFirst()));
             case "test-email" -> maintenance.testEmail(args.flags.get("to"));
             case "backup" -> {
                 new Backups(installation).backup(Maintenance.path(args.flags.get("output")).orElse(null), false);
@@ -124,6 +126,42 @@ public final class Launcher {
         };
     }
 
+    /** A step of the launcher that asks questions (setup, configure). */
+    private interface Interactive {
+        int run() throws IOException, InterruptedException;
+    }
+
+    /**
+     * Runs {@code body} on the full-screen interface (keyboard and mouse) when this is an
+     * interactive terminal that supports it; otherwise, or with --plain, JTRAC_PLAIN or an
+     * answers file, with the plain prompts. The terminal is always restored, and the
+     * transcript is printed afterwards so it stays in the scrollback.
+     */
+    private static int withScreen(Args args, Prompter prompter, String success, String failure, Interactive body)
+            throws IOException, InterruptedException {
+        boolean plain = prompter.unattended() || args.flags.containsKey("plain") || System.getenv("JTRAC_PLAIN") != null;
+        SetupScreen screen = plain ? null : TerminalDevice.open().map(device -> new SetupScreen(device, "JTRAC")).orElse(null);
+        if (screen == null) {
+            return body.run();
+        }
+        Out.Sink previous = Out.use(screen);
+        prompter.attach(screen);
+        try {
+            int code = body.run();
+            screen.conclude(code == 0, code == 0 ? success : failure, java.util.List.of());
+            return code;
+        } catch (SetupException e) {
+            if (!screen.cancelled()) {
+                screen.conclude(false, failure, java.util.List.of(e.getMessage()));
+            }
+            throw e;
+        } finally {
+            prompter.attach(null);
+            Out.use(previous);
+            screen.close(System.out);
+        }
+    }
+
     private static String requirePositional(Args args, String what) {
         if (args.positional.isEmpty()) {
             throw new SetupException("Give the " + what + ".");
@@ -140,10 +178,12 @@ public final class Launcher {
                   setup                 First-run setup wizard (database, administrator, port, email); safe to re-run
                       --answers FILE    Unattended setup from an answers file (see docs/setup-wizard.md)
                       --no-start        Don't start JTRAC at the end
+                      --plain           Plain line-by-line prompts instead of the full-screen setup
+                                        (also JTRAC_PLAIN=1; recommended with screen readers)
                   start | stop | restart | status
                   run                   Run in the foreground (used by services; Ctrl+C stops)
                   logs [--lines N] [--follow]
-                  configure [http|smtp|security|storage|legal]   Change settings without reinstalling
+                  configure [http|smtp|security|storage|legal|sso]   Change settings (full screen; --plain)
                   test-email [--to ADDRESS]                      Send a test email with the saved settings
                   backup [--output DIR]                          Verified backup of database, attachments, settings
                   verify-backup FILE

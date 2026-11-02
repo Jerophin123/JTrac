@@ -1,14 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { Command } from 'cmdk';
-import { Bell, FolderKanban, LayoutDashboard, Plus, Search, Settings, UserRound } from 'lucide-react';
+import { Bell, FolderKanban, Keyboard, LayoutDashboard, Plus, Search, Settings, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { call } from '../api/call';
 import { api } from '../api/client';
 import { keys } from '../api/queries';
+import { useShortcutSettings } from '../lib/shortcuts';
 import { useDebouncedValue } from '../lib/useDebouncedValue';
 import { StatusBadge } from '../ui/Badge';
 import { Dialog } from '../ui/Dialog';
+import { Kbd } from '../ui/Kbd';
 import styles from './CommandPalette.module.css';
 
 interface CommandPaletteProps {
@@ -16,11 +18,17 @@ interface CommandPaletteProps {
   open: boolean;
   onClose: () => void;
   onCreateIssue: () => void;
+  onShowShortcuts: () => void;
 }
 
 /** Ctrl/⌘ + K: jump to issues, projects and people, or run common actions. */
-export function CommandPalette({ org, open, onClose, onCreateIssue }: CommandPaletteProps) {
+export function CommandPalette({ org, open, onClose, onCreateIssue, onShowShortcuts }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
+  const { activeBindingFor } = useShortcutSettings();
+  const keysFor = (id: Parameters<typeof activeBindingFor>[0]) => {
+    const binding = activeBindingFor(id);
+    return binding ? <Kbd binding={binding} /> : null;
+  };
   const debounced = useDebouncedValue(query.trim(), 150);
   const navigate = useNavigate();
   const results = useQuery({
@@ -114,23 +122,32 @@ export function CommandPalette({ org, open, onClose, onCreateIssue }: CommandPal
               <Command.Item value="create-issue" className={styles.item} onSelect={() => { close(); onCreateIssue(); }}>
                 <Plus size={15} aria-hidden="true" />
                 <span className={styles.label}>Create issue</span>
-                <kbd className={styles.kbd}>C</kbd>
+                {keysFor('createIssue')}
               </Command.Item>
               <Command.Item value="inbox" className={styles.item} onSelect={() => { go(() => navigate({ to: '/$org/inbox', params: { org } })); }}>
                 <Bell size={15} aria-hidden="true" />
                 <span className={styles.label}>Open inbox</span>
+                {keysFor('goInbox')}
               </Command.Item>
               <Command.Item value="search" className={styles.item} onSelect={() => { go(() => navigate({ to: '/$org/search', params: { org } })); }}>
                 <Search size={15} aria-hidden="true" />
                 <span className={styles.label}>Search all issues</span>
+                {keysFor('goIssues')}
               </Command.Item>
               <Command.Item value="dashboards" className={styles.item} onSelect={() => { go(() => navigate({ to: '/$org/dashboards', params: { org } })); }}>
                 <LayoutDashboard size={15} aria-hidden="true" />
                 <span className={styles.label}>Dashboards</span>
+                {keysFor('goDashboards')}
               </Command.Item>
               <Command.Item value="settings" className={styles.item} onSelect={() => { go(() => navigate({ to: '/$org/settings', params: { org } })); }}>
                 <Settings size={15} aria-hidden="true" />
                 <span className={styles.label}>Organization settings</span>
+                {keysFor('goSettings')}
+              </Command.Item>
+              <Command.Item value="shortcuts" className={styles.item} onSelect={() => { close(); onShowShortcuts(); }}>
+                <Keyboard size={15} aria-hidden="true" />
+                <span className={styles.label}>Keyboard shortcuts</span>
+                {keysFor('showShortcuts')}
               </Command.Item>
             </Command.Group>
           )}

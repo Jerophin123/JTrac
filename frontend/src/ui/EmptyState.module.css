@@ -25,7 +25,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   background: var(--color-accent-soft);
   transform: skewX(var(--slant));
 }
@@ -37,4 +37,17 @@
 .text {
   max-inline-size: 30rem;
   color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .icon {
+    animation: settle 520ms var(--ease-spring) 80ms backwards;
+  }
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise)) scale(0.85);
+  }
 }

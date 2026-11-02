@@ -24,6 +24,8 @@ public final class ConfigValidator {
     private static final Pattern IPV6 = Pattern.compile("^\\[?[0-9a-fA-F:.]+(%[\\w.]+)?]?$");
     private static final Pattern ROLE = Pattern.compile("^[a-z_][a-z0-9_]{0,62}$");
     private static final Pattern DATABASE = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]{0,62}$");
+    /** Fits a property key, a URL path segment and the 50-character provider column of user_external_identity. */
+    private static final Pattern SSO_PROVIDER_ID = Pattern.compile("^[a-z][a-z0-9-]{0,49}$");
 
     private ConfigValidator() {
     }
@@ -36,6 +38,7 @@ public final class ConfigValidator {
         problems.addAll(validateSecurity(config.security()));
         problems.addAll(validateStorage(config.storage()));
         problems.addAll(validateLegal(config.legal()));
+        problems.addAll(validateSso(config.sso(), secrets.ssoClientSecret(), config.http().publicUrl()));
         if (secrets.integrationSecretKey() == null || secrets.integrationSecretKey().isBlank()) {
             problems.add(Problem.error("security.integrationSecretKey", "An encryption key for integration secrets is required."));
         }
@@ -202,6 +205,64 @@ public final class ConfigValidator {
         if (legal.operatorName().isBlank() || legal.grievanceOfficerEmail().isBlank()) {
             problems.add(Problem.warning("legal.operatorName", "The Terms of Service and Privacy Notice will show placeholders until "
                     + "the operator name and grievance officer email are set."));
+        }
+        return problems;
+    }
+
+    /**
+     * Single sign-on: an OpenID Connect issuer reachable over HTTPS (plain HTTP only on this
+     * computer), a client id and secret, and the policy settings (docs/sso.md).
+     */
+    public static List<Problem> validateSso(ServerConfig.Sso sso, String clientSecret, String publicUrl) {
+        List<Problem> problems = new ArrayList<>();
+        if (!sso.enabled()) {
+            return problems;
+        }
+        if (!SSO_PROVIDER_ID.matcher(nullToEmpty(sso.providerId())).matches()) {
+            problems.add(Problem.error("sso.providerId", "Use 1 to 50 lowercase letters, digits or hyphens, starting with a "
+                    + "letter (e.g. entra, okta)."));
+        }
+        if (sso.providerName() == null || sso.providerName().isBlank() || sso.providerName().length() > 60) {
+            problems.add(Problem.error("sso.providerName", "Enter a button label of 1 to 60 characters."));
+        }
+        URI issuer = sso.issuerUri() == null || sso.issuerUri().isBlank() ? null : parseUri(sso.issuerUri());
+        String scheme = issuer == null || issuer.getScheme() == null ? "" : issuer.getScheme().toLowerCase(Locale.ROOT);
+        if (issuer == null || issuer.getHost() == null || !(scheme.equals("https") || scheme.equals("http"))) {
+            problems.add(Problem.error("sso.issuerUri", "Enter the provider's issuer URL, e.g. "
+                    + "https://login.microsoftonline.com/<tenant id>/v2.0."));
+        } else if (issuer.getQuery() != null || issuer.getFragment() != null || issuer.getUserInfo() != null) {
+            problems.add(Problem.error("sso.issuerUri", "The issuer URL must not contain a user name, query or fragment."));
+        } else if (scheme.equals("http") && !isLoopbackHost(issuer.getHost())) {
+            problems.add(Problem.error("sso.issuerUri", "Use https:// for the identity provider (http:// only on this computer)."));
+        }
+        if (sso.clientId() == null || sso.clientId().isBlank() || sso.clientId().chars().anyMatch(Character::isWhitespace)) {
+            problems.add(Problem.error("sso.clientId", "Enter the client (application) id from the identity provider."));
+        }
+        if (clientSecret == null || clientSecret.isBlank()) {
+            problems.add(Problem.error("sso.clientSecret", "Enter the client secret from the identity provider."));
+        }
+        for (String domain : nullToEmpty(sso.allowedDomains()).split(",")) {
+            if (!domain.isBlank() && (!HOST_NAME.matcher(domain.strip()).matches() || !domain.contains("."))) {
+                problems.add(Problem.error("sso.allowedDomains", "'" + domain.strip() + "' is not an email domain (e.g. example.com)."));
+            }
+        }
+        if (sso.autoProvision() && nullToEmpty(sso.allowedDomains()).isBlank()) {
+            problems.add(Problem.warning("sso.autoProvision", "Anyone the identity provider accepts gets an account. Limit the "
+                    + "email domains unless the provider only admits your own people."));
+        }
+        if (sso.trustUnverifiedEmail() && issuer != null && issuer.getHost() != null
+                && issuer.getHost().equalsIgnoreCase("login.microsoftonline.com") && issuer.getPath() != null
+                && issuer.getPath().matches("(?i)^/(common|organizations|consumers)(/.*)?$")) {
+            problems.add(Problem.error("sso.trustUnverifiedEmail", "A multi-tenant Entra issuer lets other tenants claim any "
+                    + "email address. Use your tenant id in the issuer URL."));
+        } else if (sso.trustUnverifiedEmail()) {
+            problems.add(Problem.warning("sso.trustUnverifiedEmail", "Email addresses are trusted without the provider's "
+                    + "verification. Only do this for a single-tenant directory whose users can't change their email."));
+        }
+        URI site = publicUrl == null ? null : parseUri(publicUrl);
+        if (site != null && "http".equalsIgnoreCase(site.getScheme()) && !isLoopbackHost(site.getHost())) {
+            problems.add(Problem.warning("sso.redirectUri", "Most identity providers accept only https:// redirect URIs "
+                    + "(except localhost). Use an https:// public address."));
         }
         return problems;
     }

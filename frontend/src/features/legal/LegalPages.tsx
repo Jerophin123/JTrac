@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Clause, Email, GrievanceEmail, OperatorName, Value } from './legal';
 import { LegalLayout } from './LegalLayout';
+import { LEGACY_NAMES, StoredItemsTable } from './storage';
 import styles from './LegalPages.module.css';
 
 /*
@@ -345,45 +346,11 @@ export function PrivacyPage() {
           </Clause>
 
           <Clause id="cookies" title="8. Cookies and local storage">
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <caption className="visually-hidden">Cookies and browser storage used by JTRAC</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Purpose</th>
-                    <th scope="col">Lifetime</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <code>JTRAC_SESSION</code>
-                    </td>
-                    <td>Cookie, essential</td>
-                    <td>Keeps you signed in</td>
-                    <td>Until you sign out or the session expires</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <code>XSRF-TOKEN</code>
-                    </td>
-                    <td>Cookie, essential</td>
-                    <td>Protects forms against cross-site request forgery</td>
-                    <td>Session</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <code>jtrac.theme</code>, <code>jtrac.lastOrg</code>
-                    </td>
-                    <td>Browser storage, preference</td>
-                    <td>Remember your theme and last organization on this device; never sent to the server</td>
-                    <td>Until you clear your browser data</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <p>
+              JTRAC uses two strictly necessary cookies and a few preferences stored in your browser. The{' '}
+              <Link to="/legal/cookies">Cookie Policy</Link> explains each one and how to clear them.
+            </p>
+            <StoredItemsTable />
             <p>JTRAC does not use advertising, analytics or social-media cookies, so there is nothing to opt out of.</p>
           </Clause>
 
@@ -501,7 +468,99 @@ export function GrievancePage() {
               <li>
                 <Link to="/legal/terms">Terms of Service</Link>: the rules for using JTRAC.
               </li>
+              <li>
+                <Link to="/legal/cookies">Cookie Policy</Link>: the cookies and browser storage JTRAC uses.
+              </li>
             </ul>
+          </Clause>
+        </>
+      )}
+    </LegalLayout>
+  );
+}
+
+export function CookiePolicyPage() {
+  return (
+    <LegalLayout
+      title="Cookie Policy"
+      summary="The cookies and browser storage JTRAC uses, why, for how long, and how to remove them. No advertising, analytics or tracking."
+    >
+      {(legal) => (
+        <>
+          <Clause id="summary" title="1. In short">
+            <ul>
+              <li>
+                JTRAC sets <strong>two cookies</strong>, both strictly necessary: one keeps you signed in, the other protects your
+                changes against forged requests.
+              </li>
+              <li>
+                It remembers <strong>a few preferences</strong> (theme, last organization, sidebar, keyboard shortcuts) in your
+                browser’s storage on this device. These never leave your device.
+              </li>
+              <li>
+                There are <strong>no advertising, analytics, social-media or third-party cookies</strong>, and nothing is shared for
+                tracking. That’s why JTRAC doesn’t show a cookie banner: there is nothing optional to consent to.
+              </li>
+            </ul>
+          </Clause>
+
+          <Clause id="what" title="2. What JTRAC stores">
+            <StoredItemsTable withDetails />
+            <p>
+              Older versions of JTRAC used the names {LEGACY_NAMES.map((name, i) => (
+                <span key={name}>
+                  {i > 0 && ' and '}
+                  <code>{name}</code>
+                </span>
+              ))}. JTRAC still reads them so your preferences carry over, but no longer writes them.
+            </p>
+          </Clause>
+
+          <Clause id="necessary" title="3. Strictly necessary cookies">
+            <p>
+              The session and security cookies are needed for the service you ask for: without them you can’t sign in, and your
+              changes couldn’t be protected. They are set only by this JTRAC installation, for its own address, and are not used to
+              follow you across other websites.
+            </p>
+          </Clause>
+
+          <Clause id="preferences" title="4. Preferences in your browser">
+            <p>
+              Preferences are kept in your browser’s local storage rather than in cookies, so they’re never sent with your requests.
+              You can change them at any time: the theme under Your account › Appearance, keyboard shortcuts under Your account ›
+              Keyboard shortcuts (including Reset all), and the sidebar with its collapse button.
+            </p>
+          </Clause>
+
+          <Clause id="sso" title="5. Single sign-on providers">
+            <p>
+              If this installation lets you sign in with your organization’s identity provider (for example Microsoft Entra ID or
+              Okta), that provider may set its own cookies on its own website while you sign in there. Those are governed by the
+              provider’s policies, not this one. JTRAC itself keeps no tokens from the provider.
+            </p>
+          </Clause>
+
+          <Clause id="control" title="6. Removing or blocking them">
+            <p>
+              You can delete cookies and site data for this address in your browser’s settings at any time; signing out also ends
+              the session. If you block JTRAC’s cookies, you won’t be able to sign in. Clearing site data resets your preferences to
+              their defaults.
+            </p>
+          </Clause>
+
+          <Clause id="changes" title="7. Changes to this policy">
+            <p>
+              If JTRAC starts storing something new in your browser, this policy changes with it. Its version and effective date are
+              shown at the top, together with the other legal documents.
+            </p>
+          </Clause>
+
+          <Clause id="contact" title="8. Questions">
+            <p>
+              Questions about cookies or your data go to <OperatorName legal={legal} /> at{' '}
+              <Email value={legal.contactEmail} setting="JTRAC_LEGAL_CONTACT_EMAIL" label="Contact email" />. See also the{' '}
+              <Link to="/legal/privacy">Privacy Notice</Link>.
+            </p>
           </Clause>
         </>
       )}

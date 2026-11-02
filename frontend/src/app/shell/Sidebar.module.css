@@ -2,6 +2,11 @@
 .sidebar {
   position: sticky;
   inset-block-start: var(--shell-gap);
+  /*
+   * Sticky creates a stacking context, so the sidebar's menus can only rise as high as the
+   * sidebar itself: keep it above page content (max 15, the settings save bar), below toasts.
+   */
+  z-index: 25;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -12,6 +17,11 @@
   border-radius: var(--radius-shape);
   box-shadow: var(--shadow-float);
   overflow-y: auto;
+}
+
+/* Sections keep their size; when space runs out the sidebar scrolls instead of squashing them. */
+.sidebar > * {
+  flex-shrink: 0;
 }
 
 .brandRow {
@@ -30,6 +40,40 @@
 
 .closeButton {
   display: none;
+}
+
+.brandMark {
+  display: none;
+}
+
+/* Collapse / expand the sidebar (wide screens only). */
+.collapseButton {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-shape-xs);
+  background: transparent;
+  color: var(--color-text-subtle);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.collapseButton:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.label {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .navList {
@@ -63,7 +107,7 @@
   inset-block: 0;
   inset-inline: 7px 0;
   z-index: -1;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   transform: skewX(var(--slant));
   transition: background-color var(--duration-fast) var(--ease-out);
 }
@@ -184,8 +228,14 @@
   white-space: nowrap;
 }
 
+/* The inline search (expanded sidebar); see SidebarSearch.module.css. */
+.searchSlot {
+  display: grid;
+}
+
+/* Icon-only search for the collapsed rail. */
 .searchButton {
-  display: flex;
+  display: none;
   align-items: center;
   gap: var(--space-2);
   block-size: 2rem;
@@ -205,14 +255,6 @@
 .searchButton span {
   flex: 1;
   text-align: start;
-}
-
-.kbd {
-  padding: 0 var(--space-1);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  font-size: 0.6875rem;
 }
 
 .count {
@@ -301,8 +343,179 @@
   .closeButton {
     display: inline-flex;
   }
+
+  .collapseButton {
+    display: none;
+  }
 }
 
 .nav {
   display: grid;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .navItem svg {
+    transition: transform var(--duration-base) var(--ease-spring);
+  }
+
+  .navItem:hover svg {
+    transform: scale(1.1);
+  }
+
+  .navItem:active svg {
+    transform: scale(0.94);
+  }
+
+  .navItem[data-status='active']::after {
+    animation: barIn var(--duration-slow) var(--ease-spring);
+  }
+}
+
+@keyframes barIn {
+  from {
+    transform: skewX(var(--slant)) scaleY(0);
+  }
+}
+
+/*
+ * The icon rail. Labels stay in the accessibility tree (visually hidden), every item has a
+ * title tooltip, and menus may extend past the rail instead of being clipped by its scroller.
+ */
+@media (width > 56rem) {
+  .sidebar[data-collapsed] {
+    align-items: center;
+    padding-inline: var(--space-2);
+    overflow: visible;
+  }
+
+  .sidebar[data-collapsed] .brandRow {
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-inline: 0;
+  }
+
+  .sidebar[data-collapsed] .brandFull {
+    display: none;
+  }
+
+  .sidebar[data-collapsed] .brandMark {
+    display: block;
+  }
+
+  .sidebar[data-collapsed] .label,
+  .sidebar[data-collapsed] .orgText,
+  .sidebar[data-collapsed] .userText {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .sidebar[data-collapsed] .chevron,
+  .sidebar[data-collapsed] .section,
+  .sidebar[data-collapsed] .searchSlot {
+    display: none;
+  }
+
+  .sidebar[data-collapsed] .searchButton {
+    display: flex;
+  }
+
+  .sidebar[data-collapsed] .nav,
+  .sidebar[data-collapsed] .footer {
+    inline-size: 100%;
+  }
+
+  .sidebar[data-collapsed] .navItem {
+    justify-content: center;
+    inline-size: 2.5rem;
+    margin-inline: auto;
+    padding-inline: 0;
+  }
+
+  .sidebar[data-collapsed] .navItem::before {
+    inset-inline: 2px;
+  }
+
+  /*
+   * Org switcher, search and account: no resting box in the rail, so the mark, icon and avatar
+   * sit on the rail like the nav icons, in the same centred 2.5rem square with a leaf-shaped hover.
+   */
+  .sidebar[data-collapsed] .orgButton,
+  .sidebar[data-collapsed] .searchButton,
+  .sidebar[data-collapsed] .user {
+    justify-content: center;
+    gap: 0;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    margin-inline: auto;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-shape-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-out);
+  }
+
+  .sidebar[data-collapsed] .orgButton:hover,
+  .sidebar[data-collapsed] .searchButton:hover,
+  .sidebar[data-collapsed] .user:hover,
+  .sidebar[data-collapsed] .orgButton[aria-expanded='true'],
+  .sidebar[data-collapsed] .user[aria-expanded='true'] {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+  }
+
+  .sidebar[data-collapsed] .searchButton svg {
+    flex: none;
+  }
+
+  /*
+   * In the rail, search is the first item of the nav column: nav-item height, and the 2px
+   * item spacing instead of the sidebar's section gap.
+   */
+  .sidebar[data-collapsed] .searchButton {
+    block-size: 2rem;
+    margin-block-end: calc(2px - var(--space-4));
+  }
+
+  /* The unread count becomes a dot on the icon. */
+  .sidebar[data-collapsed] .count {
+    position: absolute;
+    inset-block-start: 3px;
+    inset-inline-end: 4px;
+    min-inline-size: 0;
+    inline-size: 8px;
+    block-size: 8px;
+    padding: 0;
+    font-size: 0;
+    box-shadow: 0 0 0 2px var(--color-surface);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .collapseButton svg {
+    transition: transform var(--duration-base) var(--ease-spring);
+  }
+
+  .collapseButton:hover svg {
+    transform: scale(1.1);
+  }
+
+  /* Labels fade back in as the sidebar widens, instead of popping into a narrow column. */
+  .sidebar:not([data-collapsed]) .label,
+  .sidebar:not([data-collapsed]) .orgText,
+  .sidebar:not([data-collapsed]) .userText {
+    animation: labelIn var(--duration-slow) var(--ease-out) backwards;
+  }
+}
+
+@keyframes labelIn {
+  from {
+    opacity: 0;
+  }
 }

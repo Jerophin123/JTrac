@@ -11,8 +11,10 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiError } from '../../api/problem';
-import { describeLoginError, LoginPage, SIGNED_OUT_NOTICE_MS } from './LoginPage';
+import type { PublicConfig } from '../../api/types';
+import { describeLoginError, describeSsoError, LoginPage, SIGNED_OUT_NOTICE_MS, ssoHref } from './LoginPage';
 import * as session from './session';
+import { publicConfigQueryOptions } from './session';
 
 vi.mock('./session', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./session')>();
@@ -21,13 +23,21 @@ vi.mock('./session', async (importOriginal) => {
 
 const login = vi.mocked(session.login);
 
-function renderLogin({ signedOut = false } = {}) {
+function renderLogin({
+  signedOut = false,
+  redirectTo = '/',
+  ssoError,
+  config,
+}: { signedOut?: boolean; redirectTo?: string; ssoError?: string; config?: PublicConfig } = {}) {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+  if (config) {
+    queryClient.setQueryData(publicConfigQueryOptions.queryKey, config);
+  }
   const rootRoute = createRootRoute({ component: Outlet });
   const loginRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/login',
-    component: () => <LoginPage redirectTo="/" signedOut={signedOut} />,
+    component: () => <LoginPage redirectTo={redirectTo} signedOut={signedOut} ssoError={ssoError} />,
   });
   const homeRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: () => <p>Home page</p> });
   const router = createRouter({
@@ -107,6 +117,57 @@ describe('LoginPage', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+});
+
+describe('LoginPage single sign-on', () => {
+  const config = (ssoProviders: PublicConfig['ssoProviders']): PublicConfig => ({
+    registrationOpen: false,
+    emailEnabled: true,
+    ssoProviders,
+    legal: {} as PublicConfig['legal'],
+  });
+
+  it('offers one button per configured provider, keeping the return path', async () => {
+    renderLogin({
+      redirectTo: '/orgs/acme',
+      config: config([
+        { id: 'entra', name: 'Microsoft Entra ID', loginUrl: '/oauth2/authorization/entra' },
+        { id: 'okta', name: 'Okta', loginUrl: '/oauth2/authorization/okta' },
+      ]),
+    });
+    expect(await screen.findByRole('link', { name: 'Sign in with Microsoft Entra ID' })).toHaveAttribute(
+      'href',
+      '/oauth2/authorization/entra?redirect=%2Forgs%2Facme',
+    );
+    expect(screen.getByRole('link', { name: 'Sign in with Okta' })).toHaveAttribute(
+      'href',
+      '/oauth2/authorization/okta?redirect=%2Forgs%2Facme',
+    );
+  });
+
+  it('shows no SSO section while no provider is configured', async () => {
+    renderLogin({ config: config([]) });
+    await screen.findByLabelText('Email');
+    expect(screen.queryByText(/or sign in with password/)).not.toBeInTheDocument();
+  });
+
+  it('explains a refused sign-in by its code', async () => {
+    renderLogin({ ssoError: 'no_account' });
+    expect(await screen.findByRole('alert')).toHaveTextContent('There’s no JTRAC account for your email address yet.');
+  });
+});
+
+describe('describeSsoError', () => {
+  it('never shows an unknown code verbatim', () => {
+    expect(describeSsoError('<script>')).toBe('Single sign-on didn’t complete. Try again, or sign in with your password.');
+  });
+});
+
+describe('ssoHref', () => {
+  it('omits the redirect for the home page', () => {
+    expect(ssoHref('/oauth2/authorization/okta', '/')).toBe('/oauth2/authorization/okta');
+    expect(ssoHref('/oauth2/authorization/okta', undefined)).toBe('/oauth2/authorization/okta');
   });
 });
 

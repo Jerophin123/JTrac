@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Building2, Download, FileText, KeyRound, Monitor, Moon, Palette, Plus, Scale, ShieldCheck, Sun, Trash2, UserRound } from 'lucide-react';
+import { Bot, Building2, Download, FileText, Info, Keyboard, KeyRound, Mail, Server, Monitor, Moon, Palette, Plus, Scale, ShieldCheck, Sun, Trash2, UserRound } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { call } from '../../api/call';
 import { api } from '../../api/client';
@@ -19,15 +19,27 @@ import { Input, Select, TextArea } from '../../ui/Field';
 import { OrgMark } from '../../ui/OrgMark';
 import { PasswordField } from '../../ui/PasswordField';
 import { Skeleton } from '../../ui/Page';
-import { SaveBar, SettingsCard, SettingsEmpty, SettingsLayout, SettingsList, SettingsListItem, SettingsSection } from '../../ui/Settings';
+import { SaveBar, SettingsCard, SettingsEmpty, SettingsLayout, SettingsList, SettingsListItem, SettingsSection, type SettingsNavGroup } from '../../ui/Settings';
 import { Switch } from '../../ui/Switch';
 import { useToast } from '../../ui/Toast';
-import { sessionQueryKey, sessionQueryOptions, useCanCreateOrganizations } from '../auth/session';
+import { sessionQueryKey, sessionQueryOptions, useCanCreateOrganizations, useIsServerAdmin } from '../auth/session';
 import { formatLegalDate, GrievanceEmail, useLegalInfo } from '../legal/legal';
 import styles from './AccountPages.module.css';
 
 export function AccountLayout({ children }: { children: ReactNode }) {
   const { data: session } = useQuery(sessionQueryOptions);
+  // Server administration is for server administrators only (the server enforces it too).
+  const serverGroups: SettingsNavGroup[] = useIsServerAdmin()
+    ? [
+        {
+          label: 'Server',
+          items: [
+            { label: 'Server overview', icon: <Server size={16} />, link: { to: '/account/server' }, exact: true },
+            { label: 'Outgoing email', icon: <Mail size={16} />, link: { to: '/account/server/email' } },
+          ],
+        },
+      ]
+    : [];
   return (
     <SettingsLayout
       title="Your account"
@@ -47,9 +59,16 @@ export function AccountLayout({ children }: { children: ReactNode }) {
           items: [
             { label: 'Profile', icon: <UserRound size={16} />, link: { to: '/account' }, exact: true },
             { label: 'API tokens', icon: <KeyRound size={16} />, link: { to: '/account/tokens' } },
+            { label: 'AI agents', icon: <Bot size={16} />, link: { to: '/account/ai-agent-connections' } },
             { label: 'Privacy & data', icon: <ShieldCheck size={16} />, link: { to: '/account/privacy' } },
             { label: 'Appearance', icon: <Palette size={16} />, link: { to: '/account/appearance' } },
+            { label: 'Keyboard shortcuts', icon: <Keyboard size={16} />, link: { to: '/account/shortcuts' } },
           ],
+        },
+        ...serverGroups,
+        {
+          label: 'JTRAC',
+          items: [{ label: 'About JTRAC', icon: <Info size={16} />, link: { to: '/account/about' } }],
         },
       ]}
     >

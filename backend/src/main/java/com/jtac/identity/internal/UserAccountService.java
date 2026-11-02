@@ -8,7 +8,10 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.security.SecureRandom;
 import java.time.Clock;
+import java.time.Instant;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -31,6 +34,7 @@ class UserAccountService implements UserDirectory {
     static final int MIN_PASSWORD_LENGTH = 12;
     static final int MAX_PASSWORD_LENGTH = 128;
     static final Pattern HANDLE = Pattern.compile("^[a-z0-9][a-z0-9_.-]{1,31}$");
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     /** The same Bean Validation rules as the sign-in request, so every created account can sign in. */
     record EmailAddress(@NotBlank @Email @Size(max = 320) String value) {
@@ -97,6 +101,41 @@ class UserAccountService implements UserDirectory {
                 passwordEncoder.encode(rawPassword), clock.instant(), verified);
         accounts.saveAndFlush(account);
         return account.id();
+    }
+
+    /**
+     * Creates a confirmed account for a user signing in through an identity provider. Its
+     * password is random and never disclosed (a local password needs a password reset); it is
+     * never a server administrator.
+     */
+    @Transactional
+    UserAccount provisionExternalUser(String email, String displayName) {
+        String address = requireValidEmail("email", email);
+        String rawName = displayName == null || displayName.isBlank()
+                ? address.substring(0, address.indexOf('@'))
+                : displayName.strip();
+        String name = requireDisplayName("displayName", rawName.length() > 120 ? rawName.substring(0, 120) : rawName);
+        UserAccount account = new UserAccount(Ids.newId(), address, name, uniqueHandleFor(address),
+                passwordEncoder.encode(undisclosedPassword()), clock.instant(), true);
+        return accounts.saveAndFlush(account);
+    }
+
+    /**
+     * Confirms an unconfirmed account whose address an identity provider has verified, and
+     * replaces its password: whoever registered the address without confirming it must not
+     * keep a working password for the owner's account.
+     */
+    @Transactional
+    void confirmForSso(UserAccount account) {
+        Instant now = clock.instant();
+        account.markVerified(now);
+        account.changePassword(passwordEncoder.encode(undisclosedPassword()), now);
+    }
+
+    private static String undisclosedPassword() {
+        byte[] bytes = new byte[32];
+        RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     @Override

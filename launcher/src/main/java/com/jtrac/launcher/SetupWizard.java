@@ -26,7 +26,7 @@ import java.util.Optional;
  */
 final class SetupWizard {
 
-    private static final int STAGES = 13;
+    private static final int STAGES = 14;
     private static final int MANAGED_DB_PORT = 54329;
 
     private final Prompter p;
@@ -39,6 +39,9 @@ final class SetupWizard {
 
     int run(boolean startWhenDone) throws IOException {
         Out.title("JTRAC server setup");
+        Out.plan(List.of("Welcome", "Directories and runtime", "Database", "First administrator", "Web server address and port",
+                "Public address and reverse proxy", "Outgoing email (SMTP)", "Accounts and sessions", "Single sign-on (optional)",
+                "Attachments, backups and logs", "Review", "Database and secure bootstrap", "Start JTRAC", "Done"));
         Platform platform = Platform.current();
 
         // 1. Welcome and installation mode
@@ -112,7 +115,8 @@ final class SetupWizard {
                 config = config.withDatabase(new ServerConfig.Database(DatabaseMode.MANAGED, "127.0.0.1", port, "jtrac",
                         "jtrac_app", "jtrac_owner", "disable"));
                 if (secrets.databasePassword().isBlank()) {
-                    secrets = new Secrets(SecretGenerator.password(32), secrets.smtpPassword(), secrets.integrationSecretKey());
+                    secrets = new Secrets(SecretGenerator.password(32), secrets.smtpPassword(), secrets.integrationSecretKey(),
+                            secrets.ssoClientSecret());
                     adminSecrets = new AdminSecrets(SecretGenerator.password(32), SecretGenerator.password(32));
                 }
                 Out.ok("Database jtrac with roles jtrac_owner (migrations) and jtrac_app (application); random passwords "
@@ -132,7 +136,7 @@ final class SetupWizard {
                 config = config.withDatabase(new ServerConfig.Database(DatabaseMode.EXTERNAL, host, port, name, app, owner, ssl));
                 String ownerPassword = p.askSecret("database.owner-password", "JTRAC_DB_OWNER_PASSWORD", "Password of " + owner, false, false, null);
                 String appPassword = p.askSecret("database.app-password", "JTRAC_DB_APP_PASSWORD", "Password of " + app, false, false, null);
-                secrets = new Secrets(appPassword, secrets.smtpPassword(), secrets.integrationSecretKey());
+                secrets = new Secrets(appPassword, secrets.smtpPassword(), secrets.integrationSecretKey(), secrets.ssoClientSecret());
                 adminSecrets = new AdminSecrets(ownerPassword, "");
                 if (p.askYesNo("database.provision", "Create the roles, database and schema now with an administrator account", false)) {
                     String adminUser = p.ask("database.admin-user", "Administrator role (used once, not stored)", "postgres", null);
@@ -150,7 +154,8 @@ final class SetupWizard {
                     + config.database().port() + ").");
         }
         if (secrets.integrationSecretKey().isBlank()) {
-            secrets = new Secrets(secrets.databasePassword(), secrets.smtpPassword(), SecretGenerator.key256());
+            secrets = new Secrets(secrets.databasePassword(), secrets.smtpPassword(), SecretGenerator.key256(),
+                    secrets.ssoClientSecret());
         }
 
         // 4. Initial administrator
@@ -189,15 +194,22 @@ final class SetupWizard {
         Out.step(8, STAGES, "Accounts and sessions");
         config = config.withSecurity(Sections.security(p, config.security()));
 
-        // 9. Storage (and optional legal details)
-        Out.step(9, STAGES, "Attachments, backups and logs");
+        // 9. Single sign-on (optional)
+        Out.step(9, STAGES, "Single sign-on (optional)");
+        Sections.Sso sso = Sections.sso(p, config.sso(), secrets.ssoClientSecret(), config.http().publicUrl(),
+                admin == null ? "" : admin.email().substring(admin.email().indexOf('@') + 1));
+        config = config.withSso(sso.settings());
+        secrets = secrets.withSsoClientSecret(sso.clientSecret());
+
+        // 10. Storage (and optional legal details)
+        Out.step(10, STAGES, "Attachments, backups and logs");
         config = config.withStorage(Sections.storage(p, config.storage(), installation.data()));
         if (p.askYesNo("legal.configure", "Enter the operator details for the legal pages now", false)) {
             config = config.withLegal(Sections.legal(p, config.legal()));
         }
 
-        // 10. Review
-        Out.step(10, STAGES, "Review");
+        // 11. Review
+        Out.step(11, STAGES, "Review");
         printSummary(config, admin);
         List<Problem> problems = ConfigValidator.validate(config, secrets);
         problems.stream().filter(Problem::isError).forEach(e -> Out.fail(e.field() + ": " + e.message()));
@@ -209,8 +221,8 @@ final class SetupWizard {
             return 1;
         }
 
-        // 11. Save, provision, migrate, create the administrator
-        Out.step(11, STAGES, "Database and secure bootstrap");
+        // 12. Save, provision, migrate, create the administrator
+        Out.step(12, STAGES, "Database and secure bootstrap");
         for (String dir : List.of(config.storage().attachmentsDir(), config.storage().backupDir(), config.storage().logDir())) {
             Files.createDirectories(Path.of(dir));
         }
@@ -232,8 +244,8 @@ final class SetupWizard {
         }
         installation.markStep("complete");
 
-        // 12. Start and health check
-        Out.step(12, STAGES, "Start JTRAC");
+        // 13. Start and health check
+        Out.step(13, STAGES, "Start JTRAC");
         boolean start = startWhenDone && p.askYesNo("start", "Start JTRAC now", true);
         if (start) {
             int code = new Lifecycle(installation).start(Duration.ofMinutes(3));
@@ -242,11 +254,15 @@ final class SetupWizard {
             }
         }
 
-        // 13. Done
-        Out.step(13, STAGES, "Done");
+        // 14. Done
+        Out.step(14, STAGES, "Done");
         Out.ok("JTRAC is set up. Open " + config.http().publicUrl() + " and sign in" + (admin == null ? "." : " as " + admin.email() + "."));
         if (!config.smtp().enabled()) {
             Out.warn("Email is pending: set it up later with `jtrac configure smtp` or in Server settings.");
+        }
+        if (config.sso().enabled()) {
+            Out.info("Single sign-on: the sign-in page offers \"Sign in with " + config.sso().providerName() + "\". The provider must "
+                    + "allow the redirect URI " + config.sso().redirectUri(config.http().publicUrl()));
         }
         Out.info("Commands: jtrac status | stop | start | logs | backup | configure | test-email");
         Out.info("Start automatically: jtrac service install");
@@ -317,7 +333,8 @@ final class SetupWizard {
                 new ServerConfig.Security(ServerConfig.RegistrationMode.INVITE_ONLY, 8),
                 new ServerConfig.Storage(data.resolve("attachments").toString(), data.resolve("backups").toString(),
                         data.resolve("logs").toString()),
-                ServerConfig.Legal.EMPTY);
+                ServerConfig.Legal.EMPTY,
+                ServerConfig.Sso.DISABLED);
     }
 
     private static void printSummary(ServerConfig c, Admin admin) {
@@ -329,6 +346,9 @@ final class SetupWizard {
                 + (c.smtp().auth() ? " as " + c.smtp().username() : " (no sign-in)") + ", from " + c.smtp().fromAddress()
                 : "pending (not configured)"));
         Out.info("Accounts:   " + c.security().registrationMode() + ", sessions " + c.security().sessionTimeoutHours() + " h");
+        Out.info("SSO:        " + (c.sso().enabled() ? c.sso().providerName() + " (" + c.sso().issuerUri() + "), "
+                + (c.sso().autoProvision() ? "creates accounts" : "existing accounts only")
+                + (c.sso().allowedDomains().isBlank() ? "" : ", domains " + c.sso().allowedDomains()) : "off"));
         Out.info("Storage:    attachments " + c.storage().attachmentsDir());
         Out.info("            backups " + c.storage().backupDir() + ", logs " + c.storage().logDir());
         if (admin != null) {

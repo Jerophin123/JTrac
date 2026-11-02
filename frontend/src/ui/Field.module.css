@@ -131,7 +131,7 @@
   inset-block: 1px;
   inset-inline: 3px;
   z-index: -1;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-sm);
   transform: skewX(var(--slant));
 }
 

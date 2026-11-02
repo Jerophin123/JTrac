@@ -19,6 +19,9 @@ dependencies {
     implementation(project(":serverconfig"))
     implementation(platform(libs.spring.boot.bom))
     implementation(libs.postgresql)
+    // Full-screen setup (keyboard and mouse). FFM provider: pure Java native access on JDK 22+.
+    implementation(libs.jline.terminal)
+    runtimeOnly(libs.jline.terminal.ffm)
 
     testImplementation(platform(libs.spring.boot.bom))
     testImplementation(libs.junit.jupiter)

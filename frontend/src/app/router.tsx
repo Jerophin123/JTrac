@@ -11,11 +11,13 @@ import {
 } from '@tanstack/react-router';
 import { orgQuery, projectQuery } from '../api/queries';
 import { AppearancePage, PrivacyPage as AccountPrivacyPage, ProfilePage, TokensPage } from '../features/account/AccountPages';
+import { ShortcutsPage } from '../features/account/ShortcutsPage';
+import { AboutPage } from '../features/about/AboutPage';
 import { ConsentGate } from '../features/legal/ConsentGate';
 import { AgentConnectionsPage } from '../features/agents/AgentConnectionsPage';
 import { ConnectAgentPage } from '../features/agents/ConnectAgentPage';
-import { ServerSettingsPage } from '../features/system/ServerSettingsPage';
-import { GrievancePage, PrivacyPage, TermsPage } from '../features/legal/LegalPages';
+import { ServerEmailPage, ServerOverviewPage } from '../features/system/ServerSettingsPage';
+import { CookiePolicyPage, GrievancePage, PrivacyPage, TermsPage } from '../features/legal/LegalPages';
 import { AcceptInvitePage, ForgotPasswordPage, RegisterPage, ResetPasswordPage, VerifyEmailPage } from '../features/auth/AccountFlows';
 import { LoginPage } from '../features/auth/LoginPage';
 import { SetupPage } from '../features/auth/SetupPage';
@@ -63,6 +65,8 @@ const rootRoute = createRootRouteWithContext<RouterContext>()({
 interface LoginSearch {
   redirect?: string;
   signedOut?: boolean;
+  /** Code from a failed single sign-on attempt, set by the server's redirect. */
+  sso?: string;
 }
 
 const setupRoute = createRoute({
@@ -97,6 +101,7 @@ const loginRoute = createRoute({
   validateSearch: (search: Record<string, unknown>): LoginSearch => ({
     redirect: safeRedirect(search.redirect),
     signedOut: search.signedOut === true || search.signedOut === 'true' ? true : undefined,
+    sso: typeof search.sso === 'string' && /^[a-z_]{1,40}$/.test(search.sso) ? search.sso : undefined,
   }),
   beforeLoad: async ({ context, search }) => {
     try {
@@ -116,7 +121,7 @@ const loginRoute = createRoute({
   },
   component: function LoginRoute() {
     const search = loginRoute.useSearch();
-    return <LoginPage redirectTo={search.redirect} signedOut={search.signedOut === true} />;
+    return <LoginPage redirectTo={search.redirect} signedOut={search.signedOut === true} ssoError={search.sso} />;
   },
 });
 
@@ -128,6 +133,7 @@ const tokenSearch = (search: Record<string, unknown>): { token?: string } => ({
 const termsRoute = createRoute({ getParentRoute: () => rootRoute, path: '/legal/terms', component: TermsPage });
 const privacyRoute = createRoute({ getParentRoute: () => rootRoute, path: '/legal/privacy', component: PrivacyPage });
 const grievanceRoute = createRoute({ getParentRoute: () => rootRoute, path: '/legal/grievance', component: GrievancePage });
+const cookiesRoute = createRoute({ getParentRoute: () => rootRoute, path: '/legal/cookies', component: CookiePolicyPage });
 const registerRoute = createRoute({ getParentRoute: () => rootRoute, path: '/register', component: RegisterPage });
 const forgotRoute = createRoute({ getParentRoute: () => rootRoute, path: '/forgot-password', component: ForgotPasswordPage });
 const resetRoute = createRoute({
@@ -223,7 +229,19 @@ const agentConnectionsRoute = createRoute({
   component: AgentConnectionsPage,
 });
 const appearanceRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/account/appearance', component: AppearancePage });
-const serverSettingsRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/server/settings', component: ServerSettingsPage });
+const shortcutsRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/account/shortcuts', component: ShortcutsPage });
+const aboutRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/account/about', component: AboutPage });
+// Server administration lives in Your account › Server; the old address still works.
+const serverSettingsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: '/server/settings',
+  beforeLoad: () => {
+    // eslint-disable-next-line @typescript-eslint/only-throw-error -- TanStack Router control flow
+    throw redirect({ to: '/account/server/email', replace: true });
+  },
+});
+const serverOverviewRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/account/server', component: ServerOverviewPage });
+const serverEmailRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/account/server/email', component: ServerEmailPage });
 const accountPrivacyRoute = createRoute({ getParentRoute: () => authenticatedRoute, path: '/account/privacy', component: AccountPrivacyPage });
 
 /** Loads a resource for a route; a 404 from the API renders the not-found screen. */
@@ -360,6 +378,7 @@ const routeTree = rootRoute.addChildren([
   termsRoute,
   privacyRoute,
   grievanceRoute,
+  cookiesRoute,
   connectAgentRoute,
   authenticatedRoute.addChildren([
     indexRoute,
@@ -368,8 +387,12 @@ const routeTree = rootRoute.addChildren([
     tokensRoute,
     agentConnectionsRoute,
     appearanceRoute,
+    shortcutsRoute,
+    aboutRoute,
     accountPrivacyRoute,
     serverSettingsRoute,
+    serverOverviewRoute,
+    serverEmailRoute,
     orgRoute.addChildren([
       myWorkRoute,
       projectsRoute,

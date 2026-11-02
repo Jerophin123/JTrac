@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CircleAlert, CircleCheck, CircleMinus, CircleX, Mail, Send, Server } from 'lucide-react';
+import { CircleAlert, CircleCheck, CircleMinus, CircleX, Send, Server } from 'lucide-react';
 import { useState } from 'react';
 import { call } from '../../api/call';
 import { api } from '../../api/client';
@@ -11,7 +11,8 @@ import { Button } from '../../ui/Button';
 import { Input, Select } from '../../ui/Field';
 import { Skeleton } from '../../ui/Page';
 import { PasswordField } from '../../ui/PasswordField';
-import { SaveBar, SettingRow, SettingsCard, SettingsLayout, SettingsSection } from '../../ui/Settings';
+import { SaveBar, SettingRow, SettingsCard, SettingsSection } from '../../ui/Settings';
+import { AccountLayout } from '../account/AccountPages';
 import { Switch } from '../../ui/Switch';
 import { useToast } from '../../ui/Toast';
 import { publicConfigQueryOptions, sessionQueryOptions } from '../auth/session';
@@ -26,18 +27,17 @@ const infoQuery = { queryKey: ['system', 'info'] as const, queryFn: () => call((
 
 const DEFAULT_PORT: Record<TlsMode, number> = { STARTTLS: 587, IMPLICIT: 465, NONE: 25 };
 
-/** Server-wide settings for server administrators; the server enforces who may use them. */
-export function ServerSettingsPage() {
+/*
+ * Server-wide settings for server administrators, shown in Your account › Server. The server
+ * enforces who may read or change them; the navigation only hides them from everyone else.
+ */
+
+/** Your account › Server › Server overview: version, public address and runtime. */
+export function ServerOverviewPage() {
   const info = useQuery(infoQuery);
-  const mail = useQuery(mailQuery);
   return (
-    <SettingsLayout
-      title="Server settings"
-      navLabel="Server settings"
-      context={<span>Applies to everyone on this JTRAC server</span>}
-      groups={[{ label: 'Server', items: [{ label: 'Outgoing email', icon: <Mail size={16} />, link: { to: '/server/settings' }, exact: true }] }]}
-    >
-      <SettingsSection title="About this server" description="The address used in links in emails, and the software version.">
+    <AccountLayout>
+      <SettingsSection title="About this server" description="Applies to everyone on this JTRAC server: the address used in links in emails, and the software version.">
         <SettingsCard>
           {info.isPending && <Skeleton lines={2} />}
           {info.isError && <Alert tone="danger">{describeError(info.error)}</Alert>}
@@ -56,10 +56,19 @@ export function ServerSettingsPage() {
           <p className={styles.hint}>Change the address, port or database with the <code>jtrac configure</code> command on the server.</p>
         </SettingsCard>
       </SettingsSection>
+    </AccountLayout>
+  );
+}
+
+/** Your account › Server › Outgoing email: SMTP settings, a test email, and the queue. */
+export function ServerEmailPage() {
+  const mail = useQuery(mailQuery);
+  return (
+    <AccountLayout>
       {mail.isPending && <Skeleton lines={6} />}
       {mail.isError && <Alert tone="danger">{describeError(mail.error)}</Alert>}
       {mail.data && <MailSettingsForm view={mail.data} />}
-    </SettingsLayout>
+    </AccountLayout>
   );
 }
 

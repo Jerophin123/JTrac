@@ -38,7 +38,8 @@ export function LogoMark({ size = 28, className, style, ...rest }: { size?: numb
       className={`${styles.svg} ${className ?? ''}`}
       width={size}
       height={size}
-      viewBox="0 1500 12540 8500"
+      // Frames the whole mark, including the top of the upper stroke (as docs/assets/jtrac-mark-*.svg).
+      viewBox="488 -2833 11701 11946"
       role="img"
       aria-label="JTRAC Mark"
       focusable="false"

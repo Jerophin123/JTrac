@@ -75,7 +75,8 @@ Credentials or tokens in `localStorage`/`sessionStorage` are exposed to any XSS.
   it is **not secure by default** and must be set to `true` for every HTTPS deployment.
 - Argon2id (with rehash-on-login via `DelegatingPasswordEncoder.upgradeEncoding`) is
   the intended upgrade from bcrypt.
-- No MFA, SSO (OIDC) or account recovery yet.
+- No MFA or account recovery yet. SSO over OpenID Connect was added later (ADR 0011); it
+  ends in the same session.
 
 ## Alternatives considered
 

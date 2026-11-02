@@ -40,7 +40,8 @@ final class Maintenance {
                 new String[] {"smtp", "Outgoing email (SMTP)"},
                 new String[] {"security", "Account registration and session length"},
                 new String[] {"storage", "Attachment, backup and log directories"},
-                new String[] {"legal", "Operator details for the legal pages"}), "smtp") : section;
+                new String[] {"legal", "Operator details for the legal pages"},
+                new String[] {"sso", "Single sign-on (OpenID Connect identity provider)"}), "smtp") : section;
         boolean running = new ServerProcess(installation).running().isPresent();
         switch (which) {
             case "http" -> config = config.withHttp(Sections.http(prompter, config.http(), !running));
@@ -52,7 +53,12 @@ final class Maintenance {
             case "security" -> config = config.withSecurity(Sections.security(prompter, config.security()));
             case "storage" -> config = config.withStorage(Sections.storage(prompter, config.storage(), installation.data()));
             case "legal" -> config = config.withLegal(Sections.legal(prompter, config.legal()));
-            default -> throw new SetupException("Unknown section '" + which + "'. Use http, smtp, security, storage or legal.");
+            case "sso" -> {
+                Sections.Sso sso = Sections.sso(prompter, config.sso(), secrets.ssoClientSecret(), config.http().publicUrl(), "");
+                config = config.withSso(sso.settings());
+                secrets = secrets.withSsoClientSecret(sso.clientSecret());
+            }
+            default -> throw new SetupException("Unknown section '" + which + "'. Use http, smtp, security, storage, legal or sso.");
         }
         List<Problem> problems = ConfigValidator.validate(config, secrets);
         problems.stream().filter(Problem::isError).forEach(e -> Out.fail(e.field() + ": " + e.message()));

@@ -161,6 +161,22 @@ jtac:
     access-token-ttl: 1h
     refresh-token-ttl: 30d
     requests-per-minute: ${JTRAC_MCP_REQUESTS_PER_MINUTE:240}
+  utcp:
+    # AI agent connections (UTCP, Experimental, docs/utcp.md). Universal Tool Calling Protocol
+    # provider for direct native tool discovery and execution.
+    enabled: ${JTRAC_UTCP_ENABLED:true}
+    requests-per-minute: ${JTRAC_UTCP_REQUESTS_PER_MINUTE:240}
+    experimental: true
+  sso:
+    # Enterprise Single Sign-On over OpenID Connect (docs/sso.md). Offered only while a provider
+    # is registered under spring.security.oauth2.client.* (Entra ID, Okta, Keycloak, Google, ...).
+    enabled: ${JTRAC_SSO_ENABLED:true}
+    # Create accounts on first SSO sign-in. Off: only existing accounts (matched by verified email) can use SSO.
+    auto-provision: ${JTRAC_SSO_AUTO_PROVISION:false}
+    # Comma-separated email domains accepted from the provider; empty accepts any.
+    allowed-domains: ${JTRAC_SSO_ALLOWED_DOMAINS:}
+    # Accept email claims without email_verified=true (single-tenant directories only; see docs/sso.md).
+    trust-unverified-email: ${JTRAC_SSO_TRUST_UNVERIFIED_EMAIL:false}
   integrations:
     # Base64 32-byte key encrypting webhook secrets. Without it a development key is
     # generated into ./data/secret.key (the prod profile requires it).

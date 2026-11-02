@@ -23,6 +23,7 @@ Compatibility rationale: ADR 0003.
 | `spring-modulith-api` | 2.1.2 | `@ApplicationModule` metadata |
 | `spring-boot-starter-webmvc` | managed | REST API, static SPA |
 | `spring-boot-starter-security` | managed (Security 7.1.2) | session auth, CSRF, headers |
+| `spring-boot-starter-oauth2-client` | managed (Security OAuth2 7.1.2; Nimbus `oauth2-oidc-sdk` 11.38.2, `nimbus-jose-jwt` 10.9.1) (added 2026-11-02) | enterprise SSO over OpenID Connect (ADR 0011, `sso.md`) |
 | `spring-boot-starter-validation` | managed | Bean Validation of requests |
 | `spring-boot-starter-actuator` | managed | liveness/readiness probes |
 | `spring-boot-starter-data-jpa` | managed (Hibernate 7.4.13) | persistence |
@@ -32,6 +33,7 @@ Compatibility rationale: ADR 0003.
 | `spring-modulith-starter-test` | 2.1.2 | module verification and docs |
 | `angus-mail` (in `serverconfig`) | managed (2.0.5) | SMTP client for delivery and test emails (Jakarta Mail implementation already used by `spring-boot-starter-mail`) |
 | `greenmail-junit5` (test) | 2.1.14 | in-process SMTP server for mail integration tests |
+| `org.jline:jline-terminal` + `jline-terminal-ffm` (launcher) | 4.4.8 (added 2026-11-02, released 2026-10-11) | full-screen setup: raw terminal input, mouse (SGR, also the Windows console), resize. Java 11+; the FFM provider needs JDK 22+ and `--enable-native-access` (set in the `jtrac` scripts). `jline-terminal` brings `jline-native` 4.4.8 (optional JNI libraries; the launcher selects the `ffm,exec` providers, so none is extracted). BSD-3-Clause. Verified on Maven Central (POMs) and the project's release notes |
 | `io.modelcontextprotocol.sdk:mcp-core` + `mcp-json-jackson3` | 2.1.0 (added 2026-10-28) | official MCP Java SDK: stateless Streamable HTTP servlet transport, schema types, tool input validation (ADR 0010). Brings `reactor-core` (Boot-managed 3.8.8) and `com.networknt:json-schema-validator` 3.0.6; its Jackson 3 module uses Boot's `jackson-databind` 3.1.7 (built against 3.1.4). Verified on Maven Central and by integration tests plus an end-to-end run with the official MCP TypeScript SDK 1.32.2 client |
 
 ## Packaging (release builds only, 2026-10-26)

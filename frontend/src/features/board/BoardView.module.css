@@ -110,6 +110,34 @@
   cursor: grabbing;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .cardBody {
+    transition:
+      transform var(--duration-base) var(--ease-spring),
+      border-color var(--duration-fast) var(--ease-out),
+      box-shadow var(--duration-base) var(--ease-out);
+  }
+
+  .card:hover .cardBody {
+    transform: translateY(-1px);
+  }
+
+  .card[data-dragging] {
+    transition: opacity var(--duration-base) var(--ease-out);
+  }
+
+  /* Picked up: a slight tilt, as if held between two fingers. */
+  .overlay {
+    animation: pickUp var(--duration-base) var(--ease-spring) forwards;
+  }
+}
+
+@keyframes pickUp {
+  to {
+    transform: rotate(-2deg) scale(1.02);
+  }
+}
+
 .cardTop {
   display: flex;
   align-items: center;
@@ -172,7 +200,7 @@
   inline-size: 1.5rem;
   block-size: 1.5rem;
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-shape-xs);
   background: transparent;
   color: var(--color-text-muted);
   cursor: pointer;

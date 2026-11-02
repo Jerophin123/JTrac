@@ -58,10 +58,19 @@ public final class ConfigMapper {
     public static final String LEGAL_GRIEVANCE_NAME = "jtac.legal.grievance-officer-name";
     public static final String LEGAL_GRIEVANCE_EMAIL = "jtac.legal.grievance-officer-email";
     public static final String LEGAL_JURISDICTION = "jtac.legal.jurisdiction";
+    // Single sign-on (docs/sso.md). The provider id marks the one registration this model manages.
+    public static final String SSO_PROVIDER_ID = "jtrac.sso.provider-id";
+    public static final String SSO_AUTO_PROVISION = "jtac.sso.auto-provision";
+    public static final String SSO_ALLOWED_DOMAINS = "jtac.sso.allowed-domains";
+    public static final String SSO_TRUST_UNVERIFIED_EMAIL = "jtac.sso.trust-unverified-email";
+    public static final String OIDC_REGISTRATION = "spring.security.oauth2.client.registration.";
+    public static final String OIDC_PROVIDER = "spring.security.oauth2.client.provider.";
     // Secrets (secrets.properties)
     public static final String DATASOURCE_PASSWORD = "spring.datasource.password";
     public static final String MAIL_PASSWORD = "jtac.mail.smtp.password";
     public static final String INTEGRATION_KEY = "jtac.integrations.secret-key";
+    /** The registration's client-secret refers to this key, so the secret stays in secrets.properties. */
+    public static final String SSO_CLIENT_SECRET = "jtac.sso.client-secret";
     // Administration secrets (admin-secrets.properties, launcher only)
     public static final String DB_OWNER_PASSWORD = "jtrac.database.owner-password";
     public static final String DB_SUPERUSER_PASSWORD = "jtrac.database.superuser-password";
@@ -119,6 +128,21 @@ public final class ConfigMapper {
         out.put(LEGAL_GRIEVANCE_NAME, legal.grievanceOfficerName());
         out.put(LEGAL_GRIEVANCE_EMAIL, legal.grievanceOfficerEmail());
         out.put(LEGAL_JURISDICTION, legal.jurisdiction());
+
+        ServerConfig.Sso sso = config.sso();
+        out.put(SSO_PROVIDER_ID, sso.enabled() ? sso.providerId() : "");
+        out.put(SSO_AUTO_PROVISION, Boolean.toString(sso.enabled() && sso.autoProvision()));
+        out.put(SSO_ALLOWED_DOMAINS, sso.enabled() ? sso.allowedDomains() : "");
+        out.put(SSO_TRUST_UNVERIFIED_EMAIL, Boolean.toString(sso.enabled() && sso.trustUnverifiedEmail()));
+        if (sso.enabled()) {
+            String registration = OIDC_REGISTRATION + sso.providerId() + ".";
+            out.put(registration + "client-name", sso.providerName());
+            out.put(registration + "client-id", sso.clientId());
+            out.put(registration + "client-secret", "${" + SSO_CLIENT_SECRET + ":}");
+            out.put(registration + "authorization-grant-type", "authorization_code");
+            out.put(registration + "scope", "openid,email,profile");
+            out.put(OIDC_PROVIDER + sso.providerId() + ".issuer-uri", sso.issuerUri());
+        }
         // Production hardening, always on for installed servers (development uses application.yaml).
         out.put("jtac.integrations.require-secret-key", "true");
         out.put("jtac.integrations.allow-private-networks", "false");
@@ -134,7 +158,7 @@ public final class ConfigMapper {
                 new ServerConfig.Http("127.0.0.1", 1, "", false),
                 new ServerConfig.Database(DatabaseMode.MANAGED, "127.0.0.1", 1, "x", "a", "o", ""),
                 smtp, new ServerConfig.Security(ServerConfig.RegistrationMode.INVITE_ONLY, 8),
-                new ServerConfig.Storage("", "", ""), ServerConfig.Legal.EMPTY));
+                new ServerConfig.Storage("", "", ""), ServerConfig.Legal.EMPTY, ServerConfig.Sso.DISABLED));
         Map<String, String> out = new LinkedHashMap<>();
         for (String key : SMTP_KEYS) {
             out.put(key, all.get(key));
@@ -189,7 +213,28 @@ public final class ConfigMapper {
         ServerConfig.Legal legal = new ServerConfig.Legal(
                 get(p, LEGAL_OPERATOR_NAME, ""), get(p, LEGAL_OPERATOR_ADDRESS, ""), get(p, LEGAL_CONTACT_EMAIL, ""),
                 get(p, LEGAL_GRIEVANCE_NAME, ""), get(p, LEGAL_GRIEVANCE_EMAIL, ""), get(p, LEGAL_JURISDICTION, ""));
-        return new ServerConfig(http, db, smtp, security, storage, legal);
+        return new ServerConfig(http, db, smtp, security, storage, legal, ssoFromProperties(p));
+    }
+
+    private static ServerConfig.Sso ssoFromProperties(Map<String, String> p) {
+        String id = get(p, SSO_PROVIDER_ID, "");
+        String registration = OIDC_REGISTRATION + id + ".";
+        if (id.isEmpty() || get(p, registration + "client-id", "").isEmpty()) {
+            return ServerConfig.Sso.DISABLED;
+        }
+        return new ServerConfig.Sso(true, id, get(p, registration + "client-name", id),
+                get(p, OIDC_PROVIDER + id + ".issuer-uri", ""), get(p, registration + "client-id", ""),
+                Boolean.parseBoolean(get(p, SSO_AUTO_PROVISION, "false")), get(p, SSO_ALLOWED_DOMAINS, ""),
+                Boolean.parseBoolean(get(p, SSO_TRUST_UNVERIFIED_EMAIL, "false")));
+    }
+
+    /**
+     * Whether {@code key} belongs to the managed provider {@code providerId}; such keys are
+     * removed before saving, so turning SSO off or renaming the provider leaves nothing behind.
+     */
+    public static boolean isSsoProviderKey(String key, String providerId) {
+        return !providerId.isBlank()
+                && (key.startsWith(OIDC_REGISTRATION + providerId + ".") || key.startsWith(OIDC_PROVIDER + providerId + "."));
     }
 
     public static Map<String, String> toProperties(Secrets secrets) {
@@ -197,11 +242,13 @@ public final class ConfigMapper {
         out.put(DATASOURCE_PASSWORD, nullToEmpty(secrets.databasePassword()));
         out.put(MAIL_PASSWORD, nullToEmpty(secrets.smtpPassword()));
         out.put(INTEGRATION_KEY, nullToEmpty(secrets.integrationSecretKey()));
+        out.put(SSO_CLIENT_SECRET, nullToEmpty(secrets.ssoClientSecret()));
         return out;
     }
 
     public static Secrets secretsFromProperties(Map<String, String> p) {
-        return new Secrets(get(p, DATASOURCE_PASSWORD, ""), get(p, MAIL_PASSWORD, ""), get(p, INTEGRATION_KEY, ""));
+        return new Secrets(get(p, DATASOURCE_PASSWORD, ""), get(p, MAIL_PASSWORD, ""), get(p, INTEGRATION_KEY, ""),
+                get(p, SSO_CLIENT_SECRET, ""));
     }
 
     public static Map<String, String> toProperties(AdminSecrets secrets) {

@@ -29,7 +29,7 @@ backend (`:8080`), so the browser still sees a single origin.
 | Module | Status | Responsibility | May depend on |
 |---|---|---|---|
 | `shared` (OPEN) | **M1** | UUIDv7 ids, RFC 9457 problems, request ids, migration settings, SPA delivery | none |
-| `identity` | **M1** | user accounts, password hashing, login/logout/session, HTTP security, login throttling, admin CLI | shared |
+| `identity` | **M1** | user accounts, password hashing, login/logout/session, HTTP security, login throttling, enterprise SSO over OIDC (ADR 0011), admin CLI | shared |
 | `organization` | M2 | organizations (tenants), memberships, teams, invitations | identity, shared |
 | `project` | M3 | projects/spaces, project roles, permission schemes, keys & sequences | organization |
 | `workflow` | M3 | versioned workflows, statuses (with categories), role-based transitions, field rules (hidden/read-only/optional/mandatory) | project, field |

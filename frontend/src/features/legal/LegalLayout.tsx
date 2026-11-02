@@ -1,5 +1,5 @@
 import { Link, useRouterState } from '@tanstack/react-router';
-import { ArrowLeft, FileText, Scale, ShieldCheck, TriangleAlert } from 'lucide-react';
+import { ArrowLeft, Cookie, FileText, Scale, ShieldCheck, TriangleAlert } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ThemeSwitcher } from '../../app/shell/ThemeSwitcher';
@@ -13,6 +13,7 @@ import styles from './LegalPages.module.css';
 const DOCUMENTS = [
   { to: '/legal/terms', label: 'Terms of Service', Icon: FileText },
   { to: '/legal/privacy', label: 'Privacy Notice', Icon: ShieldCheck },
+  { to: '/legal/cookies', label: 'Cookie Policy', Icon: Cookie },
   { to: '/legal/grievance', label: 'Grievance Redressal', Icon: Scale },
 ] as const;
 
